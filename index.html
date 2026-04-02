@@ -66,7 +66,8 @@
             top: 0;
             left: 0;
             z-index: 300;
-            background: #000;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
             width: 100%;
             height: 100%;
             display: flex;
@@ -521,7 +522,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 19:48 (JST)
+                最終更新: 2026/04/02 20:01 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -990,11 +991,11 @@
                 showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
                 const status = document.getElementById('file-status');
                 stopTitleBGM();
+                localVideo.style.opacity = "0.6"; // 即座に透過させて背景を見せる
                 localVideo.src = s.video;
                 localVideo.oncanplaythrough = () => {
                     hideLoading();
                     status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
-                    localVideo.style.opacity = "0.6"; // 選曲画面ではプレビューとして透過
                     localVideo.play().catch(() => console.log("Auto-preview blocked"));
                     localVideo.oncanplaythrough = null;
                 };
