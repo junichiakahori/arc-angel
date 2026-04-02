@@ -541,7 +541,7 @@
                     <p class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/02 21:21 (JST)
+                        最終更新: 2026/04/02 21:30 (JST)
                     </p>
                 </div>
 
@@ -1034,7 +1034,7 @@
 
                 // API fetch replaced by JSON fetch
                 try {
-                    const r = await fetch('assets/songs.json');
+                    const r = await fetch('assets/songs.json?v=' + Date.now());
                     if (!r.ok) throw new Error("JSON not found");
                     AUTO_SONG_LIST = await r.json();
                     renderList(AUTO_SONG_LIST);
@@ -1108,7 +1108,7 @@
                 }
                 showLoading("譜面を取得中...");
                 try {
-                    const r = await fetch(chartUrl);
+                    const r = await fetch(chartUrl + (chartUrl.includes('?') ? '&' : '?') + 'v=' + Date.now());
                     const txt = await r.text();
                     document.getElementById('chart-input').value = txt;
                     recordedChart = JSON.parse(txt.replace(/^const CHART = /, '').replace(/;$/, ''));
