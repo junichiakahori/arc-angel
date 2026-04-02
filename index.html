@@ -276,59 +276,87 @@
             align-items: center;
         }
 
-        /* 譜面作成用の操作パネル (超極薄ツールバー形式) */
+        /* 譜面作成用の操作パネル (左右分散・中央開放) */
         #editor-controls {
-            position: fixed;
-            bottom: max(0px, env(safe-area-inset-bottom));
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 8px 12px;
-            z-index: 500;
             display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            pointer-events: none;
+            /* 中央部を透過 */
+        }
+
+        #editor-timeline-panel {
+            position: fixed;
+            bottom: max(10px, env(safe-area-inset-bottom) + 10px);
+            left: 10px;
+            width: 260px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 8px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+            display: flex;
             flex-direction: column;
-            gap: 6px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        #editor-timeline {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 2px 8px;
-            border-radius: 8px;
-        }
-
-        .editor-btn-row {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
             gap: 4px;
-            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        #editor-actions {
+            position: fixed;
+            bottom: max(10px, env(safe-area-inset-bottom) + 10px);
+            right: 10px;
+            display: grid;
+            grid-template-cols: repeat(2, 110px);
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         }
 
         #editor-controls button {
-            @apply flex-1 py-1 rounded-lg text-[8px] font-black italic shadow-md active:scale-95 transition-all text-center flex items-center justify-center gap-1 opacity-90 hover:opacity-100;
-            height: 28px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+            @apply py-1.5 rounded-xl text-[9px] font-black italic shadow-md active:scale-95 transition-all text-center flex items-center justify-center gap-1 leading-none;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.3);
             white-space: nowrap;
         }
 
-        #editor-controls .status-box {
+        #editor-timeline {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 0 4px;
-            margin-bottom: 2px;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 10px;
         }
 
-        @media (max-width: 500px) {
-            #editor-controls {
-                padding: 6px 8px;
+        #editor-seek-bar {
+            height: 20px;
+            flex: 1;
+        }
+
+        @media (max-width: 650px) {
+            #editor-timeline-panel {
+                width: 180px;
+                bottom: 5px;
+                left: 5px;
+                padding: 6px;
+            }
+
+            #editor-actions {
+                grid-template-cols: repeat(2, 80px);
+                bottom: 5px;
+                right: 5px;
+                padding: 6px;
+            }
+
+            #editor-controls button {
+                text-[8px];
+                py-1;
             }
         }
 
@@ -380,7 +408,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 16:00 (JST)
+                最終更新: 2026/04/02 16:05 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -528,50 +556,49 @@
             <button onclick="backToTitle()" class="btn-action btn-secondary">タイトルに戻る</button>
         </div>
 
-        <!-- エディター操作パネル -->
-        <!-- 譜面作成用の操作パネル (最下部フローティング) -->
+        <!-- 譜面作成用の操作パネル (左右分散・中央開放) -->
         <div id="editor-controls">
-            <!-- タイムライン -->
-            <div id="editor-timeline">
-                <span id="editor-time-display" class="text-[10px] text-blue-300 font-mono w-10 text-right">0.00s</span>
-                <input type="range" id="editor-seek-bar" min="0" max="100" step="0.01" value="0"
-                    class="flex-1 m-0 h-4 bg-white/10 rounded-full appearance-none cursor-pointer"
-                    oninput="seekVideo(this.value)" onmousedown="seekVideoStart()" onmouseup="seekVideoEnd()"
-                    ontouchstart="seekVideoStart()" ontouchend="seekVideoEnd()">
-            </div>
-
-            <!-- ステータス & 補助操作 -->
-            <div id="editor-status-bar" class="flex items-center justify-between px-1">
-                <div class="flex items-center gap-2">
-                    <div id="rec-lamp" class="w-2 h-2 rounded-full bg-gray-600"></div>
-                    <span id="edit-status"
-                        class="text-[9px] font-black italic text-gray-400 tracking-widest uppercase">Recording
-                        Ready</span>
+            <!-- 左側パネル: タイムライン & ステータス -->
+            <div id="editor-timeline-panel">
+                <div id="editor-timeline">
+                    <span id="editor-time-display"
+                        class="text-[10px] text-blue-300 font-mono w-10 text-right">0.00s</span>
+                    <input type="range" id="editor-seek-bar" min="0" max="100" step="0.01" value="0"
+                        class="bg-white/10 rounded-full appearance-none cursor-pointer" oninput="seekVideo(this.value)"
+                        onmousedown="seekVideoStart()" onmouseup="seekVideoEnd()" ontouchstart="seekVideoStart()"
+                        ontouchend="seekVideoEnd()">
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="toggleEditorPause()"
-                        class="bg-white/10 px-3 py-1 rounded-md text-[10px] border border-white/5">⏸️/▶️</button>
-                    <button onclick="promptDeleteNote()"
-                        class="bg-red-900/40 text-red-200 border border-red-500/30 px-3 py-1 rounded-md text-[9px] font-bold">付近削除</button>
-                    <button onclick="backToTitle()"
-                        class="bg-gray-800 border border-white/10 px-3 py-1 rounded-md text-[9px] font-bold">戻る</button>
+                <div id="editor-status-row" class="flex items-center justify-between px-1">
+                    <div class="flex items-center gap-2">
+                        <div id="rec-lamp" class="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                        <span id="edit-status"
+                            class="text-[8px] font-black italic text-gray-400 uppercase tracking-tighter">Ready</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="toggleEditorPause()"
+                            class="bg-white/10 px-2 py-0.5 rounded text-[8px]">⏸️/▶️</button>
+                        <button onclick="promptDeleteNote()"
+                            class="bg-red-900/40 text-red-200 border border-red-500/20 px-2 py-0.5 rounded text-[8px] font-bold">付近削除</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- メインボタン (4列グリッド) -->
-            <div class="editor-btn-row">
+            <!-- 右側パネル: メイン・アクション -->
+            <div id="editor-actions">
                 <button id="btn-rec-toggle" onclick="toggleRecording()" class="bg-red-700 text-white">記録開始</button>
                 <button id="btn-preview-toggle" onclick="togglePreview()" class="bg-blue-700 text-white">プレビュー</button>
-                <button onclick="copyChart()" class="bg-green-800 text-white">データ出力</button>
+                <button onclick="copyChart()" class="bg-green-800 text-white">出力</button>
                 <button onclick="sendChartByEmail()"
-                    class="bg-blue-500 text-white flex items-center justify-center gap-1">
-                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="bg-blue-500 text-white flex items-center justify-center gap-0.5">
+                    <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 8l7.89 5.26a2 2 0 002.22 0L22 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
                         </path>
                     </svg>
                     送信
                 </button>
+                <button onclick="backToTitle()"
+                    class="bg-gray-700 text-gray-300 col-span-2 text-[8px] mt-1">選択画面に戻る</button>
             </div>
         </div>
 
