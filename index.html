@@ -409,7 +409,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 17:11 (JST)
+                最終更新: 2026/04/02 17:24 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -512,17 +512,23 @@
             <p id="error-msg" class="mt-4 text-[11px] text-red-500 font-bold hidden px-6 leading-tight"></p>
         </div>
 
-        <!-- 譜面入力用ポップアップ -->
-        <div id="chart-modal" class="modal-overlay">
-            <div class="modal-content">
-                <h2 class="text-xl font-black italic text-blue-400 tracking-wider">ArcAngel Chart Input</h2>
-                <textarea id="chart-input" placeholder="ここに譜面コード(JSON)を貼り付けてください"
-                    class="h-64 font-mono text-[10px] bg-black text-white p-3 rounded-xl border border-gray-700"
-                    spellcheck="false"></textarea>
-                <div class="flex gap-2 w-full mt-2">
-                    <button onclick="clearChartInput()"
-                        class="btn-action bg-gray-700 hover:bg-gray-600 border-gray-600 flex-1 py-2 text-[10px]">クリア</button>
-                    <button onclick="closeChartModal()" class="btn-action flex-2 py-2 text-[10px]">完了</button>
+        <!-- 譜面入力用モーダル (手動編集) -->
+        <div id="chart-input-modal" class="overlay-screen" style="display:none; z-index: 1000;">
+            <div
+                class="bg-gray-900/90 p-8 rounded-3xl border border-white/20 w-[90%] max-w-4xl shadow-2xl backdrop-blur-2xl">
+                <h3 class="text-3xl font-black italic mb-4 text-white tracking-tighter">譜面手動編集</h3>
+                <p class="text-[10px] text-orange-400 mb-2 font-bold tracking-widest uppercase opacity-70">
+                    JSON形式で0.01秒単位の微調整が可能です</p>
+                <textarea id="chart-input" placeholder='[{"time": 1.5, "lane": 0}, {"time": 2.0, "lane": 3}]'
+                    class="w-full h-[50vh] bg-black/50 text-sky-300 font-mono text-[11px] p-6 rounded-2xl border border-white/10 mb-6 custom-scrollbar focus:border-orange-500/50 outline-none transition-all"></textarea>
+                <div class="flex gap-4">
+                    <button onclick="applyTextChart()"
+                        class="btn-action flex-1 bg-gradient-to-r from-orange-600 to-orange-800 text-lg shadow-[0_4px_15px_rgba(234,88,12,0.3)] hover:scale-105 active:scale-95">完了
+                        (エディタに反映)</button>
+                    <button onclick="closeTextChart()"
+                        class="btn-action flex-1 btn-secondary text-lg hover:scale-105 active:scale-95">キャンセル</button>
+                    <button onclick="document.getElementById('chart-input').value=''"
+                        class="btn-action w-24 btn-secondary text-sm">クリア</button>
                 </div>
             </div>
         </div>
@@ -590,6 +596,8 @@
                 <button id="btn-rec-toggle" onclick="toggleRecording()" class="bg-red-700 text-white">記録開始</button>
                 <button onclick="startPlayFromEditor()"
                     class="bg-blue-700 text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] font-black">プレイ開始</button>
+                <button onclick="openTextEditor()"
+                    class="bg-orange-800 text-white shadow-[0_0_10px_rgba(249,115,22,0.4)]">テキスト編集</button>
                 <button onclick="copyChart()" class="bg-green-800 text-white">出力</button>
                 <button onclick="sendChartByEmail()"
                     class="bg-blue-500 text-white flex items-center justify-center gap-0.5">
