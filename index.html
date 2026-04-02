@@ -69,19 +69,24 @@
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             width: 100%;
-            height: 100%;
+            height: 100.1%; /* 微妙に大きくしてスクロール可能に */
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 40px 20px;
             text-align: center;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        .overlay-screen>* {
-            margin-top: auto;
-            margin-bottom: auto;
+        .overlay-screen-content {
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
         }
 
         #launcher-screen {
@@ -523,110 +528,118 @@
         <video id="local-video" style="display:none;" playsinline webkit-playsinline crossorigin="anonymous"></video>
 
         <!-- 1. 起動画面 -->
-        <div id="launcher-screen" class="overlay-screen flex flex-col items-center justify-center p-6 pt-16">
-            <h1 class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl mb-4">ArcAngel</h1>
-            <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
-                動画同期リズムゲーム</p>
-            <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 21:12 (JST)
-            </p>
+        <div id="launcher-screen" class="overlay-screen">
+            <div class="overlay-screen-content">
+                <div class="mb-12">
+                    <h1 class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl mb-4">ArcAngel</h1>
+                    <p class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
+                        動画同期リズムゲーム</p>
+                    <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
+                        最終更新: 2026/04/02 21:21 (JST)
+                    </p>
+                </div>
 
-            <button class="launcher-btn" onclick="tryOpenNewTab()">
-                別タブで起動<br><span class="text-xs font-normal opacity-70">(推奨：表示エラーを回避)</span>
-            </button>
+                <div class="flex flex-col items-center gap-6 w-full max-w-xs">
+                    <button class="launcher-btn w-full" onclick="tryOpenNewTab()">
+                        別タブで起動<br><span class="text-xs font-normal opacity-70">(推奨：表示エラーを回避)</span>
+                    </button>
 
-            <button class="btn-action btn-secondary" onclick="launchInPlace()">
-                この枠内で開始
-            </button>
-
-            <p class="mt-8 text-gray-500 text-[10px] px-8 leading-relaxed text-center max-w-sm">
-                本アプリはローカルファイル専用です。<br>お手持ちの動画（MP4等）を読み込んでプレイしてください。
-            </p>
+                    <button class="btn-action btn-secondary w-full" onclick="launchInPlace()">
+                        この枠内で開始
+                    </button>
+                    
+                    <p class="text-gray-500 text-[10px] px-8 leading-relaxed text-center opacity-60">
+                        本アプリはローカルファイル専用です。<br>お手持ちの動画（MP4等）を読み込んでプレイしてください。
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- 2. スタジオ設定画面 -->
         <div id="start-screen" class="overlay-screen" style="display: none;">
-            <h1 class="text-3xl font-black mb-1 italic text-blue-500 tracking-tighter">ArcAngel</h1>
-            <p class="mb-6 text-gray-400 text-[10px] font-bold tracking-widest text-center px-4">動画ファイルを選択して開始してください</p>
+            <div class="overlay-screen-content">
+                <h1 class="text-3xl font-black mb-1 italic text-blue-500 tracking-tighter">ArcAngel</h1>
+                <p class="mb-6 text-gray-400 text-[10px] font-bold tracking-widest text-center px-4">動画ファイルを選択して開始してください</p>
 
-            <div class="input-box text-left space-y-4">
-                <div id="video-selector"
-                    class="p-5 bg-blue-600/10 border-2 border-blue-500/30 rounded-3xl shadow-lg transition-all">
-                    <label class="block text-[11px] text-blue-300 font-black mb-2 tracking-wider">動画ファイルを選択</label>
-                    <input type="file" id="local-file-input" accept="video/*" class="cursor-pointer">
-                    <p id="file-status" class="text-[9px] text-gray-500 mt-2">※ファイルを選択すると準備が完了します。</p>
-                </div>
-
-                <!-- 隠し選曲リスト (コナミコマンド後に出現) -->
-                <div id="song-list-container"
-                    class="hidden mt-4 w-full p-3 bg-blue-900/40 border-2 border-blue-500/50 rounded-3xl shadow-[0_0_20px_rgba(37,99,235,0.3)] animate-pulse overflow-visible">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">Secret Song
-                            List</p>
-                        <button onclick="toggleBGM(this)"
-                            class="bg-blue-500/20 hover:bg-blue-500/40 border border-blue-500/30 px-3 py-1 rounded-full text-[8px] font-bold text-blue-200 transition-all">BGM
-                            STOP</button>
+                <div class="input-box text-left space-y-4">
+                    <div id="video-selector"
+                        class="p-5 bg-blue-600/10 border-2 border-blue-500/30 rounded-3xl shadow-lg transition-all">
+                        <label class="block text-[11px] text-blue-300 font-black mb-2 tracking-wider">動画ファイルを選択</label>
+                        <input type="file" id="local-file-input" accept="video/*" class="cursor-pointer">
+                        <p id="file-status" class="text-[9px] text-gray-500 mt-2">※ファイルを選択すると準備が完了します。</p>
                     </div>
-                    <div id="song-list"
-                        class="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 px-2 snap-proximity snap-x scroll-smooth no-scrollbar"
-                        style="-webkit-overflow-scrolling: touch; touch-action: pan-x; user-select: none;"></div>
 
-                    <!-- 難易度選択パネル (曲選択後に出現) -->
-                    <div id="difficulty-box" class="hidden mt-4 animate-slide-up">
-                        <p
-                            class="text-[10px] font-black italic text-gray-400 mb-2 text-center uppercase tracking-widest">
-                            Select Difficulty</p>
-                        <div class="flex flex-wrap justify-center gap-2.5 sm:gap-4 px-2">
-                            <button onclick="selectDifficulty('EASY')" class="btn-diff btn-diff-easy">EASY</button>
-                            <button onclick="selectDifficulty('NORMAL')"
-                                class="btn-diff btn-diff-normal">NORMAL</button>
-                            <button onclick="selectDifficulty('HARD')" class="btn-diff btn-diff-hard">HARD</button>
-                            <button onclick="selectDifficulty('EXPERT')"
-                                class="btn-diff btn-diff-expert">EXPERT</button>
-                            <button onclick="selectDifficulty('MASTER')"
-                                class="btn-diff btn-diff-master">MASTER</button>
+                    <!-- 隠し選曲リスト (コナミコマンド後に出現) -->
+                    <div id="song-list-container"
+                        class="hidden mt-4 w-full p-3 bg-blue-900/40 border-2 border-blue-500/50 rounded-3xl shadow-[0_0_20px_rgba(37,99,235,0.3)] animate-pulse overflow-visible">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">Secret Song
+                                List</p>
+                            <button onclick="toggleBGM(this)"
+                                class="bg-blue-500/20 hover:bg-blue-500/40 border border-blue-500/30 px-3 py-1 rounded-full text-[8px] font-bold text-blue-200 transition-all">BGM
+                                STOP</button>
+                        </div>
+                        <div id="song-list"
+                            class="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 px-2 snap-proximity snap-x scroll-smooth no-scrollbar"
+                            style="-webkit-overflow-scrolling: touch; touch-action: pan-x; user-select: none;"></div>
+
+                        <!-- 難易度選択パネル (曲選択後に出現) -->
+                        <div id="difficulty-box" class="hidden mt-4 animate-slide-up">
+                            <p
+                                class="text-[10px] font-black italic text-gray-400 mb-2 text-center uppercase tracking-widest">
+                                Select Difficulty</p>
+                            <div class="flex flex-wrap justify-center gap-2.5 sm:gap-4 px-2">
+                                <button onclick="selectDifficulty('EASY')" class="btn-diff btn-diff-easy">EASY</button>
+                                <button onclick="selectDifficulty('NORMAL')"
+                                    class="btn-diff btn-diff-normal">NORMAL</button>
+                                <button onclick="selectDifficulty('HARD')" class="btn-diff btn-diff-hard">HARD</button>
+                                <button onclick="selectDifficulty('EXPERT')"
+                                    class="btn-diff btn-diff-expert">EXPERT</button>
+                                <button onclick="selectDifficulty('MASTER')"
+                                    class="btn-diff btn-diff-master">MASTER</button>
+                            </div>
                         </div>
                     </div>
+
+                    <div id="chart-selector"
+                        class="mt-2 flex flex-col items-center justify-center p-3 bg-gray-800 border-2 border-dashed border-gray-600 rounded-xl w-full transition-all">
+                        <label
+                            class="font-bold text-gray-300 text-[11px] cursor-pointer w-full text-center py-2 relative hover:bg-gray-700 transition-colors rounded-lg">
+                            2. 譜面ファイルを選ぶ (任意)
+                            <input type="file" id="chart-file-input" accept=".json,.txt,.js"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                onchange="loadChartFile(this)">
+                        </label>
+                        <p id="chart-file-status" class="text-[9px] text-gray-400 mt-1">または、下のボタンから直接コードを入力</p>
+                        <button onclick="openChartModal()"
+                            class="mt-2 w-full bg-gray-700 border border-gray-500 py-2 rounded-lg text-[10px] font-bold hover:bg-gray-600 transition-all shadow-md">
+                            テキストで直接入力する
+                        </button>
+                    </div>
+
+                    <div class="text-center pt-2">
+                        <label class="block text-[10px] text-gray-400 font-bold tracking-widest">ノーツ速度: <span id="speed-val"
+                                class="text-blue-400">5.0</span></label>
+                        <input type="range" id="speed-input" min="1.0" max="10.0" step="0.5" value="5.0"
+                            oninput="document.getElementById('speed-val').innerText = this.value">
+                    </div>
                 </div>
 
-                <div id="chart-selector"
-                    class="mt-2 flex flex-col items-center justify-center p-3 bg-gray-800 border-2 border-dashed border-gray-600 rounded-xl w-full transition-all">
-                    <label
-                        class="font-bold text-gray-300 text-[11px] cursor-pointer w-full text-center py-2 relative hover:bg-gray-700 transition-colors rounded-lg">
-                        2. 譜面ファイルを選ぶ (任意)
-                        <input type="file" id="chart-file-input" accept=".json,.txt,.js"
-                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                            onchange="loadChartFile(this)">
-                    </label>
-                    <p id="chart-file-status" class="text-[9px] text-gray-400 mt-1">または、下のボタンから直接コードを入力</p>
-                    <button onclick="openChartModal()"
-                        class="mt-2 w-full bg-gray-700 border border-gray-500 py-2 rounded-lg text-[10px] font-bold hover:bg-gray-600 transition-all shadow-md">
-                        テキストで直接入力する
+                <div class="flex flex-wrap justify-center mt-4 gap-4">
+                    <button onclick="startLive(false)" class="btn-action px-10" id="btn-start-game">プレイ開始</button>
+                    <button onclick="startLive(true)" class="btn-action btn-secondary px-8"
+                        id="btn-start-edit">譜面作成</button>
+                </div>
+
+                <div class="text-center mt-6">
+                    <button onclick="toggleFullScreen()"
+                        class="text-[10px] text-blue-400 border border-blue-900 px-6 py-2 rounded-full bg-blue-950/30 hover:bg-blue-900/50 transition-colors">
+                        全画面表示の切り替え
                     </button>
                 </div>
 
-                <div class="text-center pt-2">
-                    <label class="block text-[10px] text-gray-400 font-bold tracking-widest">ノーツ速度: <span id="speed-val"
-                            class="text-blue-400">5.0</span></label>
-                    <input type="range" id="speed-input" min="1.0" max="10.0" step="0.5" value="5.0"
-                        oninput="document.getElementById('speed-val').innerText = this.value">
-                </div>
+                <p id="error-msg" class="mt-4 text-[11px] text-red-500 font-bold hidden px-6 leading-tight"></p>
             </div>
-
-            <div class="flex flex-wrap justify-center mt-4 gap-2">
-                <button onclick="startLive(false)" class="btn-action px-10" id="btn-start-game">プレイ開始</button>
-                <button onclick="startLive(true)" class="btn-action btn-secondary px-8"
-                    id="btn-start-edit">譜面作成</button>
-            </div>
-
-            <div class="text-center mt-6">
-                <button onclick="toggleFullScreen()"
-                    class="text-[10px] text-blue-400 border border-blue-900 px-6 py-2 rounded-full bg-blue-950/30 hover:bg-blue-900/50 transition-colors">
-                    全画面表示の切り替え
-                </button>
-            </div>
-
-            <p id="error-msg" class="mt-4 text-[11px] text-red-500 font-bold hidden px-6 leading-tight"></p>
         </div>
 
         <!-- 譜面入力用モーダル (手動編集) -->
@@ -704,11 +717,13 @@
         </div>
 
         <div id="pause-screen" class="overlay-screen" style="display:none;">
-            <h2 class="text-4xl font-black mb-6 italic text-white tracking-tighter">一時停止中</h2>
-            <button onclick="togglePause()" class="btn-action">再開</button>
-            <button id="btn-back-to-editor" onclick="backToEditorFromPlay()"
-                class="btn-action bg-blue-700 hidden">エディターに戻る</button>
-            <button onclick="backToTitle()" class="btn-action btn-secondary">タイトルに戻る</button>
+            <div class="overlay-screen-content gap-4">
+                <h2 class="text-4xl font-black mb-6 italic text-white tracking-tighter">一時停止中</h2>
+                <button onclick="togglePause()" class="btn-action w-64">再開</button>
+                <button id="btn-back-to-editor" onclick="backToEditorFromPlay()"
+                    class="btn-action bg-blue-700 hidden w-64">エディターに戻る</button>
+                <button onclick="backToTitle()" class="btn-action btn-secondary w-64">タイトルに戻る</button>
+            </div>
         </div>
 
         <!-- 譜面作成用の操作パネル (左右分散・中央開放) -->
@@ -767,28 +782,30 @@
 
         <!-- リザルト画面 -->
         <div id="result-screen" class="overlay-screen" style="display: none;">
-            <h2
-                class="text-3xl font-black mb-4 italic text-yellow-500 tracking-tighter text-center px-12 overflow-visible min-w-full">
-                ArcAngel Result</h2>
-            <div id="final-score" class="text-5xl font-black mb-4 tracking-widest text-white">000000</div>
-            <div
-                class="bg-gray-900 p-6 rounded-3xl border border-gray-800 mb-6 w-full max-w-xs text-sm font-mono shadow-2xl">
-                <div class="flex justify-between text-yellow-400 mb-1 text-xs font-bold"><span>PERFECT</span><span
-                        id="res-perfect">0</span></div>
-                <div class="flex justify-between text-pink-400 mb-1 text-xs font-bold"><span>GREAT</span><span
-                        id="res-great">0</span></div>
-                <div class="flex justify-between text-green-400 mb-1 text-xs font-bold"><span>GOOD</span><span
-                        id="res-good">0</span></div>
-                <div class="flex justify-between text-blue-400 mb-1 text-xs font-bold"><span>BAD</span><span
-                        id="res-bad">0</span></div>
-                <div class="flex justify-between text-red-400 mb-3 text-xs font-bold"><span>MISS</span><span
-                        id="res-miss">0</span></div>
+            <div class="overlay-screen-content">
+                <h2
+                    class="text-3xl font-black mb-4 italic text-yellow-500 tracking-tighter text-center px-12 overflow-visible min-w-full">
+                    ArcAngel Result</h2>
+                <div id="final-score" class="text-5xl font-black mb-4 tracking-widest text-white">000000</div>
                 <div
-                    class="pt-2 mt-2 border-t border-gray-800 flex justify-between font-bold text-white text-lg italic tracking-wider">
-                    <span>Max Combo</span><span id="res-combo">0</span>
+                    class="bg-gray-900 p-6 rounded-3xl border border-gray-800 mb-6 w-full max-w-xs text-sm font-mono shadow-2xl">
+                    <div class="flex justify-between text-yellow-400 mb-1 text-xs font-bold"><span>PERFECT</span><span
+                            id="res-perfect">0</span></div>
+                    <div class="flex justify-between text-pink-400 mb-1 text-xs font-bold"><span>GREAT</span><span
+                            id="res-great">0</span></div>
+                    <div class="flex justify-between text-green-400 mb-1 text-xs font-bold"><span>GOOD</span><span
+                            id="res-good">0</span></div>
+                    <div class="flex justify-between text-blue-400 mb-1 text-xs font-bold"><span>BAD</span><span
+                            id="res-bad">0</span></div>
+                    <div class="flex justify-between text-red-400 mb-3 text-xs font-bold"><span>MISS</span><span
+                            id="res-miss">0</span></div>
+                    <div
+                        class="pt-2 mt-2 border-t border-gray-800 flex justify-between font-bold text-white text-lg italic tracking-wider">
+                        <span>Max Combo</span><span id="res-combo">0</span>
+                    </div>
                 </div>
+                <button onclick="backToTitle()" class="btn-action shadow-lg px-12">メニューに戻る</button>
             </div>
-            <button onclick="backToTitle()" class="btn-action shadow-lg">メニューに戻る</button>
         </div>
 
         <script>
