@@ -409,7 +409,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 17:04 (JST)
+                最終更新: 2026/04/02 17:11 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -857,9 +857,7 @@
 
                 showToast(`「${s.name}」プレビュー中！難易度を選んでね♪`);
             }
-            function getChartKey() { return `chart_${currentSelectedSong.name}_${currentDifficulty}`; }
-            function saveChartToLocal() { if (!currentSelectedSong || !currentDifficulty) return; localStorage.setItem(getChartKey(), JSON.stringify(recordedChart)); }
-            function loadChartFromLocal() { if (!currentSelectedSong || !currentDifficulty) return null; const data = localStorage.getItem(getChartKey()); return data ? JSON.parse(data) : null; }
+
             async function selectDifficulty(diff) {
                 currentDifficulty = diff;
                 const btns = document.getElementById('difficulty-box').querySelectorAll('.btn-diff');
@@ -876,7 +874,7 @@
                 if (savedData) {
                     recordedChart = savedData;
                     CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                    chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました (16:43)`;
+                    chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました (17:11)`;
                     chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
                     syncEditorNotes();
                     return;
@@ -1191,7 +1189,7 @@
 
             function backToEditorFromPlay() {
                 isPaused = false;
-                isPlaying = false;
+                isPlaying = true; // 描画ループのために true にする
                 isEditMode = true;
                 isEditorTestPlay = false;
                 document.getElementById('pause-screen').style.display = 'none';
@@ -1203,6 +1201,8 @@
                 document.getElementById('ui-overlay').style.pointerEvents = 'none';
                 document.getElementById('btn-back-to-editor').classList.add('hidden');
 
+                // 描画ループ再開
+                requestAnimationFrame(update);
                 showToast("エディターに復帰しました");
             }
 
