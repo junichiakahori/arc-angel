@@ -1,0 +1,12 @@
+[
+    {
+        "name": "タカラモノズ",
+        "video": "assets/videos/タカラモノズ.mp4",
+        "chart": "assets/charts/タカラモノズ.txt"
+    },
+    {
+        "name": "A song for You! You? You!!",
+        "video": "assets/videos/asongforyou.mp4",
+        "chart": "assets/charts/asongforyou.txt"
+    }
+]

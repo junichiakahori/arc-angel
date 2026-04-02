@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 10:47 (JST)
+                最終更新: 2026/04/02 10:49 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -566,10 +566,9 @@
             let isKonamiActivated = false;
             let BACKUP_SONG_LIST = [
                 { name: "タカラモノズ", video: "assets/videos/タカラモノズ.mp4", chart: "assets/charts/タカラモノズ.txt" },
-                { name: "TEST", video: "assets/videos/TEST.MOV", chart: "assets/charts/TEST.txt" },
                 { name: "A song for You! You? You!!", video: "assets/videos/asongforyou.mp4", chart: "assets/charts/asongforyou.txt" }
             ];
-            let AUTO_SONG_LIST = []; // API成功時にキャッシュする用
+            let AUTO_SONG_LIST = []; // キャッシュ用
             let localVideo, isVideoReady = false;
             let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, miss: 0 };
             let isEditorPaused = false, isSeeking = false;
@@ -685,7 +684,7 @@
             function closeChartModal() { const el = document.getElementById('chart-input'); if (el.value.replace(/\s+/g, '') === '上上下下左右左右BA') { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
             async function showSongList() {
                 const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
-                container.classList.remove('hidden'); list.innerHTML = '<p class="text-[9px] text-blue-300 animate-pulse text-center">サーバーをスキャン中...</p>';
+                container.classList.remove('hidden'); list.innerHTML = '<p class="text-[9px] text-blue-300 animate-pulse text-center">楽曲リストを読込中...</p>';
 
                 const renderList = (songs) => {
                     list.innerHTML = '';
@@ -698,24 +697,14 @@
                     });
                 };
 
+                // API fetch replaced by JSON fetch
                 try {
-                    const user = "junichiakahori", repo = "arc-angel";
-                    const resV = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/assets/videos`);
-                    if (!resV.ok) throw new Error("API Limit");
-                    const videos = await resV.json();
-                    const resC = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/assets/charts`);
-                    const charts = await resC.json();
-
-                    AUTO_SONG_LIST = [];
-                    videos.forEach(v => {
-                        const baseName = v.name.split('.').slice(0, -1).join('.');
-                        const match = charts.find(c => c.name.startsWith(baseName));
-                        if (match) AUTO_SONG_LIST.push({ name: baseName, video: v.path, chart: match.path });
-                    });
+                    const r = await fetch('assets/songs.json');
+                    if (!r.ok) throw new Error("JSON not found");
+                    AUTO_SONG_LIST = await r.json();
                     renderList(AUTO_SONG_LIST);
                 } catch (e) {
-                    console.log("GitHub API Limit reached, falling back to backup list.");
-                    showToast("API制限のためバックアップリストを表示します");
+                    console.log("songs.json not found or error, using backup list.");
                     renderList(BACKUP_SONG_LIST);
                 }
             }
