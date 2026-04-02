@@ -6,8 +6,8 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
-    <link rel="apple-touch-icon" href="../assets/images/favicon.png">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="assets/images/favicon.png">
     <title>ArcAngel v0.5 - 2026/04/03 01:15 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -1076,23 +1076,10 @@
 
                 // API fetch replaced by JSON fetch
                 try {
-                    const response = await fetch(`../assets/songs.json?v=${Date.now()}`);
+                    const response = await fetch(`assets/songs.json?v=${Date.now()}`);
                     songsStore = await response.json();
                     
-                    // songs.json内の全パスを、現在の階層（latestフォルダ内）に合わせて調整
-                    songsStore = songsStore.map(song => {
-                        const adjustPath = (p) => p.startsWith('assets/') ? '../' + p : p;
-                        const newCharts = {};
-                        for (let key in song.charts) {
-                            newCharts[key] = adjustPath(song.charts[key]);
-                        }
-                        return {
-                            ...song,
-                            video: adjustPath(song.video),
-                            jacket: adjustPath(song.jacket),
-                            charts: newCharts
-                        };
-                    });
+                    // index.html (root) の場合はパス調整不要 (assets/ から始まるため)
                     AUTO_SONG_LIST = songsStore;
                     renderList(AUTO_SONG_LIST);
                 } catch (e) {
