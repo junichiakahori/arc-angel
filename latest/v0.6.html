@@ -861,6 +861,10 @@
     </div>
 
     <script>
+        // --- 動的なパス解決ロジック ---
+        // サブフォルダ (latest/ 等) にいてもルートにいても assets を見つけられるようにする
+        const BASE_PATH = window.location.pathname.includes('/latest/') ? '../' : '';
+
         // --- 設定・定数 ---
         const ADMIN_EMAIL = "drone.akahori@gmail.com";
 
@@ -871,9 +875,9 @@
         let currentSongIndex = -1;
         let songsStore = [];
         let BACKUP_SONG_LIST = [
-            { name: "僕らのLIVE 君とのLIFE", video: "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/bokura.jpg" },
-            { name: "タカラモノズ", video: "assets/videos/takaramonos.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/takaramonos.jpg" },
-            { name: "A song for You! You? You!!", video: "assets/videos/asongforyou.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/asongforyou.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/asongforyou.jpg" }
+            { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
+            { name: "タカラモノズ", video: BASE_PATH + "assets/videos/takaramonos.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/takaramonos.jpg" },
+            { name: "A song for You! You? You!!", video: BASE_PATH + "assets/videos/asongforyou.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/asongforyou.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/asongforyou.jpg" }
         ];
         let AUTO_SONG_LIST = []; // キャッシュ用
         let localVideo, isVideoReady = false;
@@ -961,7 +965,7 @@
                     document.body.style.backgroundImage = "none";
                     wrapper.style.backgroundImage = "none";
                 } else {
-                    const imgUrl = jacketUrl || 'assets/images/takaramonos.jpg';
+                    const imgUrl = jacketUrl || BASE_PATH + 'assets/images/takaramonos.jpg';
                     document.body.style.backgroundImage = `url('${imgUrl}')`;
                     wrapper.style.backgroundImage = `url('${imgUrl}')`;
                 }
@@ -1043,7 +1047,7 @@
         }
         function clearChartInput() { if (confirm("入力内容をすべて消去しますか？")) { document.getElementById('chart-input').value = ''; } }
         function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
-        function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
+        function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
         function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
         function toggleBGM(btn) {
             if (bgmAudio || (localVideo && !localVideo.paused && !isPlaying)) {
