@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 02:01 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 02:18 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 02:01 (JST)
+                        最終更新: 2026/04/03 02:18 (JST)
                     </p>
                 </div>
 
@@ -918,27 +918,30 @@
             const now = audioCtx.currentTime;
 
             if (judgment === 'PERFECT') {
-                // --- クリスマスベル・シャン！(鈴の多重層構成) ---
-                const freqs = [2300, 4100, 5900, 8500];
+                // --- 改良版: スクフェス・リスペクト「シャン！」(クリスタル・ジングル) ---
+                
+                // 1. 高域のキレのある金属音 (倍音構成)
+                const freqs = [5000, 8000, 11500]; // 抜けの良い高域に絞る
                 freqs.forEach((f, i) => {
                     const osc = audioCtx.createOscillator();
                     const og = audioCtx.createGain();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(f, now);
-                    const decay = 0.4 - (i * 0.05);
-                    og.gain.setValueAtTime(0.06, now);
-                    og.gain.exponentialRampToValueAtTime(0.01, now + decay);
+                    og.gain.setValueAtTime(0.08, now);
+                    og.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                     osc.connect(og); og.connect(audioCtx.destination);
-                    osc.start(now); osc.stop(now + 0.5);
+                    osc.start(now); osc.stop(now + 0.4);
                 });
-                const nsJingle = audioCtx.createBufferSource(); nsJingle.buffer = noiseBuffer;
-                const nfJingle = audioCtx.createBiquadFilter(); 
-                nfJingle.type = 'bandpass'; nfJingle.frequency.setValueAtTime(7000, now);
-                const ngJingle = audioCtx.createGain();
-                ngJingle.gain.setValueAtTime(0.25, now);
-                ngJingle.gain.exponentialRampToValueAtTime(0.01, now + 0.5); 
-                nsJingle.connect(nfJingle); nfJingle.connect(ngJingle); ngJingle.connect(audioCtx.destination);
-                nsJingle.start(now);
+
+                // 2. 弾けるような煌めき層 (ノイズ)
+                const nsShimmer = audioCtx.createBufferSource(); nsShimmer.buffer = noiseBuffer;
+                const nfShimmer = audioCtx.createBiquadFilter(); 
+                nfShimmer.type = 'highpass'; nfShimmer.frequency.setValueAtTime(6000, now);
+                const ngShimmer = audioCtx.createGain();
+                ngShimmer.gain.setValueAtTime(0.35, now); // 音量をアップしてアタックを強調
+                ngShimmer.gain.exponentialRampToValueAtTime(0.01, now + 0.35); 
+                nsShimmer.connect(nfShimmer); nfShimmer.connect(ngShimmer); ngShimmer.connect(audioCtx.destination);
+                nsShimmer.start(now);
             } else {
                 // --- それ以外: 「カン！」という乾いた打撃音 ---
                 const oscKan = audioCtx.createOscillator();
