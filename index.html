@@ -481,7 +481,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 18:31 (JST)
+                最終更新: 2026/04/02 18:45 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -1316,9 +1316,11 @@
                 document.getElementById('chart-input-modal').style.display = 'none';
             }
             function applyTextChart() {
-                const txt = document.getElementById('chart-input').value.trim();
+                const rawTxt = document.getElementById('chart-input').value.trim();
+                // 変数宣言や末尾セミコロンがあれば除去
+                const cleanTxt = rawTxt.replace(/^(const|let|var)\s+CHART\s*=\s*/, '').replace(/;\s*$/, '');
                 try {
-                    let data = txt ? JSON.parse(txt) : [];
+                    let data = cleanTxt ? JSON.parse(cleanTxt) : [];
                     if (!Array.isArray(data)) throw new Error("配列形式である必要があります");
                     recordedChart = data;
                     syncEditorNotes();
@@ -1368,7 +1370,11 @@
                 document.getElementById('res-combo').innerText = maxCombo;
             }
 
-            function copyChart() { const txt = `const CHART = ${JSON.stringify(recordedChart, null, 2)};`; navigator.clipboard.writeText(txt); showToast("コードをクリップボードにコピーしました"); }
+            function copyChart() {
+                const txt = JSON.stringify(recordedChart, null, 2);
+                navigator.clipboard.writeText(txt);
+                showToast("純粋なJSONデータをコピーしました");
+            }
             function sendChartByEmail() {
                 const songName = currentSelectedSong ? currentSelectedSong.name : "Unknown Song";
                 const diffBtns = document.getElementById('difficulty-box').querySelectorAll('.btn-diff');
@@ -1392,9 +1398,9 @@
                     return;
                 }
 
-                const chartData = `const CHART = ${JSON.stringify(currentChartData, null, 2)};`;
+                const chartData = JSON.stringify(currentChartData, null, 2);
                 const subject = encodeURIComponent(`【ArcAngel】譜面投稿: ${songName} [${diffName}]`);
-                const body = encodeURIComponent(`以下の譜面データを公式譜面として申請します。\n\n曲名: ${songName}\n難易度: ${diffName}\n\n--- 譜面データ ---\n${chartData}\n\n---`);
+                const body = encodeURIComponent(`以下の譜面データを公式譜面として申請します。\n\n曲名: ${songName}\n難易度: ${diffName}\n\n--- 譜面データ (JSON) ---\n${chartData}\n\n---`);
 
                 window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
             }
