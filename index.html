@@ -481,7 +481,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 18:24 (JST)
+                最終更新: 2026/04/02 18:31 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -702,6 +702,8 @@
                         id="res-great">0</span></div>
                 <div class="flex justify-between text-green-400 mb-1 text-xs font-bold"><span>GOOD</span><span
                         id="res-good">0</span></div>
+                <div class="flex justify-between text-blue-400 mb-1 text-xs font-bold"><span>BAD</span><span
+                        id="res-bad">0</span></div>
                 <div class="flex justify-between text-red-400 mb-3 text-xs font-bold"><span>MISS</span><span
                         id="res-miss">0</span></div>
                 <div
@@ -727,7 +729,7 @@
             ];
             let AUTO_SONG_LIST = []; // キャッシュ用
             let localVideo, isVideoReady = false;
-            let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+            let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
             let isEditorPaused = false, isSeeking = false;
             let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false;
             let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
@@ -1252,7 +1254,7 @@
 
                 // ライブ開始
                 score = 0; combo = 0; maxCombo = 0;
-                counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+                counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
                 notesQueue = [...CHART];
                 activeNotes = [];
 
@@ -1333,23 +1335,37 @@
             function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
             function judgeStart(l) { const ct = localVideo.currentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } }
             function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = localVideo.currentTime; const d = Math.abs(ct - n.endTime); laneCurrentHoldNote[l] = null; playTapSound(); const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(d, buttons[l]); else { counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); } }
-            function processResult(d, tb) { if (d < 0.08) { score += 1000; counts.perfect++; combo++; showJ("PERFECT", "text-yellow-400"); createHitEffect(tb.x, tb.y, '#facc15'); } else if (d < 0.18) { score += 500; counts.great++; combo++; showJ("GREAT", "text-pink-400"); createHitEffect(tb.x, tb.y, '#f472b6'); } else { score += 200; counts.good++; combo++; showJ("GOOD", "text-green-400"); createHitEffect(tb.x, tb.y, '#4ade80'); } if (combo > maxCombo) maxCombo = combo; updateUI(); }
+            function processResult(d, tb) {
+                if (d < 0.05) { score += 1000; counts.perfect++; combo++; showJ("PERFECT", "text-yellow-400"); createHitEffect(tb.x, tb.y, '#facc15'); }
+                else if (d < 0.10) { score += 800; counts.great++; combo++; showJ("GREAT", "text-pink-400"); createHitEffect(tb.x, tb.y, '#f472b6'); }
+                else if (d < 0.15) { score += 400; counts.good++; combo = 0; showJ("GOOD", "text-green-400"); createHitEffect(tb.x, tb.y, '#4ade80'); }
+                else if (d < 0.22) { score += 200; counts.bad++; combo = 0; showJ("BAD", "text-blue-400"); createHitEffect(tb.x, tb.y, '#60a5fa'); }
+                else { counts.miss++; combo = 0; showJ("MISS", "text-red-500"); }
+                if (combo > maxCombo) maxCombo = combo;
+                updateUI();
+            }
             function createHitEffect(x, y, color) { hitEffects.push({ type: 'ring', x, y, size: buttonRadius, opacity: 1, color, speed: 6 }); for (let i = 0; i < 8; i++) { const a = Math.random() * Math.PI * 2, d = Math.random() * 4 + 2; hitEffects.push({ type: 'spark', x, y, vx: Math.cos(a) * d, vy: Math.sin(a) * d, size: Math.random() * 3 + 1, opacity: 1, color }); } }
             function showJ(t, c) { const el = document.getElementById('judge-display'); el.innerText = t; el.className = `text-2xl font-black ${c} animate-bounce flex items-center justify-center h-8 italic tracking-widest`; }
             function updateUI() { document.getElementById('score-display').innerText = `SCORE: ${score.toString().padStart(6, '0')}`; document.getElementById('combo-display').innerText = `COMBO: ${combo}`; }
 
             function showResults() {
                 isPlaying = false; if (localVideo) localVideo.pause();
-                const totalNotesPlayed = counts.perfect + counts.great + counts.good;
-                const isFullCombo = counts.miss === 0 && totalNotesPlayed > 0;
-                const isAllPerfect = isFullCombo && counts.great === 0 && counts.good === 0;
+                const totalNotesPlayed = counts.perfect + counts.great + counts.good + counts.bad;
+                const isFullCombo = counts.miss === 0 && counts.bad === 0 && counts.good === 0 && totalNotesPlayed > 0;
+                const isAllPerfect = isFullCombo && counts.great === 0;
                 if (isAllPerfect) playResultJingle('AP'); else if (isFullCombo) playResultJingle('FC'); else playResultJingle('Normal');
                 const resultTitle = document.querySelector('#result-screen h2');
                 if (isAllPerfect) { resultTitle.innerText = "ALL PERFECT!!"; resultTitle.className = "text-5xl font-black mb-4 italic text-rainbow tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"; }
                 else if (isFullCombo) { resultTitle.innerText = "FULL COMBO!!"; resultTitle.className = "text-4xl font-black mb-4 italic text-yellow-300 tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]"; }
                 else { resultTitle.innerText = "ArcAngel Result"; resultTitle.className = "text-3xl font-black mb-4 italic text-yellow-500 tracking-tighter text-center px-12 overflow-visible min-w-full"; }
                 document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('result-screen').style.display = 'flex';
-                document.getElementById('final-score').innerText = score.toString().padStart(6, '0'); document.getElementById('res-perfect').innerText = counts.perfect; document.getElementById('res-great').innerText = counts.great; document.getElementById('res-good').innerText = counts.good; document.getElementById('res-miss').innerText = counts.miss; document.getElementById('res-combo').innerText = maxCombo;
+                document.getElementById('final-score').innerText = score.toString().padStart(6, '0');
+                document.getElementById('res-perfect').innerText = counts.perfect;
+                document.getElementById('res-great').innerText = counts.great;
+                document.getElementById('res-good').innerText = counts.good;
+                document.getElementById('res-bad').innerText = counts.bad;
+                document.getElementById('res-miss').innerText = counts.miss;
+                document.getElementById('res-combo').innerText = maxCombo;
             }
 
             function copyChart() { const txt = `const CHART = ${JSON.stringify(recordedChart, null, 2)};`; navigator.clipboard.writeText(txt); showToast("コードをクリップボードにコピーしました"); }
