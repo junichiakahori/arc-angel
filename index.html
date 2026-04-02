@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 01:46 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 01:51 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 01:46 (JST)
+                        最終更新: 2026/04/03 01:51 (JST)
                     </p>
                 </div>
 
@@ -917,51 +917,38 @@
             if (!audioCtx || !noiseBuffer) return;
             const now = audioCtx.currentTime;
 
-            // --- ベースのノイズ成分 (アタック感) ---
-            const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
-            const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
-            const ng = audioCtx.createGain();
+            // --- 1. ノイズ成分 (タンバリンの鈴・シャカシャカ感) ---
+            const nsJingle = audioCtx.createBufferSource(); 
+            nsJingle.buffer = noiseBuffer;
+            const nfJingle = audioCtx.createBiquadFilter(); 
+            nfJingle.type = 'bandpass'; 
+            // 鈴の音色を調整 (Perfectは明るめ、その他は控えめ)
+            nfJingle.frequency.setValueAtTime(judgment === 'PERFECT' ? 6500 : 4500, now);
+            nfJingle.Q.value = 1.2;
             
-            // Perfectなら少し強めのアタック
-            const gainVal = (judgment === 'PERFECT') ? 0.25 : 0.15;
-            ng.gain.setValueAtTime(gainVal, now);
-            ng.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            const ngJingle = audioCtx.createGain();
+            const jingleGain = judgment === 'PERFECT' ? 0.18 : 0.08;
+            ngJingle.gain.setValueAtTime(jingleGain, now);
+            ngJingle.gain.exponentialRampToValueAtTime(0.01, now + (judgment === 'PERFECT' ? 0.2 : 0.1));
             
-            ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
-            ns.start(now);
+            nsJingle.connect(nfJingle); 
+            nfJingle.connect(ngJingle); 
+            ngJingle.connect(audioCtx.destination);
+            nsJingle.start(now);
 
-            // --- 音程成分 (サイン波) ---
-            const osc = audioCtx.createOscillator();
-            const og = audioCtx.createGain();
+            // --- 2. 打撃成分 (皮を叩く「トッ」という音) ---
+            const oscThump = audioCtx.createOscillator();
+            const ogThump = audioCtx.createGain();
+            oscThump.type = 'sine';
+            // 手のひらで叩くような低い周波数
+            oscThump.frequency.setValueAtTime(judgment === 'PERFECT' ? 180 : 150, now);
+            ogThump.gain.setValueAtTime(0.12, now);
+            ogThump.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
             
-            if (judgment === 'PERFECT') {
-                // Perfect: 「シャン！」煌びやかな高音
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(12000, now);
-                osc.frequency.exponentialRampToValueAtTime(4000, now + 0.15);
-                og.gain.setValueAtTime(0.22, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-
-                const osc2 = audioCtx.createOscillator();
-                const og2 = audioCtx.createGain();
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(16000, now);
-                osc2.frequency.exponentialRampToValueAtTime(13000, now + 0.1);
-                og2.gain.setValueAtTime(0.12, now);
-                og2.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                osc2.connect(og2); og2.connect(audioCtx.destination);
-                osc2.start(now); osc2.stop(now + 0.2);
-            } else {
-                // それ以外: 「チンッ」と鋭く短い金属音
-                osc.type = 'sine'; 
-                osc.frequency.setValueAtTime(7000, now);
-                osc.frequency.exponentialRampToValueAtTime(5000, now + 0.05);
-                og.gain.setValueAtTime(0.15, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.08); // 非常に短い
-            }
-
-            osc.connect(og); og.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 0.3);
+            oscThump.connect(ogThump); 
+            ogThump.connect(audioCtx.destination);
+            oscThump.start(now); 
+            oscThump.stop(now + 0.2);
         }
 
         function playResultJingle(resultType) {
