@@ -518,7 +518,11 @@
 
         <!-- 1. 起動画面 -->
         <div id="launcher-screen" class="screen flex flex-col items-center justify-center p-6 bg-black/60 pt-16">
-            最終更新: 2026/04/02 20:06 (JST)
+            <h1 class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl mb-4">ArcAngel</h1>
+            <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
+                動画同期リズムゲーム</p>
+            <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
+                最終更新: 2026/04/02 20:11 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -829,12 +833,17 @@
 
             function updateKonamiUI(isActivated, jacketUrl) {
                 const wrapper = document.getElementById('game-wrapper');
-                const imgUrl = jacketUrl || 'assets/images/takaramonos.jpg';
                 if (isActivated) {
                     document.body.classList.add('konami-mode');
                     wrapper.classList.add('konami-mode');
-                    document.body.style.backgroundImage = `url('${imgUrl}')`;
-                    wrapper.style.backgroundImage = `url('${imgUrl}')`;
+                    if (jacketUrl) {
+                        document.body.style.backgroundImage = `url('${jacketUrl}')`;
+                        wrapper.style.backgroundImage = `url('${jacketUrl}')`;
+                    } else {
+                        // 動画プレビューを見せるために背景画像を消去
+                        document.body.style.backgroundImage = "none";
+                        wrapper.style.backgroundImage = "none";
+                    }
                     wrapper.style.backgroundSize = "contain";
                     wrapper.style.backgroundRepeat = "no-repeat";
                     wrapper.style.backgroundPosition = "center top";
@@ -989,6 +998,8 @@
                 showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
                 const status = document.getElementById('file-status');
                 stopTitleBGM();
+                // 動画プレビューを見せるため、静止画背景をクリア
+                if (isKonamiActivated) updateKonamiUI(true, null);
                 // ブラウザの再生ロックを解除するため、タップ直後に一瞬再生を試みる
                 localVideo.style.opacity = "0.6";
                 localVideo.play().then(() => localVideo.pause()).catch(() => { });
@@ -1435,7 +1446,11 @@
                     localVideo.pause();
                     localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
                 }
-                if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); }
+                if (isKonamiActivated) {
+                    playTitleBGM();
+                    showSongList();
+                    updateKonamiUI(true, 'assets/images/takaramonos.jpg');
+                }
                 else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); }
                 document.getElementById('result-screen').style.display = 'none';
                 document.getElementById('launcher-screen').style.display = 'none';
