@@ -481,7 +481,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 19:27 (JST)
+                最終更新: 2026/04/02 19:43 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -735,6 +735,8 @@
             // --- 変数管理 ---
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
+            let chromaCanvas = document.createElement('canvas');
+            let chromaCtx = chromaCanvas.getContext('2d', { willReadFrequently: true });
             let currentSelectedSong = null;
             let BACKUP_SONG_LIST = [
                 { name: "僕らのLIVE 君とのLIFE", video: "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/bokura.jpg" },
@@ -790,13 +792,14 @@
                 });
             }
 
-            function updateKonamiUI(isActivated) {
+            function updateKonamiUI(isActivated, jacketUrl) {
                 const wrapper = document.getElementById('game-wrapper');
+                const imgUrl = jacketUrl || 'assets/images/takaramonos.jpg';
                 if (isActivated) {
                     document.body.classList.add('konami-mode');
                     wrapper.classList.add('konami-mode');
-                    document.body.style.backgroundImage = "url('assets/images/takaramonos.jpg')";
-                    wrapper.style.backgroundImage = "url('assets/images/takaramonos.jpg')";
+                    document.body.style.backgroundImage = `url('${imgUrl}')`;
+                    wrapper.style.backgroundImage = `url('${imgUrl}')`;
                     wrapper.style.backgroundSize = "contain";
                     wrapper.style.backgroundRepeat = "no-repeat";
                     wrapper.style.backgroundPosition = "center top";
@@ -1101,6 +1104,7 @@
                 lanePressed.fill(false); activeTouches.clear(); updateUI();
                 const jEl = document.getElementById('judge-display'); jEl.innerText = "READY?"; jEl.className = "text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest";
                 syncEditorNotes();
+                if (isKonamiActivated) updateKonamiUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
 
                 if (isEditMode) {
                     isRecording = true;
@@ -1109,7 +1113,9 @@
                 } else { isRecording = false; }
 
                 localVideo.currentTime = 0; localVideo.style.display = 'block';
-                localVideo.style.opacity = "1"; // プレイ中は不透明度を 100% に
+                // 僕らのLIVEの場合は動画自体の不透明度を0にし、キャンバスでクロマキー描画する
+                const isBokura = currentSelectedSong && currentSelectedSong.name.includes("僕らのLIVE");
+                localVideo.style.opacity = isBokura ? "0" : "1";
                 localVideo.play();
                 isPlaying = true; requestAnimationFrame(update);
             }
@@ -1165,7 +1171,29 @@
             }
 
             function draw(ct) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); const isP = canvas.height > canvas.width;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // クロマキー合成 (僕らのLIVE君とのLIFE用)
+                if (currentSelectedSong && currentSelectedSong.name.includes("僕らのLIVE") && localVideo && !localVideo.paused) {
+                    if (chromaCanvas.width !== canvas.width) {
+                        chromaCanvas.width = canvas.width;
+                        chromaCanvas.height = canvas.height;
+                    }
+                    chromaCtx.drawImage(localVideo, 0, 0, chromaCanvas.width, chromaCanvas.height);
+                    const frame = chromaCtx.getImageData(0, 0, chromaCanvas.width, chromaCanvas.height);
+                    const data = frame.data;
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i], g = data[i + 1], b = data[i + 2];
+                        // グリーンバック除去
+                        if (g > 100 && g > r * 1.2 && g > b * 1.2) {
+                            data[i + 3] = 0;
+                        }
+                    }
+                    chromaCtx.putImageData(frame, 0, 0);
+                    ctx.drawImage(chromaCanvas, 0, 0);
+                }
+
+                const isP = canvas.height > canvas.width;
                 const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
                 buttons.forEach((btn, idx) => {
                     ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2); ctx.strokeStyle = lanePressed[idx] ? '#fff' : '#00f0ff'; ctx.lineWidth = lanePressed[idx] ? 4 : 2; ctx.stroke();
