@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 02:00 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 02:01 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 02:00 (JST)
+                        最終更新: 2026/04/03 02:01 (JST)
                     </p>
                 </div>
 
@@ -919,41 +919,36 @@
 
             if (judgment === 'PERFECT') {
                 // --- クリスマスベル・シャン！(鈴の多重層構成) ---
-                
-                // 1. ベルのコア音 (複数の鈴が鳴る不協和音的な響き)
-                const freqs = [2300, 4100, 5900, 8500]; // 鈴特有の倍音
+                const freqs = [2300, 4100, 5900, 8500];
                 freqs.forEach((f, i) => {
                     const osc = audioCtx.createOscillator();
                     const og = audioCtx.createGain();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(f, now);
-                    // 高い音ほど減衰を早く
                     const decay = 0.4 - (i * 0.05);
                     og.gain.setValueAtTime(0.06, now);
                     og.gain.exponentialRampToValueAtTime(0.01, now + decay);
                     osc.connect(og); og.connect(audioCtx.destination);
                     osc.start(now); osc.stop(now + 0.5);
                 });
-
-                // 2. シャララ…という煌めき層 (ノイズ)
                 const nsJingle = audioCtx.createBufferSource(); nsJingle.buffer = noiseBuffer;
                 const nfJingle = audioCtx.createBiquadFilter(); 
                 nfJingle.type = 'bandpass'; nfJingle.frequency.setValueAtTime(7000, now);
                 const ngJingle = audioCtx.createGain();
                 ngJingle.gain.setValueAtTime(0.25, now);
-                ngJingle.gain.exponentialRampToValueAtTime(0.01, now + 0.5); // 残響を長く
+                ngJingle.gain.exponentialRampToValueAtTime(0.01, now + 0.5); 
                 nsJingle.connect(nfJingle); nfJingle.connect(ngJingle); ngJingle.connect(audioCtx.destination);
                 nsJingle.start(now);
-
             } else {
-                // それ以外: 「チッ」という鋭いクリック音
-                const nsClick = audioCtx.createBufferSource(); nsClick.buffer = noiseBuffer;
-                const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(10000, now);
-                const ngClick = audioCtx.createGain();
-                ngClick.gain.setValueAtTime(0.12, now);
-                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.03); 
-                nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
-                nsClick.start(now);
+                // --- それ以外: 「カン！」という乾いた打撃音 ---
+                const oscKan = audioCtx.createOscillator();
+                const ogKan = audioCtx.createGain();
+                oscKan.type = 'triangle';
+                oscKan.frequency.setValueAtTime(2800, now);
+                ogKan.gain.setValueAtTime(0.12, now);
+                ogKan.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                oscKan.connect(ogKan); ogKan.connect(audioCtx.destination);
+                oscKan.start(now); oscKan.stop(now + 0.1);
             }
         }
 
