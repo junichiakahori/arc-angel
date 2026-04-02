@@ -1310,7 +1310,8 @@
             isEditMode = editMode;
 
             const speedVal = parseFloat(document.getElementById('speed-input').value) || 5.0;
-            NOTE_TRAVEL_TIME = Math.max(0.5, 3.2 - (0.24 * speedVal));
+            // 速度計算を2倍速ベースに変更 (5.0設定時に約1.0秒で到達)
+            NOTE_TRAVEL_TIME = Math.max(0.2, 5.0 / speedVal);
 
             const raw = document.getElementById('chart-input').value.trim();
             CHART = raw ? JSON.parse(raw.replace(/^const CHART = /, '').replace(/;$/, '')).sort((a, b) => a.time - b.time) : [];
