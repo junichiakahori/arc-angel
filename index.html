@@ -6,9 +6,9 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
-    <link rel="apple-touch-icon" href="assets/images/favicon.png">
-    <title>ArcAngel - 動画同期リズムゲーム (Last Updated: 11:51)</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="../assets/images/favicon.png">
+    <title>ArcAngel v0.5 - 2026/04/03 01:15 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -569,7 +569,7 @@
                     <p class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/02 22:22 (JST)
+                        最終更新: 2026/04/02 23:26 (JST)
                     </p>
                 </div>
 
@@ -862,6 +862,8 @@
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
             let currentSelectedSong = null;
+            let currentSongIndex = -1;
+            let songsStore = [];
             let BACKUP_SONG_LIST = [
                 { name: "僕らのLIVE 君とのLIFE", video: "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/bokura.jpg" },
                 { name: "タカラモノズ", video: "assets/videos/takaramonos.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/takaramonos.jpg" },
@@ -1074,9 +1076,24 @@
 
                 // API fetch replaced by JSON fetch
                 try {
-                    const r = await fetch('assets/songs.json?v=' + Date.now());
-                    if (!r.ok) throw new Error("JSON not found");
-                    AUTO_SONG_LIST = await r.json();
+                    const response = await fetch(`../assets/songs.json?v=${Date.now()}`);
+                    songsStore = await response.json();
+                    
+                    // songs.json内の全パスを、現在の階層（latestフォルダ内）に合わせて調整
+                    songsStore = songsStore.map(song => {
+                        const adjustPath = (p) => p.startsWith('assets/') ? '../' + p : p;
+                        const newCharts = {};
+                        for (let key in song.charts) {
+                            newCharts[key] = adjustPath(song.charts[key]);
+                        }
+                        return {
+                            ...song,
+                            video: adjustPath(song.video),
+                            jacket: adjustPath(song.jacket),
+                            charts: newCharts
+                        };
+                    });
+                    AUTO_SONG_LIST = songsStore;
                     renderList(AUTO_SONG_LIST);
                 } catch (e) {
                     console.log("songs.json not found or error, using backup list.");
@@ -1117,27 +1134,32 @@
                 showToast(`「${s.name}」プレビュー中！難易度を選んでね♪`);
             }
 
-            async function selectDifficulty(diff) {
-                currentDifficulty = diff;
-                const btns = document.getElementById('difficulty-box').querySelectorAll('.btn-diff');
-                btns.forEach(b => b.classList.remove('selected'));
-                const target = Array.from(btns).find(b => b.innerText === diff);
-                if (target) target.classList.add('selected');
+            window.selectDifficulty = async (diff) => {
+                const target = event.currentTarget || event.target;
+                const buttons = document.querySelectorAll('.btn-diff');
+                buttons.forEach(btn => btn.classList.remove('selected'));
+                if (target && target.classList) target.classList.add('selected');
 
+                if (!currentSelectedSong) {
+                    showError("先に曲を選択してください。");
+                    return;
+                }
                 const song = currentSelectedSong;
                 const chartUrl = song.charts[diff];
                 const chartStatus = document.getElementById('chart-file-status');
 
-                // --- ローカル保存済みデータのチェック ---
+                // サーバーからの読み込みを優先するため、保存済みデータの自動復旧を一旦無効化、または後に回します
+                /*
                 const savedData = loadChartFromLocal();
                 if (savedData) {
                     recordedChart = savedData;
                     CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                    chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました (17:11)`;
+                    chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました`;
                     chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
                     syncEditorNotes();
                     return;
                 }
+                */
 
                 if (!chartUrl) {
                     CHART = []; recordedChart = [];
@@ -1148,13 +1170,28 @@
                 }
                 showLoading("譜面を取得中...");
                 try {
-                    const r = await fetch(chartUrl + (chartUrl.includes('?') ? '&' : '?') + 'v=' + Date.now());
-                    const txt = await r.text();
+                    const response = await fetch(`${chartUrl}?v=${Date.now()}`);
+                    const txt = await response.text();
                     document.getElementById('chart-input').value = txt;
-                    recordedChart = JSON.parse(txt.replace(/^const CHART = /, '').replace(/;$/, ''));
-                    CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                    chartStatus.innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}]`;
-                    chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                    
+                    // 読み込みをより堅牢に修正（前後トリム、セミコロン削除の強化）
+                    let jsonText = txt.trim()
+                        .replace(/^const CHART\s*=\s*/, '')
+                        .replace(/;+\s*$/, '');
+                    
+                    try {
+                        recordedChart = JSON.parse(jsonText);
+                        CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                        showToast(`譜面読込成功: ${CHART.length}個のノーツ`);
+                        console.log("Chart Loaded Successfully:", CHART);
+                        
+                        chartStatus.innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}] (${CHART.length}notes)`;
+                        chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                    } catch (e) {
+                        console.error("JSON Parse Error:", e, jsonText);
+                        showError("譜面データの解析に失敗しました。形式を確認してください。");
+                        showToast("譜面解析エラー");
+                    }
                     showToast(`${diff} 譜面を読み込みました！`);
                     syncEditorNotes();
                 } catch (e) { showToast("譜面の取得に失敗しました"); }
@@ -1296,7 +1333,6 @@
 
             function showLiveFailed() {
                 isPlaying = false; if (localVideo) localVideo.pause();
-                showToast("LIVE FAILED...");
                 const resultTitle = document.querySelector('#result-screen h2');
                 resultTitle.innerText = "LIVE FAILED";
                 resultTitle.className = "text-5xl font-black mb-4 italic text-red-600 animate-pulse tracking-tighter text-center px-12 overflow-visible min-w-full";
