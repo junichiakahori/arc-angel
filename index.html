@@ -72,10 +72,16 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
             text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .overlay-screen>* {
+            margin-top: auto;
+            margin-bottom: auto;
         }
 
         #launcher-screen {
@@ -522,7 +528,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 20:57 (JST)
+                最終更新: 2026/04/02 21:12 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
