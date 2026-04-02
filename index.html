@@ -408,7 +408,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 16:36 (JST)
+                最終更新: 2026/04/02 16:43 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -856,21 +856,49 @@
 
                 showToast(`「${s.name}」プレビュー中！難易度を選んでね♪`);
             }
+            function getChartKey() { return `chart_${currentSelectedSong.name}_${currentDifficulty}`; }
+            function saveChartToLocal() { if (!currentSelectedSong || !currentDifficulty) return; localStorage.setItem(getChartKey(), JSON.stringify(recordedChart)); }
+            function loadChartFromLocal() { if (!currentSelectedSong || !currentDifficulty) return null; const data = localStorage.getItem(getChartKey()); return data ? JSON.parse(data) : null; }
             async function selectDifficulty(diff) {
-                if (!currentSelectedSong || !currentSelectedSong.charts[diff]) {
-                    showToast("この難易度はまだ作成されていません");
+                currentDifficulty = diff;
+                const btns = document.getElementById('difficulty-box').querySelectorAll('.btn-diff');
+                btns.forEach(b => b.classList.remove('selected'));
+                const target = Array.from(btns).find(b => b.innerText === diff);
+                if (target) target.classList.add('selected');
+
+                const song = currentSelectedSong;
+                const chartUrl = song.charts[diff];
+                const chartStatus = document.getElementById('chart-file-status');
+
+                // --- ローカル保存済みデータのチェック ---
+                const savedData = loadChartFromLocal();
+                if (savedData) {
+                    recordedChart = savedData;
+                    CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                    chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました (16:43)`;
+                    chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                    syncEditorNotes();
                     return;
                 }
-                const btns = document.getElementById('difficulty-box').querySelectorAll('.btn-diff');
-                btns.forEach(b => b.classList.toggle('selected', b.innerText === diff));
 
+                if (!chartUrl) {
+                    CHART = []; recordedChart = [];
+                    chartStatus.innerText = `[${diff}] 新規作成 (譜面データなし)`;
+                    chartStatus.className = "text-[9px] text-yellow-400 mt-1";
+                    syncEditorNotes();
+                    return;
+                }
                 showLoading("譜面を取得中...");
                 try {
-                    const r = await fetch(currentSelectedSong.charts[diff]);
+                    const r = await fetch(chartUrl);
                     const txt = await r.text();
                     document.getElementById('chart-input').value = txt;
-                    document.getElementById('chart-file-status').innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}]`;
+                    recordedChart = JSON.parse(txt.replace(/^const CHART = /, '').replace(/;$/, ''));
+                    CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                    chartStatus.innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}]`;
+                    chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
                     showToast(`${diff} 譜面を読み込みました！`);
+                    syncEditorNotes();
                 } catch (e) { showToast("譜面の取得に失敗しました"); }
                 hideLoading();
             }
@@ -1091,7 +1119,11 @@
                 isRecording = !isRecording;
                 const btn = document.getElementById('btn-rec-toggle'), status = document.getElementById('edit-status'), lamp = document.getElementById('rec-lamp');
                 if (isRecording) { btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500'); if (recordedChart.length > 0 && confirm("RESET?")) recordedChart = []; localVideo.currentTime = 0; localVideo.play(); }
-                else { btn.innerText = "記録開始"; btn.classList.remove('bg-red-600'); status.innerText = "RECORDING READY"; status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; lamp.classList.replace('bg-red-500', 'bg-gray-600'); localVideo.pause(); }
+                else {
+                    btn.innerText = "記録開始"; btn.classList.remove('bg-red-600'); status.innerText = "RECORDING READY"; status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; lamp.classList.replace('bg-red-500', 'bg-gray-600'); localVideo.pause();
+                    // 記録停止時にオートセーブ
+                    saveChartToLocal();
+                }
             }
 
             function togglePreview() {
@@ -1131,7 +1163,29 @@
 
                 localVideo.currentTime = 0;
                 localVideo.play();
+                saveChartToLocal(); // プレイ開始時にも保存
                 showToast("本番プレイ開始！");
+            }
+
+            // --- 譜面保存関連 ---
+            function getChartKey() {
+                if (!currentSelectedSong) return null;
+                const diffBtns = document.getElementById('difficulty-box').querySelectorAll('.btn-diff');
+                let diffName = "UNKNOWN";
+                diffBtns.forEach(b => { if (b.classList.contains('selected')) diffName = b.innerText; });
+                return `arcangel_chart_${currentSelectedSong.name}_${diffName}`;
+            }
+            function saveChartToLocal() {
+                const key = getChartKey();
+                if (!key || recordedChart.length === 0) return;
+                localStorage.setItem(key, JSON.stringify(recordedChart));
+                console.log("Chart saved to localStorage:", key);
+            }
+            function loadChartFromLocal() {
+                const key = getChartKey();
+                if (!key) return null;
+                const saved = localStorage.getItem(key);
+                return saved ? JSON.parse(saved) : null;
             }
 
             function backToEditorFromPlay() {
