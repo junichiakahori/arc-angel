@@ -372,7 +372,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:35 (JST)
+                最終更新: 2026/04/02 11:40 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -411,7 +411,9 @@
                             class="bg-blue-500/20 hover:bg-blue-500/40 border border-blue-500/30 px-3 py-1 rounded-full text-[8px] font-bold text-blue-200 transition-all">BGM
                             STOP</button>
                     </div>
-                    <div id="song-list" class="flex flex-row gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x"></div>
+                    <div id="song-list"
+                        class="flex flex-row gap-4 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scroll-smooth"
+                        style="-webkit-overflow-scrolling: touch;"></div>
                 </div>
 
                 <div id="chart-selector"
@@ -727,17 +729,18 @@
                     list.innerHTML = '';
                     songs.forEach(s => {
                         const b = document.createElement('button');
-                        b.className = "flex-shrink-0 w-36 h-48 bg-blue-900/40 hover:scale-105 border border-blue-500/30 rounded-3xl transition-all snap-center animate-fade-in relative overflow-hidden group flex flex-col";
+                        b.className = "flex-shrink-0 w-[45%] max-w-[160px] h-48 bg-blue-900/40 hover:scale-95 active:scale-90 border-2 border-blue-500/20 rounded-[2rem] transition-all snap-center animate-fade-in relative overflow-hidden group flex flex-col shadow-lg";
 
                         // ジャケット画像コンテナ
                         const img = document.createElement('div');
-                        img.className = "w-full aspect-square bg-cover bg-center";
+                        img.className = "w-full aspect-square bg-cover bg-center transition-transform group-hover:scale-110";
                         if (s.jacket) img.style.backgroundImage = `url('${s.jacket}')`;
+                        else img.className += " bg-blue-600/20";
 
-                        // 曲名コンテナ (下部の暗い部分)
+                        // 曲名コンテナ
                         const info = document.createElement('div');
-                        info.className = "w-full p-2 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center flex-1";
-                        info.innerHTML = `<span class="text-[9px] font-black italic text-white leading-tight drop-shadow-lg text-center h-full flex items-center">${s.name}</span>`;
+                        info.className = "w-full p-2 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center flex-1";
+                        info.innerHTML = `<span class="text-[10px] font-black italic text-white leading-tight drop-shadow-lg text-center px-1">${s.name}</span>`;
 
                         b.appendChild(img);
                         b.appendChild(info);
