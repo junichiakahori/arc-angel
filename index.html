@@ -361,7 +361,7 @@
         }
 
         .btn-diff {
-            @apply p-2 rounded-xl border-2 text-[10px] font-black italic transition-all hover:scale-105 active:scale-95;
+            @apply px-0.5 py-3 rounded-xl border-2 text-[9px] font-black italic transition-all hover:scale-105 active:scale-95 tracking-tighter flex items-center justify-center whitespace-nowrap overflow-hidden;
         }
 
         .btn-diff.inactive {
@@ -409,7 +409,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 17:38 (JST)
+                最終更新: 2026/04/02 18:00 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -457,7 +457,7 @@
                         <p
                             class="text-[10px] font-black italic text-gray-400 mb-2 text-center uppercase tracking-widest">
                             Select Difficulty</p>
-                        <div class="grid grid-cols-5 gap-2">
+                        <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
                             <button onclick="selectDifficulty('EASY')"
                                 class="btn-diff bg-[#55e05a]/20 border-[#55e05a] text-[#55e05a]">EASY</button>
                             <button onclick="selectDifficulty('NORMAL')"
