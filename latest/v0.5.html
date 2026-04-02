@@ -1171,11 +1171,20 @@
                     let jsonText = txt.trim()
                         .replace(/^const CHART\s*=\s*/, '')
                         .replace(/;+\s*$/, '');
+                    
+                    try {
+                        recordedChart = JSON.parse(jsonText);
+                        CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                        showToast(`譜面読込成功: ${CHART.length}個のノーツ`);
+                        console.log("Chart Loaded Successfully:", CHART);
                         
-                    recordedChart = JSON.parse(jsonText);
-                    CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                    chartStatus.innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}]`;
-                    chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                        chartStatus.innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}] (${CHART.length}notes)`;
+                        chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                    } catch (e) {
+                        console.error("JSON Parse Error:", e, jsonText);
+                        showError("譜面データの解析に失敗しました。形式を確認してください。");
+                        showToast("譜面解析エラー");
+                    }
                     showToast(`${diff} 譜面を読み込みました！`);
                     syncEditorNotes();
                 } catch (e) { showToast("譜面の取得に失敗しました"); }
