@@ -564,7 +564,10 @@
             // --- 変数管理 ---
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
-            let MAINTAINED_SONGS = [{ name: "タカラモノズ", video: "assets/videos/タカラモノズ.mp4", chart: "assets/charts/タカラモノズ.txt" }];
+            let MAINTAINED_SONGS = [
+                { name: "タカラモノズ", video: "assets/videos/タカラモノズ.mp4", chart: "assets/charts/タカラモノズ.txt" },
+                { name: "TEST", video: "assets/videos/TEST.MOV", chart: "assets/charts/TEST.txt" }
+            ];
             let localVideo, isVideoReady = false;
             let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, miss: 0 };
             let isEditorPaused = false, isSeeking = false;
