@@ -13,7 +13,7 @@
     },
     {
         "name": "START:DASH!!",
-        "video": "assets/videos/startdash.mov",
+        "video": "assets/videos/startdash.mp4",
         "charts": {
             "EASY": "assets/charts/startdash_easy.txt",
             "NORMAL": "assets/charts/startdash_normal.txt",
