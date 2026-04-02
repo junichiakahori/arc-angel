@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 01:59 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 02:00 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 01:59 (JST)
+                        最終更新: 2026/04/03 02:00 (JST)
                     </p>
                 </div>
 
@@ -918,36 +918,32 @@
             const now = audioCtx.currentTime;
 
             if (judgment === 'PERFECT') {
-                // --- 究極の「シャン！」(多重レイヤー構成) ---
+                // --- クリスマスベル・シャン！(鈴の多重層構成) ---
                 
-                // 1. 煌めきレイヤー (シャーーーー)
-                const nsShimmer = audioCtx.createBufferSource(); nsShimmer.buffer = noiseBuffer;
-                const nfShimmer = audioCtx.createBiquadFilter(); nfShimmer.type = 'highpass'; nfShimmer.frequency.setValueAtTime(7000, now);
-                const ngShimmer = audioCtx.createGain();
-                ngShimmer.gain.setValueAtTime(0.35, now);
-                ngShimmer.gain.exponentialRampToValueAtTime(0.01, now + 0.4); 
-                nsShimmer.connect(nfShimmer); nfShimmer.connect(ngShimmer); ngShimmer.connect(audioCtx.destination);
-                nsShimmer.start(now);
+                // 1. ベルのコア音 (複数の鈴が鳴る不協和音的な響き)
+                const freqs = [2300, 4100, 5900, 8500]; // 鈴特有の倍音
+                freqs.forEach((f, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const og = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, now);
+                    // 高い音ほど減衰を早く
+                    const decay = 0.4 - (i * 0.05);
+                    og.gain.setValueAtTime(0.06, now);
+                    og.gain.exponentialRampToValueAtTime(0.01, now + decay);
+                    osc.connect(og); og.connect(audioCtx.destination);
+                    osc.start(now); osc.stop(now + 0.5);
+                });
 
-                // 2. 打撃・芯レイヤー (音の厚み)
-                const oscPunch = audioCtx.createOscillator();
-                const ogPunch = audioCtx.createGain();
-                oscPunch.type = 'sine';
-                oscPunch.frequency.setValueAtTime(2500, now);
-                ogPunch.gain.setValueAtTime(0.15, now);
-                ogPunch.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                oscPunch.connect(ogPunch); ogPunch.connect(audioCtx.destination);
-                oscPunch.start(now); oscPunch.stop(now + 0.2);
-
-                // 3. 高域倍音レイヤー (金属の鳴り)
-                const oscZing = audioCtx.createOscillator();
-                const ogZing = audioCtx.createGain();
-                oscZing.type = 'sine';
-                oscZing.frequency.setValueAtTime(14000, now);
-                ogZing.gain.setValueAtTime(0.08, now);
-                ogZing.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                oscZing.connect(ogZing); ogZing.connect(audioCtx.destination);
-                oscZing.start(now); oscZing.stop(now + 0.15);
+                // 2. シャララ…という煌めき層 (ノイズ)
+                const nsJingle = audioCtx.createBufferSource(); nsJingle.buffer = noiseBuffer;
+                const nfJingle = audioCtx.createBiquadFilter(); 
+                nfJingle.type = 'bandpass'; nfJingle.frequency.setValueAtTime(7000, now);
+                const ngJingle = audioCtx.createGain();
+                ngJingle.gain.setValueAtTime(0.25, now);
+                ngJingle.gain.exponentialRampToValueAtTime(0.01, now + 0.5); // 残響を長く
+                nsJingle.connect(nfJingle); nfJingle.connect(ngJingle); ngJingle.connect(audioCtx.destination);
+                nsJingle.start(now);
 
             } else {
                 // それ以外: 「チッ」という鋭いクリック音
