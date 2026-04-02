@@ -1333,7 +1333,6 @@
 
             function showLiveFailed() {
                 isPlaying = false; if (localVideo) localVideo.pause();
-                showToast("LIVE FAILED...");
                 const resultTitle = document.querySelector('#result-screen h2');
                 resultTitle.innerText = "LIVE FAILED";
                 resultTitle.className = "text-5xl font-black mb-4 italic text-red-600 animate-pulse tracking-tighter text-center px-12 overflow-visible min-w-full";
