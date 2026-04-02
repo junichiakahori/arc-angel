@@ -409,7 +409,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 17:35 (JST)
+                最終更新: 2026/04/02 17:38 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -522,9 +522,9 @@
                 <textarea id="chart-input" placeholder='[{"time": 1.5, "lane": 0}, {"time": 2.0, "lane": 3}]'
                     class="w-full h-[50vh] bg-black/50 text-sky-300 font-mono text-[11px] p-6 rounded-2xl border border-white/10 mb-6 custom-scrollbar focus:border-orange-500/50 outline-none transition-all"></textarea>
                 <div class="flex gap-4">
-                    <button onclick="applyTextChart()"
+                    <button onclick="closeChartModal()"
                         class="btn-action flex-1 bg-gradient-to-r from-orange-600 to-orange-800 text-lg shadow-[0_4px_15px_rgba(234,88,12,0.3)] hover:scale-105 active:scale-95">完了
-                        (エディタに反映)</button>
+                        (反映)</button>
                     <button onclick="closeTextChart()"
                         class="btn-action flex-1 btn-secondary text-lg hover:scale-105 active:scale-95">キャンセル</button>
                     <button onclick="document.getElementById('chart-input').value=''"
@@ -782,7 +782,10 @@
             function showLoading(txt = "準備中...") { document.getElementById('loading-text').innerText = txt; document.getElementById('loading-overlay').style.display = 'flex'; }
             function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
             function playStartSound() { if (!audioCtx) initAudio(); const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.3); g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.connect(g); g.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.3); }
-            function openChartModal() { document.getElementById('chart-modal').style.display = 'flex'; }
+            function openChartModal() {
+                document.getElementById('chart-input').value = ''; // スタート画面からはクリア
+                document.getElementById('chart-input-modal').style.display = 'flex';
+            }
             function clearChartInput() { if (confirm("入力内容をすべて消去しますか？")) { document.getElementById('chart-input').value = ''; } }
             function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
             function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
@@ -797,7 +800,22 @@
                     btn.innerText = "BGM STOP"; btn.classList.remove('bg-red-500/20');
                 }
             }
-            function closeChartModal() { const el = document.getElementById('chart-input'); const val = el.value.replace(/\s+/g, '').toLowerCase(); if (val === "μ'sicforever") { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); updateKonamiUI(true); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
+            function closeChartModal() {
+                const el = document.getElementById('chart-input');
+                const val = el.value.replace(/\s+/g, '').toLowerCase();
+                if (val === "μ'sicforever") {
+                    isKonamiActivated = true;
+                    playSecretSound();
+                    playTitleBGM();
+                    showSongList();
+                    updateKonamiUI(true);
+                    el.value = '';
+                    document.getElementById('chart-input-modal').style.display = 'none';
+                    return;
+                }
+                // 合言葉でなければ通常の譜面として反映
+                applyTextChart();
+            }
             async function showSongList() {
                 const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
                 const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector');
