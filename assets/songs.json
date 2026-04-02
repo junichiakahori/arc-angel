@@ -2,11 +2,13 @@
     {
         "name": "タカラモノズ",
         "video": "assets/videos/takaramonos.mp4",
-        "chart": "assets/charts/takaramonos.txt"
+        "chart": "assets/charts/takaramonos.txt",
+        "jacket": "assets/images/takaramonos.jpg"
     },
     {
         "name": "A song for You! You? You!!",
         "video": "assets/videos/asongforyou.mp4",
-        "chart": "assets/charts/asongforyou.txt"
+        "chart": "assets/charts/asongforyou.txt",
+        "jacket": "assets/images/asongforyou.jpg"
     }
 ]
