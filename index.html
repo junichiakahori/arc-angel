@@ -522,7 +522,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 20:28 (JST)
+                最終更新: 2026/04/02 20:30 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -1019,6 +1019,7 @@
                 // ブラウザの再生ロックを解除するため、タップ直後に一瞬再生を試みる
                 localVideo.style.display = 'block'; // 表示をONにする
                 localVideo.style.opacity = "0.6";
+                localVideo.loop = true; // プレビュー時はループ再生
                 localVideo.play().then(() => localVideo.pause()).catch(() => { });
                 localVideo.src = s.video;
                 localVideo.oncanplaythrough = () => {
@@ -1182,6 +1183,7 @@
 
                 localVideo.currentTime = 0; localVideo.style.display = 'block';
                 localVideo.style.opacity = "1"; // プレイ中は一律不透明
+                localVideo.loop = false; // プレイ中はループ解除
                 localVideo.play();
                 isPlaying = true; requestAnimationFrame(update);
             }
