@@ -372,7 +372,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:40 (JST)
+                最終更新: 2026/04/02 11:46 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -573,8 +573,9 @@
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
             let BACKUP_SONG_LIST = [
-                { name: "タカラモノズ", video: "assets/videos/takaramonos.mp4", chart: "assets/charts/takaramonos.txt" },
-                { name: "A song for You! You? You!!", video: "assets/videos/asongforyou.mp4", chart: "assets/charts/asongforyou.txt" }
+                { name: "タカラモノズ", video: "assets/videos/takaramonos.mp4", chart: "assets/charts/takaramonos.txt", jacket: "assets/images/takaramonos.jpg" },
+                { name: "A song for You! You? You!!", video: "assets/videos/asongforyou.mp4", chart: "assets/charts/asongforyou.txt", jacket: "assets/images/asongforyou.jpg" },
+                { name: "僕らのLIVE 君とのLIFE", video: "assets/videos/bokura.mp4", chart: "assets/charts/bokura.txt", jacket: "assets/images/bokura.jpg" }
             ];
             let AUTO_SONG_LIST = []; // キャッシュ用
             let localVideo, isVideoReady = false;

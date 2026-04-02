@@ -10,5 +10,11 @@
         "video": "assets/videos/asongforyou.mp4",
         "chart": "assets/charts/asongforyou.txt",
         "jacket": "assets/images/asongforyou.jpg"
+    },
+    {
+        "name": "僕らのLIVE 君とのLIFE",
+        "video": "assets/videos/bokura.mp4",
+        "chart": "assets/charts/bokura.txt",
+        "jacket": "assets/images/bokura.jpg"
     }
 ]
