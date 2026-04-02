@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 10:49 (JST)
+                最終更新: 2026/04/02 10:54 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -681,7 +681,7 @@
             function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
             function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
             function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
-            function closeChartModal() { const el = document.getElementById('chart-input'); if (el.value.replace(/\s+/g, '') === '上上下下左右左右BA') { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
+            function closeChartModal() { const el = document.getElementById('chart-input'); if (el.value.replace(/\s+/g, '') === "μ'sicForever") { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
             async function showSongList() {
                 const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
                 container.classList.remove('hidden'); list.innerHTML = '<p class="text-[9px] text-blue-300 animate-pulse text-center">楽曲リストを読込中...</p>';
