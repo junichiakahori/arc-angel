@@ -361,11 +361,83 @@
         }
 
         .btn-diff {
-            @apply px-0.5 py-3 rounded-xl border-2 text-[9px] font-black italic transition-all hover:scale-105 active:scale-95 tracking-tighter flex items-center justify-center whitespace-nowrap overflow-hidden;
+            @apply flex-grow py-3.5 px-2 rounded-2xl border-2 text-[12px] font-black italic tracking-wider transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center backdrop-blur-md shadow-lg;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            min-width: 90px;
+        }
+
+        .btn-diff.selected {
+            @apply border-white scale-[1.05] shadow-[0_0_25px_rgba(255, 255, 255, 0.4)];
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        /* 難易度別カラー (通常時も薄くつける) */
+        .btn-diff-easy {
+            border-color: rgba(34, 197, 94, 0.3);
+            color: rgba(34, 197, 94, 0.7);
+        }
+
+        .btn-diff-normal {
+            border-color: rgba(59, 130, 246, 0.3);
+            color: rgba(59, 130, 246, 0.7);
+        }
+
+        .btn-diff-hard {
+            border-color: rgba(234, 179, 8, 0.3);
+            color: rgba(234, 179, 8, 0.7);
+        }
+
+        .btn-diff-expert {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: rgba(239, 68, 68, 0.7);
+        }
+
+        .btn-diff-master {
+            border-color: rgba(168, 85, 247, 0.3);
+            color: rgba(168, 85, 247, 0.7);
+        }
+
+        /* 難易度別カラー (選択) */
+        .btn-diff-easy.selected {
+            border-color: #22c55e;
+            color: #fff;
+            background: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+        }
+
+        .btn-diff-normal.selected {
+            border-color: #3b82f6;
+            color: #fff;
+            background: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+        }
+
+        .btn-diff-hard.selected {
+            border-color: #eab308;
+            color: #fff;
+            background: rgba(234, 179, 8, 0.4);
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.6);
+        }
+
+        .btn-diff-expert.selected {
+            border-color: #ef4444;
+            color: #fff;
+            background: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-diff-master.selected {
+            border-color: #a855f7;
+            color: #fff;
+            background: rgba(168, 85, 247, 0.4);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
         }
 
         .btn-diff.inactive {
-            @apply opacity-20 cursor-not-allowed scale-90 grayscale-[0.5] border-gray-700 !text-gray-600;
+            @apply opacity-10 cursor-not-allowed grayscale pointer-events-none;
         }
 
         .btn-diff.selected {
@@ -409,7 +481,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 18:00 (JST)
+                最終更新: 2026/04/02 18:08 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -457,17 +529,15 @@
                         <p
                             class="text-[10px] font-black italic text-gray-400 mb-2 text-center uppercase tracking-widest">
                             Select Difficulty</p>
-                        <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
-                            <button onclick="selectDifficulty('EASY')"
-                                class="btn-diff bg-[#55e05a]/20 border-[#55e05a] text-[#55e05a]">EASY</button>
+                        <div class="flex flex-wrap justify-center gap-2.5 sm:gap-4 px-2">
+                            <button onclick="selectDifficulty('EASY')" class="btn-diff btn-diff-easy">EASY</button>
                             <button onclick="selectDifficulty('NORMAL')"
-                                class="btn-diff bg-[#58bff0]/20 border-[#58bff0] text-[#58bff0]">NORMAL</button>
-                            <button onclick="selectDifficulty('HARD')"
-                                class="btn-diff bg-[#f0ea58]/20 border-[#f0ea58] text-[#f0ea58]">HARD</button>
+                                class="btn-diff btn-diff-normal">NORMAL</button>
+                            <button onclick="selectDifficulty('HARD')" class="btn-diff btn-diff-hard">HARD</button>
                             <button onclick="selectDifficulty('EXPERT')"
-                                class="btn-diff bg-[#f05858]/20 border-[#f05858] text-[#f05858]">EXPERT</button>
+                                class="btn-diff btn-diff-expert">EXPERT</button>
                             <button onclick="selectDifficulty('MASTER')"
-                                class="btn-diff bg-[#bd58f0]/20 border-[#bd58f0] text-[#bd58f0]">MASTER</button>
+                                class="btn-diff btn-diff-master">MASTER</button>
                         </div>
                     </div>
                 </div>
