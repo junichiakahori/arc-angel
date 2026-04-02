@@ -409,7 +409,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 17:24 (JST)
+                最終更新: 2026/04/02 17:35 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -1215,6 +1215,32 @@
             }
 
             function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
+            function openTextEditor() {
+                if (isRecording) toggleRecording();
+                const jsonStr = JSON.stringify(recordedChart, null, 2);
+                document.getElementById('chart-input').value = jsonStr;
+                document.getElementById('chart-input-modal').style.display = 'flex';
+                if (localVideo) localVideo.pause();
+                showToast("テキスト編集モード");
+            }
+            function closeTextChart() {
+                document.getElementById('chart-input-modal').style.display = 'none';
+            }
+            function applyTextChart() {
+                const txt = document.getElementById('chart-input').value.trim();
+                try {
+                    let data = txt ? JSON.parse(txt) : [];
+                    if (!Array.isArray(data)) throw new Error("配列形式である必要があります");
+                    recordedChart = data;
+                    syncEditorNotes();
+                    saveChartToLocal();
+                    closeTextChart();
+                    showToast("編集を反映しました");
+                } catch (e) {
+                    alert("エラー: " + e.message);
+                }
+            }
+
             function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('launcher-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
             function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = localVideo.currentTime; playTapSound(); if (isEditMode && isRecording) { recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); syncEditorNotes(); } else if (!isEditMode) judgeStart(l); else createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); }
             function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
