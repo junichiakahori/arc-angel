@@ -13,15 +13,15 @@
     },
     {
         "name": "START:DASH!!",
-        "video": "assets/videos/start_dash.mp4",
+        "video": "assets/videos/startdash.mp4",
         "charts": {
-            "EASY": "assets/charts/start_dash_easy.txt",
-            "NORMAL": "assets/charts/start_dash_normal.txt",
-            "HARD": "assets/charts/start_dash_hard.txt",
-            "EXPERT": "assets/charts/start_dash_expert.txt",
-            "MASTER": "assets/charts/start_dash_master.txt"
+            "EASY": "assets/charts/startdash_easy.txt",
+            "NORMAL": "assets/charts/startdash_normal.txt",
+            "HARD": "assets/charts/startdash_hard.txt",
+            "EXPERT": "assets/charts/startdash_expert.txt",
+            "MASTER": "assets/charts/startdash_master.txt"
         },
-        "jacket": "assets/images/start_dash.jpg"
+        "jacket": "assets/images/startdash.jpg"
     },
     {
         "name": "タカラモノズ",
