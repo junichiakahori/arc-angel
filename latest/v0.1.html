@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ArcAngel - 動画同期リズムゲーム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: none;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+            color: white;
+            width: 100%;
+            height: 100vh;
+            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+        }
+
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        #bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 0;
+            opacity: 0.6;
+            pointer-events: none;
+            background-color: #000;
+        }
+
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+        }
+
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            background: #000;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .launcher-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white !important;
+            padding: 25px 40px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: 900;
+            border: 4px solid #fff;
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.7);
+            cursor: pointer;
+            text-decoration: none !important;
+            display: inline-block;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 9999px;
+            font-size: 15px;
+            font-weight: 900;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn-secondary {
+            background: #333;
+            border: 1px solid #555;
+        }
+
+        .debug-info {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            font-family: 'Hiragino Sans', sans-serif;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            pointer-events: auto;
+            opacity: 0;
+            transition: 0.5s;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .input-box {
+            width: 100%;
+            max-width: 380px;
+            background: #111;
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"],
+        textarea {
+            background: #000;
+            color: white;
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 5px;
+            appearance: none;
+            outline: none;
+            margin: 10px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #2563eb;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
+
+        #pause-screen {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+        }
+
+        #editor-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 150;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 12px 20px;
+            border-radius: 20px;
+            border: 1px solid #444;
+            display: none;
+            gap: 10px;
+            align-items: center;
+            width: max-content;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .edit-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 70px;
+        }
+
+        .btn-rec {
+            background: #991b1b;
+            color: white;
+            border: 1px solid #f87171;
+        }
+
+        .btn-rec.active {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: blink 1s infinite;
+        }
+
+        .btn-preview {
+            background: #1e3a8a;
+            color: white;
+            border: 1px solid #60a5fa;
+        }
+
+        .btn-preview.active {
+            background: #3b82f6;
+            box-shadow: 0 0 15px #3b82f6;
+        }
+
+        .btn-export {
+            background: #111;
+            color: #4ade80;
+            border: 1px solid #22c55e;
+        }
+
+        #chart-output {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            height: 70%;
+            background: #111;
+            color: #0f0;
+            font-family: monospace;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #555;
+            display: none;
+            z-index: 200;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 11px;
+        }
+
+        .toast {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00f0ff;
+            color: #000;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 300;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-wrapper">
+        <!-- 1. 起動画面 -->
+        <div id="launcher-screen" class="overlay-screen">
+            <h1 class="text-3xl font-black italic text-white tracking-tighter">ArcAngel</h1>
+            <p class="text-[10px] text-blue-400 mb-1 uppercase tracking-[0.3em] font-bold">動画同期リズムゲーム</p>
+            <p class="text-[9px] text-gray-500 mb-8 uppercase tracking-widest font-bold opacity-60">
+                最終更新: 2026/04/01 12:52 (JST)
+            </p>
+
+            <button id="tab-launch-btn" class="launcher-btn" onclick="tryOpenNewTab()">
+                別タブで開く<br><span class="text-xs font-normal opacity-70">(推奨)</span>
+            </button>
+
+            <button class="btn-action btn-secondary" onclick="launchInPlace()">
+                この枠内で開始
+            </button>
+
+            <p class="mt-8 text-gray-500 text-[10px] px-8 leading-relaxed">
+                ※ノーツが不自然に巨大化する不具合を修正しました。<br>
+                横長動画の表示を縦画面に最適化しています。
+            </p>
+        </div>
+
+        <!-- 2. メインメニュー -->
+        <div id="start-screen" class="overlay-screen" style="display: none;">
+            <h1 class="text-4xl font-black mb-1 italic text-blue-500 tracking-tighter">ArcAngel</h1>
+            <p class="mb-4 text-gray-400 text-[10px] uppercase font-bold tracking-widest">動画同期リズムゲーム</p>
+
+            <div class="input-box">
+                <label class="block text-[10px] text-gray-400 font-bold text-left">1. 動画ファイルを選択 (.mp4)</label>
+                <input type="file" id="file-input" accept="video/*" class="w-full">
+
+                <label class="block text-[10px] text-gray-400 font-bold text-left mt-3">2. ノーツの速さ: <span id="speed-val"
+                        class="text-blue-400">5.0</span></label>
+                <input type="range" id="speed-input" min="1.0" max="10.0" step="0.5" value="5.0"
+                    oninput="document.getElementById('speed-val').innerText = this.value">
+
+                <label class="block text-[10px] text-gray-400 font-bold text-left mt-1">3. 譜面データ (貼り付け)</label>
+                <textarea id="chart-input" placeholder="譜面コードをここに貼り付け（任意）"></textarea>
+            </div>
+
+            <div class="flex flex-wrap justify-center">
+                <button onclick="startLive(false)" class="btn-action">ゲームプレイ</button>
+                <button onclick="startLive(true)" class="btn-action btn-secondary">譜面作成 (エディット)</button>
+            </div>
+
+            <button onclick="toggleFullScreen()"
+                class="mt-4 text-[10px] text-blue-400 border border-blue-900 px-4 py-1 rounded-full bg-blue-950/30">
+                全画面表示の切り替え
+            </button>
+        </div>
+
+        <video id="bg-video" playsinline preload="auto" webkit-playsinline></video>
+        <canvas id="game-canvas"></canvas>
+
+        <!-- インゲームUI -->
+        <div id="ui-overlay" class="debug-info">
+            <div class="flex justify-between items-center gap-4 mb-1 border-b border-white/10 pb-1">
+                <div id="score-display" class="font-bold">SCORE: 000000</div>
+                <div id="time-display" class="opacity-70 text-[9px]">0.00s</div>
+            </div>
+            <div id="combo-display" class="text-xs font-bold text-blue-400">COMBO: 0</div>
+            <div id="judge-display"
+                class="text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest uppercase">
+                READY?</div>
+
+            <div class="flex justify-center gap-3 mt-1 pt-1 border-t border-white/10">
+                <button class="bg-white/10 px-4 py-1 rounded text-[9px] font-bold active:bg-white/30"
+                    onclick="togglePause()">一時停止</button>
+                <button class="bg-white/10 px-4 py-1 rounded text-[9px] font-bold active:bg-red-500/50"
+                    onclick="backToTitle()">タイトルへ</button>
+            </div>
+        </div>
+
+        <!-- ポーズ画面 -->
+        <div id="pause-screen" class="overlay-screen">
+            <h2 class="text-4xl font-black mb-6 italic text-white uppercase tracking-tighter text-center">一時停止中</h2>
+            <button onclick="togglePause()" class="btn-action">再開する</button>
+            <button onclick="backToTitle()" class="btn-action btn-secondary">メニューに戻る</button>
+        </div>
+
+        <!-- エディター専用UI -->
+        <div id="editor-controls">
+            <div class="flex flex-col items-center mr-3">
+                <span id="edit-status" class="text-[9px] font-bold text-gray-500 mb-1">待機中</span>
+                <div id="rec-lamp" class="w-2 h-2 rounded-full bg-gray-600"></div>
+            </div>
+            <button id="btn-rec-toggle" onclick="toggleRecording()" class="edit-btn btn-rec">記録開始</button>
+            <button id="btn-preview-toggle" onclick="togglePreview()" class="edit-btn btn-preview">プレビュー</button>
+            <button onclick="copyChart()" class="edit-btn btn-export">データ出力</button>
+            <button onclick="backToTitle()" class="edit-btn bg-gray-800 text-white">終了</button>
+        </div>
+
+        <div id="chart-output" onclick="this.style.display='none'"></div>
+        <div id="toast-msg" class="toast"></div>
+
+        <!-- リザルト画面 -->
+        <div id="result-screen" class="overlay-screen" style="display: none;">
+            <h2 class="text-2xl font-black mb-1 italic text-yellow-500 uppercase tracking-tighter text-center">
+                PERFORMANCE RESULT</h2>
+            <div id="final-score" class="text-5xl font-black mb-4 tracking-widest text-white">000000</div>
+            <div
+                class="bg-gray-900 p-6 rounded-3xl border border-gray-800 mb-6 w-full max-w-xs text-sm font-mono shadow-2xl">
+                <div class="flex justify-between text-yellow-400 mb-1"><span>PERFECT</span><span
+                        id="res-perfect">0</span></div>
+                <div class="flex justify-between text-pink-400 mb-1"><span>GREAT</span><span id="res-great">0</span>
+                </div>
+                <div class="flex justify-between text-green-400 mb-1"><span>GOOD</span><span id="res-good">0</span>
+                </div>
+                <div class="flex justify-between text-red-400 mb-3"><span>MISS</span><span id="res-miss">0</span></div>
+                <div
+                    class="pt-2 mt-2 border-t border-gray-800 flex justify-between font-bold text-white text-lg italic">
+                    <span>MAX COMBO</span><span id="res-combo">0</span></div>
+            </div>
+            <button onclick="backToTitle()" class="btn-action">メニューに戻る</button>
+        </div>
+    </div>
+
+    <script>
+        // --- システム・音響管理 ---
+        let video, canvas, ctx, audioCtx, buttons = [], noiseBuffer = null;
+        let buttonRadius = 35;
+
+        function tryOpenNewTab() {
+            initAudio();
+            const newWin = window.open('about:blank', '_blank');
+            if (newWin) {
+                const html = document.documentElement.outerHTML;
+                newWin.document.open();
+                newWin.document.write(html);
+                newWin.document.close();
+                newWin.isForcedMain = true;
+            } else {
+                showToast("ポップアップがブロックされました");
+            }
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const bufferSize = audioCtx.sampleRate * 0.1;
+                noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+            }
+            if (navigator.audioSession) navigator.audioSession.type = 'playback';
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playTapSound() {
+            if (!audioCtx || !noiseBuffer) return;
+            if (audioCtx.state !== 'running') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'highpass';
+            noiseFilter.frequency.setValueAtTime(5000, now);
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(0.15, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            noiseSource.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+            noiseSource.start(now);
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(8000, now);
+            osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
+            const oscGain = audioCtx.createGain();
+            oscGain.gain.setValueAtTime(0.1, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.connect(oscGain);
+            oscGain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        }
+
+        function playResultJingle() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + i * 0.12);
+                gain.gain.setValueAtTime(0.2, now + i * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + i * 0.12);
+                osc.stop(now + i * 0.12 + 0.5);
+            });
+        }
+
+        function toggleFullScreen() {
+            const wrapper = document.getElementById('game-wrapper');
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+            if (!isFull) {
+                const requestMethod = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen || wrapper.mozRequestFullScreen || wrapper.msRequestFullscreen;
+                if (requestMethod) requestMethod.call(wrapper).catch(() => showToast("全画面化できませんでした。"));
+            } else {
+                const exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+                if (exitMethod) exitMethod.call(document);
+            }
+        }
+
+        // --- ゲームエンジン ---
+        let CHART = [{ time: 2.1, lane: 4 }, { time: 4.1, lane: 2, endTime: 5.5 }];
+        let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false;
+        let notesQueue = [], activeNotes = [], hitEffects = [];
+        let recordedChart = [], gameStartTime = 0, pauseStartTime = 0, totalPauseDuration = 0;
+        let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0);
+        let laneCurrentHoldNote = new Array(9).fill(null);
+
+        let NOTE_TRAVEL_TIME = 2.0;
+        const BUTTON_COUNT = 9;
+        const KEY_LABELS = ['A', 'S', 'D', 'F', 'G/H', 'J', 'K', 'L', ';'];
+        const KEY_MAP = ['a', 's', 'd', 'f', 'g', 'j', 'k', 'l', ';'];
+
+        window.onload = () => {
+            if (window.isForcedMain || window.opener) {
+                document.getElementById('launcher-screen').style.display = 'none';
+                document.getElementById('start-screen').style.display = 'flex';
+            }
+            video = document.getElementById('bg-video');
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas.getContext('2d');
+            window.addEventListener('resize', resize);
+            document.getElementById('file-input').onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) { video.src = URL.createObjectURL(file); video.load(); }
+            };
+            setupInput();
+            resize();
+        };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            buttons = [];
+            const isPortrait = canvas.height > canvas.width;
+            const cx = canvas.width / 2;
+            const cy = isPortrait ? canvas.height * 0.35 : canvas.height * 0.15;
+            buttonRadius = Math.max(18, Math.min(35, canvas.width / 15));
+            const radius = isPortrait ? canvas.width * 0.44 : Math.min(canvas.height - cy - 100, canvas.width * 0.45);
+            const startAngle = isPortrait ? Math.PI * 0.10 : Math.PI * 0.12;
+            const endAngle = isPortrait ? Math.PI * 0.90 : Math.PI * 0.88;
+            for (let i = 0; i < BUTTON_COUNT; i++) {
+                const t = i / (BUTTON_COUNT - 1);
+                const angle = Math.PI - (startAngle + (endAngle - startAngle) * t);
+                buttons.push({ x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius });
+            }
+        }
+
+        function setupInput() {
+            const startH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputStart(l); };
+            const endH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
+            window.addEventListener('keydown', (e) => { if (e.repeat) return; let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) startH(l); if (e.key === 'Escape') togglePause(); });
+            window.addEventListener('keyup', (e) => { let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) endH(l); });
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); for (let i = 0; i < e.changedTouches.length; i++) { const l = getNearestLane(e.changedTouches[i].clientX, e.changedTouches[i].clientY); if (l !== -1) startH(l); } }, { passive: false });
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); for (let i = 0; i < e.changedTouches.length; i++) { const l = getNearestLane(e.changedTouches[i].clientX, e.changedTouches[i].clientY); if (l !== -1) endH(l); } }, { passive: false });
+            video.onended = () => { if (!isEditMode) showResults(); else if (isPreviewMode) togglePreview(); };
+        }
+
+        function handleInputStart(l) {
+            if (lanePressed[l]) return;
+            lanePressed[l] = true; lanePressStartTime[l] = getCurrentGameTime();
+            playTapSound();
+            if (isEditMode && isRecording) createHitEffect(buttons[l].x, buttons[l].y, '#ef4444');
+            else if (!isEditMode) judgeStart(l);
+            else createHitEffect(buttons[l].x, buttons[l].y, '#ffffff');
+        }
+
+        function handleInputEnd(l) {
+            if (!lanePressed[l]) return;
+            lanePressed[l] = false; const ct = getCurrentGameTime();
+            if (isEditMode && isRecording) {
+                const dur = ct - lanePressStartTime[l];
+                const note = { time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l };
+                if (dur > 0.2) note.endTime = parseFloat(ct.toFixed(2));
+                recordedChart.push(note);
+            } else if (!isEditMode) judgeEnd(l);
+        }
+
+        function startLive(editMode = false) {
+            if (isPlaying || !video.src) return;
+            initAudio(); isEditMode = editMode; isPaused = false; isRecording = false; isPreviewMode = false;
+            totalPauseDuration = 0;
+            const userSpeed = parseFloat(document.getElementById('speed-input').value) || 5.0;
+            NOTE_TRAVEL_TIME = 5.0 / userSpeed;
+            const raw = document.getElementById('chart-input').value.trim();
+            if (raw) { try { CHART = JSON.parse(raw.replace(/^const CHART = /, '').replace(/;$/, '')).sort((a, b) => a.time - b.time); } catch (e) { alert("解析失敗。"); return; } }
+            for (let i = 0; i < CHART.length; i++) {
+                const current = CHART[i];
+                current.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - current.time) < 0.015);
+            }
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
+            document.getElementById('editor-controls').style.display = isEditMode ? 'flex' : 'none';
+            score = 0; combo = 0; maxCombo = 0; counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+            notesQueue = isEditMode ? [] : [...CHART]; activeNotes = []; hitEffects = []; recordedChart = [];
+            lanePressed.fill(false); updateUI();
+            video.currentTime = 0;
+            video.play().then(() => { isPlaying = !isEditMode; gameStartTime = performance.now(); requestAnimationFrame(update); });
+        }
+
+        function toggleRecording() {
+            if (!isEditMode) return;
+            if (isPreviewMode) togglePreview();
+            isRecording = !isRecording;
+            const btn = document.getElementById('btn-rec-toggle');
+            const status = document.getElementById('edit-status');
+            if (isRecording) {
+                btn.innerText = "停止"; btn.classList.add('active');
+                status.innerText = "記録中"; status.classList.replace('text-gray-500', 'text-red-500');
+                if (recordedChart.length > 0 && confirm("リセットして新しく開始しますか？")) recordedChart = [];
+            } else {
+                btn.innerText = "記録開始"; btn.classList.remove('active');
+                status.innerText = "待機中"; status.classList.replace('text-red-500', 'text-gray-500');
+            }
+        }
+
+        function togglePreview() {
+            if (!isEditMode) return;
+            if (isRecording) toggleRecording();
+            isPreviewMode = !isPreviewMode;
+            const btn = document.getElementById('btn-preview-toggle');
+            const status = document.getElementById('edit-status');
+            if (isPreviewMode) {
+                if (recordedChart.length === 0) { showToast("ノーツがありません"); isPreviewMode = false; return; }
+                btn.innerText = "停止"; btn.classList.add('active');
+                status.innerText = "プレビュー中"; status.classList.add('text-blue-400');
+                notesQueue = [...recordedChart].sort((a, b) => a.time - b.time);
+                for (let i = 0; i < notesQueue.length; i++) {
+                    const cur = notesQueue[i];
+                    cur.isSim = notesQueue.some((n, idx) => idx !== i && Math.abs(n.time - cur.time) < 0.015);
+                }
+                activeNotes = []; video.currentTime = 0; video.play();
+            } else {
+                btn.innerText = "プレビュー"; btn.classList.remove('active');
+                status.innerText = "待機中"; status.classList.remove('text-blue-400');
+                activeNotes = []; video.pause();
+            }
+        }
+
+        function togglePause() {
+            if (!video.src) return;
+            isPaused = !isPaused;
+            const ps = document.getElementById('pause-screen');
+            if (isPaused) { video.pause(); pauseStartTime = performance.now(); ps.style.display = 'flex'; }
+            else { totalPauseDuration += (performance.now() - pauseStartTime); video.play(); ps.style.display = 'none'; requestAnimationFrame(update); }
+        }
+
+        function backToTitle() {
+            isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; video.pause();
+            document.getElementById('result-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0';
+            document.getElementById('editor-controls').style.display = 'none'; document.getElementById('chart-output').style.display = 'none';
+        }
+
+        function getCurrentGameTime() {
+            if (!video) return 0;
+            return video.currentTime;
+        }
+
+        function update() {
+            if (isPaused) return;
+            let ct = getCurrentGameTime();
+            if (isPreviewMode || (!isEditMode && isPlaying)) {
+                while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) { activeNotes.push({ ...notesQueue.shift(), status: 'waiting' }); }
+                if (!isEditMode) document.getElementById('time-display').innerText = `${ct.toFixed(2)}s`;
+            }
+            for (let i = hitEffects.length - 1; i >= 0; i--) {
+                const e = hitEffects[i];
+                if (e.type === 'ring') { e.size += e.speed; e.opacity -= 0.05; }
+                else { e.x += e.vx; e.y += e.vy; e.opacity -= 0.04; }
+                if (e.opacity <= 0) hitEffects.splice(i, 1);
+            }
+            draw(ct);
+            requestAnimationFrame(update);
+        }
+
+        function draw(ct) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isPortrait = canvas.height > canvas.width;
+            const cx = canvas.width / 2;
+            const cy = isPortrait ? canvas.height * 0.35 : canvas.height * 0.15;
+
+            buttons.forEach((btn, idx) => {
+                ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2);
+                ctx.strokeStyle = lanePressed[idx] ? '#fff' : '#00f0ff'; ctx.lineWidth = lanePressed[idx] ? 4 : 2; ctx.stroke();
+                ctx.fillStyle = 'rgba(0, 240, 255, 0.15)'; ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = `bold ${buttonRadius / 2.5}px Arial`; ctx.textAlign = 'center'; ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
+            });
+
+            const timeGroups = {};
+            activeNotes.forEach(n => {
+                if (n.status === 'waiting') {
+                    const key = n.time.toFixed(3);
+                    if (!timeGroups[key]) timeGroups[key] = [];
+                    timeGroups[key].push(n);
+                }
+            });
+            Object.values(timeGroups).forEach(group => {
+                if (group.length > 1) {
+                    group.sort((a, b) => a.lane - b.lane);
+                    ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 4;
+                    for (let i = 0; i < group.length; i++) {
+                        const n = group[i];
+                        const sp = (ct - (n.time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
+                        const hx = cx + (buttons[n.lane].x - cx) * sp; const hy = cy + (buttons[n.lane].y - cy) * sp;
+                        if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
+                    }
+                    ctx.stroke();
+                }
+            });
+
+            activeNotes.forEach((n, i) => {
+                const tb = buttons[n.lane]; const sp = (ct - (n.time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
+                if (sp >= 0) {
+                    const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
+                    // 修正：spが1を越えてもノーツサイズがbuttonRadiusを越えないようにする
+                    const sizeSp = Math.min(1.0, sp);
+                    const noteSize = buttonRadius * (0.4 + 0.6 * sizeSp);
+
+                    if (n.endTime) {
+                        const ep = (ct - (n.endTime - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
+                        const tx = cx + (tb.x - cx) * Math.max(0, ep), ty = cy + (tb.y - cy) * Math.max(0, ep);
+                        ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(tx, ty);
+                        ctx.strokeStyle = (n.status === 'holding') ? '#facc15' : 'rgba(255,0,255,0.5)';
+                        ctx.lineWidth = noteSize * 0.8; ctx.lineCap = 'round'; ctx.stroke();
+                        if (ep >= 0) {
+                            ctx.beginPath(); ctx.arc(tx, ty, noteSize * 0.7, 0, Math.PI * 2);
+                            ctx.fillStyle = '#facc15'; ctx.fill();
+                            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
+                        }
+                    }
+                    if (n.status !== 'holding') {
+                        if (n.isSim) { ctx.beginPath(); ctx.arc(hx, hy, noteSize + 5, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke(); }
+                        ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2);
+                        ctx.fillStyle = n.endTime ? '#facc15' : '#ff00ff'; ctx.fill();
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+                    }
+                }
+                if (!isEditMode && ct > (n.endTime || n.time) + 0.4 && n.status === 'waiting') {
+                    activeNotes.splice(i, 1); counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI();
+                }
+            });
+            hitEffects.forEach(e => {
+                ctx.globalAlpha = e.opacity; ctx.beginPath();
+                if (e.type === 'ring') { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.strokeStyle = e.color; ctx.lineWidth = 3; ctx.stroke(); }
+                else { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); }
+            });
+            ctx.globalAlpha = 1.0;
+        }
+
+        function judgeStart(l) {
+            const ct = getCurrentGameTime(); let ti = -1, md = 0.35;
+            activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } });
+            if (ti !== -1) {
+                const n = activeNotes[ti]; const tb = buttons[l];
+                if (n.endTime) { n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(tb.x, tb.y, '#facc15'); }
+                else { activeNotes.splice(ti, 1); processResult(md, tb); }
+            }
+        }
+
+        function judgeEnd(l) {
+            const n = laneCurrentHoldNote[l]; if (!n) return;
+            const ct = getCurrentGameTime(); const d = Math.abs(ct - n.endTime);
+            const tb = buttons[l]; laneCurrentHoldNote[l] = null; n.status = 'hit';
+            playTapSound();
+            if (d < 0.4) processResult(d, tb); else { counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); }
+        }
+
+        function processResult(d, tb) {
+            if (d < 0.08) { score += 1000; counts.perfect++; combo++; showJ("PERFECT", "text-yellow-400"); createHitEffect(tb.x, tb.y, '#facc15'); }
+            else if (d < 0.18) { score += 500; counts.great++; combo++; showJ("GREAT", "text-pink-400"); createHitEffect(tb.x, tb.y, '#f472b6'); }
+            else { score += 200; counts.good++; combo++; showJ("GOOD", "text-green-400"); createHitEffect(tb.x, tb.y, '#4ade80'); }
+            if (combo > maxCombo) maxCombo = combo; updateUI();
+        }
+
+        function createHitEffect(x, y, color) {
+            hitEffects.push({ type: 'ring', x, y, size: buttonRadius, opacity: 1, color, speed: 6 });
+            for (let i = 0; i < 8; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 4 + 2;
+                hitEffects.push({ type: 'spark', x, y, vx: Math.cos(angle) * dist, vy: Math.sin(angle) * dist, size: Math.random() * 3 + 1, opacity: 1, color });
+            }
+        }
+
+        function showJ(t, c) { const el = document.getElementById('judge-display'); el.innerText = t; el.className = `text-2xl font-black ${c} animate-bounce flex items-center justify-center h-8 italic tracking-widest`; }
+        function updateUI() { document.getElementById('score-display').innerText = `SCORE: ${score.toString().padStart(6, '0')}`; document.getElementById('combo-display').innerText = `COMBO: ${combo}`; }
+        function showResults() { isPlaying = false; video.pause(); playResultJingle(); document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('result-screen').style.display = 'flex'; document.getElementById('final-score').innerText = score.toString().padStart(6, '0'); document.getElementById('res-perfect').innerText = counts.perfect; document.getElementById('res-great').innerText = counts.great; document.getElementById('res-good').innerText = counts.good; document.getElementById('res-miss').innerText = counts.miss; document.getElementById('res-combo').innerText = maxCombo; }
+        function copyChart() { const sorted = recordedChart.sort((a, b) => a.time - b.time); const chartStr = "const CHART = " + JSON.stringify(sorted, null, 2) + ";"; const out = document.getElementById('chart-output'); out.innerText = chartStr + "\n\n(タップして閉じる)"; out.style.display = 'block'; const el = document.createElement('textarea'); el.value = chartStr; document.body.appendChild(el); el.select(); try { document.execCommand('copy'); showToast("譜面データをコピーしました"); } catch (e) { } document.body.removeChild(el); }
+        function showToast(m) { const t = document.getElementById('toast-msg'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+        function getNearestLane(x, y) { let idx = -1, min = buttonRadius * 2.5; buttons.forEach((btn, i) => { const d = Math.hypot(btn.x - x, btn.y - y); if (d < min) { min = d; idx = i; } }); return idx; }
+    </script>
+
+</body>
+
+</html>

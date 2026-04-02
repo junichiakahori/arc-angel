@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ArcAngel - 動画同期リズムゲーム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: none;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+            color: white;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+        }
+
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        #local-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6;
+            pointer-events: none;
+            object-fit: contain;
+        }
+
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+        }
+
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 300;
+            background: #000;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #launcher-screen {
+            z-index: 500;
+        }
+
+        #start-screen {
+            z-index: 400;
+            overflow-y: auto;
+        }
+
+        .launcher-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white !important;
+            padding: 25px 40px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: 900;
+            border: 4px solid #fff;
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.7);
+            cursor: pointer;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 9999px;
+            font-size: 16px;
+            font-weight: 900;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            margin: 5px;
+            pointer-events: auto;
+        }
+
+        .btn-secondary {
+            background: #333;
+            border: 1px solid #555;
+        }
+
+        /* 判定パネル（上部） */
+        .debug-info {
+            position: absolute;
+            top: max(45px, env(safe-area-inset-top) + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            font-family: 'Hiragino Sans', sans-serif;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 12px 24px;
+            border-radius: 16px;
+            border: 1px solid #444;
+            text-align: center;
+            min-width: 250px;
+            pointer-events: none;
+            opacity: 0;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .debug-info button {
+            pointer-events: auto;
+        }
+
+        .input-box {
+            width: 100%;
+            max-width: 420px;
+            background: #111;
+            padding: 20px;
+            border-radius: 28px;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"],
+        textarea {
+            background: #000;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            margin: 15px 0;
+            accent-color: #2563eb;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 600;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #111;
+            border: 2px solid #333;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 28px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .toast {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00f0ff;
+            color: #000;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 800;
+            display: none;
+            pointer-events: none;
+        }
+
+        .text-rainbow {
+            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% 100%;
+            animation: rainbow-scroll 2s linear infinite;
+        }
+
+        @keyframes rainbow-scroll {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        #loading-overlay {
+            position: absolute;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 譜面作成用の操作パネル */
+        #editor-controls {
+            position: absolute;
+            bottom: max(20px, env(safe-area-inset-bottom) + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 450;
+            background: rgba(15, 15, 15, 0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #555;
+            display: none;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            min-width: 300px;
+            max-width: 95%;
+            flex-wrap: nowrap;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s;
+        }
+
+        #editor-controls button {
+            padding: 8px 15px;
+            font-size: 11px;
+            border-radius: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        #editor-controls .status-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 10px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 500px) {
+            #editor-controls {
+                flex-wrap: wrap;
+                bottom: max(60px, env(safe-area-inset-bottom) + 35px);
+                padding: 15px;
+            }
+
+            #editor-controls .status-box {
+                flex: 1 1 100%;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-right: 0;
+                padding-bottom: 8px;
+                margin-bottom: 5px;
+            }
+
+            #editor-controls button {
+                flex: 1 1 45%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-wrapper">
+        <!-- ローディング表示 -->
+        <div id="loading-overlay">
+            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div id="loading-text" class="text-xl font-black italic tracking-widest text-blue-400">動画を準備中...</div>
+        </div>
+
+        <video id="local-video" style="display:none;" playsinline webkit-playsinline crossorigin="anonymous"></video>
+
+        <!-- 1. 起動画面 -->
+        <div id="launcher-screen" class="overlay-screen">
+            <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
+            <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
+            <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
+                最終更新: 2026/04/02 02:28 (JST)
+            </p>
+
+            <button class="launcher-btn" onclick="tryOpenNewTab()">
+                別タブで起動<br><span class="text-xs font-normal opacity-70">(推奨：表示エラーを回避)</span>
+            </button>
+
+            <button class="btn-action btn-secondary" onclick="launchInPlace()">
+                この枠内で開始
+            </button>
+
+            <p class="mt-8 text-gray-500 text-[10px] px-8 leading-relaxed text-center max-w-sm">
+                本アプリはローカルファイル専用です。<br>お手持ちの動画（MP4等）を読み込んでプレイしてください。
+            </p>
+        </div>
+
+        <!-- 2. スタジオ設定画面 -->
+        <div id="start-screen" class="overlay-screen" style="display: none;">
+            <h1 class="text-3xl font-black mb-1 italic text-blue-500 tracking-tighter">ArcAngel</h1>
+            <p class="mb-6 text-gray-400 text-[10px] font-bold tracking-widest text-center px-4">動画ファイルを選択して開始してください</p>
+
+            <div class="input-box text-left space-y-4">
+                <div class="p-5 bg-blue-600/10 border-2 border-blue-500/30 rounded-3xl shadow-lg">
+                    <label class="block text-[11px] text-blue-300 font-black mb-2 tracking-wider">動画ファイルを選択</label>
+                    <input type="file" id="local-file-input" accept="video/*" class="cursor-pointer">
+                    <p id="file-status" class="text-[9px] text-gray-500 mt-2">※ファイルを選択すると準備が完了します。</p>
+                </div>
+
+                <button onclick="openChartModal()"
+                    class="w-full bg-gray-800 border border-gray-600 py-3 rounded-xl text-[10px] font-bold hover:bg-gray-700 transition-all">
+                    譜面データを貼り付ける
+                </button>
+
+                <div class="text-center pt-2">
+                    <label class="block text-[10px] text-gray-400 font-bold tracking-widest">ノーツ速度: <span id="speed-val"
+                            class="text-blue-400">5.0</span></label>
+                    <input type="range" id="speed-input" min="1.0" max="10.0" step="0.5" value="5.0"
+                        oninput="document.getElementById('speed-val').innerText = this.value">
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center mt-4 gap-2">
+                <button onclick="startLive(false)" class="btn-action px-10" id="btn-start-game">プレイ開始</button>
+                <button onclick="startLive(true)" class="btn-action btn-secondary px-8"
+                    id="btn-start-edit">譜面作成</button>
+            </div>
+
+            <div class="text-center mt-6">
+                <button onclick="toggleFullScreen()"
+                    class="text-[10px] text-blue-400 border border-blue-900 px-6 py-2 rounded-full bg-blue-950/30 hover:bg-blue-900/50 transition-colors">
+                    全画面表示の切り替え
+                </button>
+            </div>
+
+            <p id="error-msg" class="mt-4 text-[11px] text-red-500 font-bold hidden px-6 leading-tight"></p>
+        </div>
+
+        <!-- 譜面入力用ポップアップ -->
+        <div id="chart-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2 class="text-xl font-black italic text-blue-400 tracking-wider">ArcAngel Chart Input</h2>
+                <textarea id="chart-input" placeholder="ここに譜面コード(JSON)を貼り付けてください"
+                    class="h-64 font-mono text-[10px] bg-black text-white p-3 rounded-xl border border-gray-700"
+                    spellcheck="false"></textarea>
+                <button onclick="closeChartModal()" class="btn-action">完了</button>
+            </div>
+        </div>
+
+        <canvas id="game-canvas"></canvas>
+
+        <!-- プレイ中UI -->
+        <div id="ui-overlay" class="debug-info">
+            <div class="flex justify-between items-center gap-4 mb-1 border-b border-white/10 pb-1">
+                <div id="score-display" class="font-bold">SCORE: 000000</div>
+                <div id="time-display" class="opacity-70 text-[9px]">0.00s</div>
+            </div>
+            <div id="combo-display" class="text-xs font-bold text-blue-400">COMBO: 0</div>
+            <div id="judge-display"
+                class="text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest">
+                READY?</div>
+            <div class="flex flex-wrap justify-center gap-2 mt-1 pt-1 border-t border-white/10">
+                <button class="bg-white/10 px-3 py-1 rounded text-[9px] font-bold active:bg-white/20"
+                    onclick="togglePause()">一時停止</button>
+                <button id="btn-skip-result"
+                    class="bg-blue-600 px-4 py-1 rounded text-[9px] font-black hidden border border-white/40 animate-pulse shadow-[0_0_15px_rgba(37,99,235,0.8)]"
+                    onclick="showResults()">リザルトへ進む</button>
+                <button class="bg-white/10 px-3 py-1 rounded text-[9px] font-bold active:bg-red-500/30"
+                    onclick="backToTitle()">タイトルへ</button>
+            </div>
+        </div>
+
+        <!-- ポーズ画面 -->
+        <div id="pause-screen" class="overlay-screen" style="display:none;">
+            <h2 class="text-4xl font-black mb-6 italic text-white tracking-tighter">一時停止中</h2>
+            <button onclick="togglePause()" class="btn-action">再開</button>
+            <button onclick="backToTitle()" class="btn-action btn-secondary">タイトルに戻る</button>
+        </div>
+
+        <!-- エディター操作パネル -->
+        <div id="editor-controls">
+            <div class="status-box">
+                <span id="edit-status" class="text-[10px] font-bold text-gray-400 tracking-widest">RECORDING
+                    READY</span>
+                <div id="rec-lamp" class="w-2.5 h-2.5 rounded-full bg-gray-600 shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                </div>
+            </div>
+            <button id="btn-rec-toggle" onclick="toggleRecording()"
+                class="bg-red-800 text-white shadow-lg active:scale-95 transition-transform">記録停止</button>
+            <button id="btn-preview-toggle" onclick="togglePreview()"
+                class="bg-blue-800 text-white shadow-lg active:scale-95 transition-transform">プレビュー</button>
+            <button onclick="copyChart()"
+                class="bg-green-900 text-white shadow-lg active:scale-95 transition-transform">データ出力</button>
+            <button onclick="backToTitle()"
+                class="bg-gray-700 text-white shadow-lg active:scale-95 transition-transform">タイトル</button>
+        </div>
+
+        <div id="chart-output" onclick="this.style.display='none'"
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; height: 70%; background: #111; color: #0f0; font-family: monospace; padding: 20px; border-radius: 15px; border: 2px solid #555; display: none; z-index: 600; overflow-y: auto; font-size: 11px;">
+        </div>
+        <div id="toast-msg" class="toast"></div>
+
+        <!-- リザルト画面 -->
+        <div id="result-screen" class="overlay-screen" style="display: none;">
+            <h2
+                class="text-3xl font-black mb-4 italic text-yellow-500 tracking-tighter text-center px-12 overflow-visible min-w-full">
+                ArcAngel Result</h2>
+            <div id="final-score" class="text-5xl font-black mb-4 tracking-widest text-white">000000</div>
+            <div
+                class="bg-gray-900 p-6 rounded-3xl border border-gray-800 mb-6 w-full max-w-xs text-sm font-mono shadow-2xl">
+                <div class="flex justify-between text-yellow-400 mb-1 text-xs font-bold"><span>PERFECT</span><span
+                        id="res-perfect">0</span></div>
+                <div class="flex justify-between text-pink-400 mb-1 text-xs font-bold"><span>GREAT</span><span
+                        id="res-great">0</span></div>
+                <div class="flex justify-between text-green-400 mb-1 text-xs font-bold"><span>GOOD</span><span
+                        id="res-good">0</span></div>
+                <div class="flex justify-between text-red-400 mb-3 text-xs font-bold"><span>MISS</span><span
+                        id="res-miss">0</span></div>
+                <div
+                    class="pt-2 mt-2 border-t border-gray-800 flex justify-between font-bold text-white text-lg italic tracking-wider">
+                    <span>Max Combo</span><span id="res-combo">0</span>
+                </div>
+            </div>
+            <button onclick="backToTitle()" class="btn-action shadow-lg">メニューに戻る</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 変数管理 ---
+        let canvas, ctx, audioCtx, noiseBuffer = null, buttons = [], buttonRadius = 35;
+        let localVideo, isVideoReady = false;
+        let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false;
+        let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
+        let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
+        let NOTE_TRAVEL_TIME = 2.0;
+        const KEY_LABELS = ['A', 'S', 'D', 'F', 'G/H', 'J', 'K', 'L', ';'], KEY_MAP = ['a', 's', 'd', 'f', 'g', 'j', 'k', 'l', ';'];
+
+        const activeTouches = new Map();
+
+        // --- 音響処理 ---
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const bufferSize = audioCtx.sampleRate * 0.1; noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const d = noiseBuffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) d[i] = Math.random() * 2 - 1;
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playTapSound() {
+            if (!audioCtx || !noiseBuffer) return;
+            const now = audioCtx.currentTime;
+            const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
+            const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
+            const ng = audioCtx.createGain(); ng.gain.setValueAtTime(0.15, now); ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination); ns.start(now);
+            const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(8000, now); osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
+            const og = audioCtx.createGain(); og.gain.setValueAtTime(0.1, now); og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.connect(og); og.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.1);
+        }
+
+        function playResultJingle(resultType) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            let notes = [], interval = 0.1, oscType = 'triangle', gainVal = 0.2;
+            if (resultType === 'AP') { notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50, 1174.66, 1318.51, 1567.98, 2093.00]; interval = 0.05; oscType = 'sawtooth'; gainVal = 0.05; }
+            else if (resultType === 'FC') { notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98, 2093.00]; interval = 0.08; oscType = 'square'; gainVal = 0.08; }
+            else { notes = [523.25, 659.25, 783.99, 1046.50]; interval = 0.12; oscType = 'triangle'; gainVal = 0.2; }
+            notes.forEach((freq, i) => {
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = oscType; o.frequency.setValueAtTime(freq, now + i * interval);
+                g.gain.setValueAtTime(gainVal, now + i * interval); g.gain.exponentialRampToValueAtTime(0.01, now + i * interval + 0.8);
+                o.connect(g); g.connect(audioCtx.destination); o.start(now + i * interval); o.stop(now + i * interval + 0.8);
+            });
+        }
+
+        function toggleFullScreen() {
+            const wrapper = document.getElementById('game-wrapper');
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+            if (!isFull) {
+                const requestMethod = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen || wrapper.mozRequestFullScreen || wrapper.msRequestFullscreen;
+                if (requestMethod) {
+                    requestMethod.call(wrapper).catch(() => showToast("全画面化できませんでした。"));
+                } else {
+                    showToast("iPhone等の環境ではOSの仕様上非対応です。画面を横向きにすると広くプレイできます。");
+                }
+            } else {
+                const exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+                if (exitMethod) exitMethod.call(document);
+            }
+        }
+
+        function tryOpenNewTab() {
+            initAudio();
+            const newWin = window.open('about:blank', '_blank');
+            if (newWin) {
+                const html = document.documentElement.outerHTML;
+                newWin.document.open();
+                newWin.document.write(html);
+                newWin.document.close();
+                newWin.isForcedMain = true;
+            } else {
+                showToast("ポップアップがブロックされました");
+            }
+        }
+
+        function initGame() {
+            if (window.isForcedMain || window.opener) {
+                document.getElementById('launcher-screen').style.display = 'none';
+                document.getElementById('start-screen').style.display = 'flex';
+            }
+            if (canvas) return; // 二重実行防止
+            canvas = document.getElementById('game-canvas'); ctx = canvas.getContext('2d');
+            localVideo = document.getElementById('local-video');
+            localVideo.onended = () => { if (!isEditMode && isPlaying) showResults(); };
+
+            localVideo.oncanplaythrough = () => { isVideoReady = true; hideLoading(); document.getElementById('file-status').innerText = "準備完了"; document.getElementById('file-status').className = "text-[9px] text-green-400 mt-2 font-bold"; };
+            localVideo.onerror = () => { hideLoading(); document.getElementById('error-msg').classList.remove('hidden'); document.getElementById('error-msg').innerText = "この動画ファイルは読み込めませんでした。"; isVideoReady = false; };
+            document.getElementById('local-file-input').onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) { showLoading("動画を解析中..."); localVideo.src = URL.createObjectURL(file); localVideo.load(); }
+            };
+            window.addEventListener('resize', resize); setupInput(); resize();
+
+            if (window.location.hash === '#autolaunch') {
+                setTimeout(launchInPlace, 100);
+            }
+        }
+
+        // クラウドIDE等に勝手に onload を上書きされて動かなくなるのを防ぐため、addEventListener を使用する
+        window.addEventListener('DOMContentLoaded', initGame);
+        window.addEventListener('load', initGame);
+
+        function showLoading(txt = "準備中...") { document.getElementById('loading-text').innerText = txt; document.getElementById('loading-overlay').style.display = 'flex'; }
+        function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+        function openChartModal() { document.getElementById('chart-modal').style.display = 'flex'; }
+        function closeChartModal() { document.getElementById('chart-modal').style.display = 'none'; }
+
+        function resize() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            buttons = []; const isP = canvas.height > canvas.width;
+            const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
+            buttonRadius = Math.max(18, Math.min(35, canvas.width / 15));
+            const rad = isP ? canvas.width * 0.44 : Math.min(canvas.height - cy - 100, canvas.width * 0.45);
+            const sA = isP ? Math.PI * 0.10 : Math.PI * 0.12, eA = isP ? Math.PI * 0.90 : Math.PI * 0.88;
+            for (let i = 0; i < 9; i++) { const t = i / 8; const a = Math.PI - (sA + (eA - sA) * t); buttons.push({ x: cx + Math.cos(a) * rad, y: cy + Math.sin(a) * rad }); }
+        }
+
+        function getNearestLane(x, y) {
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = x - rect.left;
+            const canvasY = y - rect.top;
+            let idx = -1, min = buttonRadius * 3.5;
+            buttons.forEach((btn, i) => {
+                const d = Math.hypot(btn.x - canvasX, btn.y - canvasY);
+                if (d < min) { min = d; idx = i; }
+            });
+            return idx;
+        }
+
+        function setupInput() {
+            const sH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputStart(l); };
+            const eH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
+
+            window.addEventListener('keydown', (e) => { if (e.repeat) return; let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) sH(l); if (e.key === 'Escape') togglePause(); });
+            window.addEventListener('keyup', (e) => { let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) eH(l); });
+
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    const l = getNearestLane(t.clientX, t.clientY);
+                    if (l !== -1) {
+                        activeTouches.set(t.identifier, l);
+                        sH(l);
+                    }
+                }
+            }, { passive: false });
+
+            const handleEnd = (e) => {
+                e.preventDefault();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    const l = activeTouches.get(t.identifier);
+                    if (l !== undefined) {
+                        eH(l);
+                        activeTouches.delete(t.identifier);
+                    }
+                }
+            };
+
+            canvas.addEventListener('touchend', handleEnd, { passive: false });
+            canvas.addEventListener('touchcancel', handleEnd, { passive: false });
+        }
+
+        async function startLive(editMode = false) {
+            initAudio(); if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
+            isEditMode = editMode;
+            const raw = document.getElementById('chart-input').value.trim();
+            CHART = raw ? JSON.parse(raw.replace(/^const CHART = /, '').replace(/;$/, '')).sort((a, b) => a.time - b.time) : [];
+            CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
+
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('launcher-screen').style.display = 'none';
+            document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
+            document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
+            document.getElementById('editor-controls').style.display = isEditMode ? 'flex' : 'none';
+
+            score = 0; combo = 0; maxCombo = 0; counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+            notesQueue = isEditMode ? [] : [...CHART]; activeNotes = []; hitEffects = []; recordedChart = [];
+            lanePressed.fill(false); activeTouches.clear(); updateUI();
+
+            if (isEditMode) {
+                isRecording = true;
+                const btn = document.getElementById('btn-rec-toggle'), status = document.getElementById('edit-status'), lamp = document.getElementById('rec-lamp');
+                btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500');
+            } else { isRecording = false; }
+
+            localVideo.currentTime = 0; localVideo.style.display = 'block'; localVideo.play();
+            isPlaying = true; requestAnimationFrame(update);
+        }
+
+        function update() {
+            if (!isPlaying || isPaused) return;
+            const ct = localVideo.currentTime;
+            if (!isEditMode && notesQueue.length === 0 && activeNotes.length === 0 && CHART.length > 0) {
+                document.getElementById('btn-skip-result').classList.remove('hidden');
+            }
+            if (typeof ct === 'number') {
+                if (isPreviewMode || (!isEditMode && isPlaying)) {
+                    while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) { activeNotes.push({ ...notesQueue.shift(), status: 'waiting' }); }
+                    if (!isEditMode) document.getElementById('time-display').innerText = `${ct.toFixed(2)}s`;
+                }
+                for (let i = hitEffects.length - 1; i >= 0; i--) { let e = hitEffects[i]; if (e.type === 'ring') { e.size += e.speed; e.opacity -= 0.05; } else { e.x += e.vx; e.y += e.vy; e.opacity -= 0.04; } if (e.opacity <= 0) hitEffects.splice(i, 1); }
+                draw(ct);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function draw(ct) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); const isP = canvas.height > canvas.width;
+            const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
+            buttons.forEach((btn, idx) => {
+                ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2); ctx.strokeStyle = lanePressed[idx] ? '#fff' : '#00f0ff'; ctx.lineWidth = lanePressed[idx] ? 4 : 2; ctx.stroke();
+                ctx.fillStyle = 'rgba(0, 240, 255, 0.15)'; ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = `bold ${buttonRadius / 2.5}px Arial`; ctx.textAlign = 'center'; ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
+            });
+            const timeG = {}; activeNotes.forEach(n => { if (n.status === 'waiting') { const k = n.time.toFixed(3); if (!timeG[k]) timeG[k] = []; timeG[k].push(n); } });
+            Object.values(timeG).forEach(g => {
+                if (g.length > 1) {
+                    g.sort((a, b) => a.lane - b.lane); ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 4;
+                    for (let i = 0; i < g.length; i++) { const sp = (ct - (g[i].time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME; const hx = cx + (buttons[g[i].lane].x - cx) * sp, hy = cy + (buttons[g[i].lane].y - cy) * sp; if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy); }
+                    ctx.stroke();
+                }
+            });
+            activeNotes.forEach((n, i) => {
+                const tb = buttons[n.lane]; const sp = (ct - (n.time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
+                if (sp >= 0) {
+                    const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
+                    const sizeSp = Math.min(1.0, sp); const noteSize = buttonRadius * (0.4 + 0.6 * sizeSp);
+                    if (n.endTime) {
+                        const ep = (ct - (n.endTime - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME; const tx = cx + (tb.x - cx) * Math.max(0, ep), ty = cy + (tb.y - cy) * Math.max(0, ep);
+                        ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(tx, ty); ctx.strokeStyle = (n.status === 'holding') ? '#facc15' : 'rgba(255,0,255,0.5)'; ctx.lineWidth = noteSize * 0.8; ctx.lineCap = 'round'; ctx.stroke();
+                        if (ep >= 0) { ctx.beginPath(); ctx.arc(tx, ty, noteSize * 0.7, 0, Math.PI * 2); ctx.fillStyle = '#facc15'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); }
+                    }
+                    if (n.status !== 'holding') {
+                        if (n.isSim) { ctx.beginPath(); ctx.arc(hx, hy, noteSize + 5, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke(); }
+                        ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2); ctx.fillStyle = n.endTime ? '#facc15' : '#ff00ff'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+                    }
+                }
+                if (!isEditMode && ct > (n.endTime || n.time) + 0.4 && n.status === 'waiting') { activeNotes.splice(i, 1); counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); }
+            });
+            hitEffects.forEach(e => { ctx.globalAlpha = e.opacity; ctx.beginPath(); if (e.type === 'ring') { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.strokeStyle = e.color; ctx.lineWidth = 3; ctx.stroke(); } else { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); } });
+            ctx.globalAlpha = 1.0;
+        }
+
+        function toggleRecording() {
+            if (!isEditMode) return; if (isPreviewMode) togglePreview();
+            isRecording = !isRecording;
+            const btn = document.getElementById('btn-rec-toggle'), status = document.getElementById('edit-status'), lamp = document.getElementById('rec-lamp');
+            if (isRecording) { btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500'); if (recordedChart.length > 0 && confirm("RESET?")) recordedChart = []; localVideo.currentTime = 0; localVideo.play(); }
+            else { btn.innerText = "記録開始"; btn.classList.remove('bg-red-600'); status.innerText = "RECORDING READY"; status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; lamp.classList.replace('bg-red-500', 'bg-gray-600'); localVideo.pause(); }
+        }
+
+        function togglePreview() {
+            if (!isEditMode) return; if (isRecording) toggleRecording();
+            isPreviewMode = !isPreviewMode;
+            const btn = document.getElementById('btn-preview-toggle'), status = document.getElementById('edit-status');
+            if (isPreviewMode) { if (recordedChart.length === 0) { showToast("ノーツがありません"); isPreviewMode = false; return; } btn.innerText = "停止"; status.innerText = "PREVIEW NOW"; status.className = "text-[10px] font-bold text-blue-400 tracking-widest"; notesQueue = [...recordedChart].sort((a, b) => a.time - b.time); notesQueue.forEach((c, i) => c.isSim = notesQueue.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015)); activeNotes = []; localVideo.currentTime = 0; localVideo.play(); }
+            else { btn.innerText = "プレビュー"; status.innerText = "RECORDING READY"; status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; activeNotes = []; localVideo.pause(); }
+        }
+
+        function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
+        function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); document.getElementById('result-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; }
+        function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = localVideo.currentTime; playTapSound(); if (isEditMode && isRecording) { recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); } else if (!isEditMode) judgeStart(l); else createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); }
+        function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } } else if (!isEditMode) judgeEnd(l); }
+        function judgeStart(l) { const ct = localVideo.currentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } }
+        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = localVideo.currentTime; const d = Math.abs(ct - n.endTime); laneCurrentHoldNote[l] = null; n.status = 'hit'; playTapSound(); if (d < 0.4) processResult(d, buttons[l]); else { counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); } }
+        function processResult(d, tb) { if (d < 0.08) { score += 1000; counts.perfect++; combo++; showJ("PERFECT", "text-yellow-400"); createHitEffect(tb.x, tb.y, '#facc15'); } else if (d < 0.18) { score += 500; counts.great++; combo++; showJ("GREAT", "text-pink-400"); createHitEffect(tb.x, tb.y, '#f472b6'); } else { score += 200; counts.good++; combo++; showJ("GOOD", "text-green-400"); createHitEffect(tb.x, tb.y, '#4ade80'); } if (combo > maxCombo) maxCombo = combo; updateUI(); }
+        function createHitEffect(x, y, color) { hitEffects.push({ type: 'ring', x, y, size: buttonRadius, opacity: 1, color, speed: 6 }); for (let i = 0; i < 8; i++) { const a = Math.random() * Math.PI * 2, d = Math.random() * 4 + 2; hitEffects.push({ type: 'spark', x, y, vx: Math.cos(a) * d, vy: Math.sin(a) * d, size: Math.random() * 3 + 1, opacity: 1, color }); } }
+        function showJ(t, c) { const el = document.getElementById('judge-display'); el.innerText = t; el.className = `text-2xl font-black ${c} animate-bounce flex items-center justify-center h-8 italic tracking-widest`; }
+        function updateUI() { document.getElementById('score-display').innerText = `SCORE: ${score.toString().padStart(6, '0')}`; document.getElementById('combo-display').innerText = `COMBO: ${combo}`; }
+
+        function showResults() {
+            isPlaying = false; if (localVideo) localVideo.pause();
+            const totalNotesPlayed = counts.perfect + counts.great + counts.good;
+            const isFullCombo = counts.miss === 0 && totalNotesPlayed > 0;
+            const isAllPerfect = isFullCombo && counts.great === 0 && counts.good === 0;
+            if (isAllPerfect) playResultJingle('AP'); else if (isFullCombo) playResultJingle('FC'); else playResultJingle('Normal');
+            const resultTitle = document.querySelector('#result-screen h2');
+            if (isAllPerfect) { resultTitle.innerText = "ALL PERFECT!!"; resultTitle.className = "text-5xl font-black mb-4 italic text-rainbow tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"; }
+            else if (isFullCombo) { resultTitle.innerText = "FULL COMBO!!"; resultTitle.className = "text-4xl font-black mb-4 italic text-yellow-300 tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]"; }
+            else { resultTitle.innerText = "ArcAngel Result"; resultTitle.className = "text-3xl font-black mb-4 italic text-yellow-500 tracking-tighter text-center px-12 overflow-visible min-w-full"; }
+            document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('result-screen').style.display = 'flex';
+            document.getElementById('final-score').innerText = score.toString().padStart(6, '0'); document.getElementById('res-perfect').innerText = counts.perfect; document.getElementById('res-great').innerText = counts.great; document.getElementById('res-good').innerText = counts.good; document.getElementById('res-miss').innerText = counts.miss; document.getElementById('res-combo').innerText = maxCombo;
+        }
+
+        function copyChart() { const sorted = recordedChart.sort((a, b) => a.time - b.time); const s = "const CHART = " + JSON.stringify(sorted, null, 2) + ";"; const out = document.getElementById('chart-output'); out.innerText = s + "\n\n(タップして閉じる)"; out.style.display = 'block'; const el = document.createElement('textarea'); el.value = s; document.body.appendChild(el); el.select(); try { document.execCommand('copy'); showToast("コピーしました"); } catch (e) { } document.body.removeChild(el); }
+        function showToast(m) { const t = document.getElementById('toast-msg'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+        function launchInPlace() { initAudio(); document.getElementById('launcher-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; resize(); }
+    </script>
+</body>
+
+</html>
