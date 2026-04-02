@@ -481,7 +481,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 18:08 (JST)
+                最終更新: 2026/04/02 18:19 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -591,14 +591,14 @@
                     JSON形式で0.01秒単位の微調整が可能です</p>
                 <textarea id="chart-input" placeholder='[{"time": 1.5, "lane": 0}, {"time": 2.0, "lane": 3}]'
                     class="w-full h-[50vh] bg-black/50 text-sky-300 font-mono text-[11px] p-6 rounded-2xl border border-white/10 mb-6 custom-scrollbar focus:border-orange-500/50 outline-none transition-all"></textarea>
-                <div class="flex gap-4">
+                <div class="flex flex-wrap justify-center gap-3">
                     <button onclick="closeChartModal()"
-                        class="btn-action flex-1 bg-gradient-to-r from-orange-600 to-orange-800 text-lg shadow-[0_4px_15px_rgba(234,88,12,0.3)] hover:scale-105 active:scale-95">完了
+                        class="btn-action px-8 py-2.5 bg-gradient-to-r from-orange-600 to-orange-800 text-sm shadow-[0_4px_15px_rgba(234,88,12,0.3)] hover:scale-105 active:scale-95">完了
                         (反映)</button>
                     <button onclick="closeTextChart()"
-                        class="btn-action flex-1 btn-secondary text-lg hover:scale-105 active:scale-95">キャンセル</button>
+                        class="btn-action px-8 py-2.5 btn-secondary text-sm hover:scale-105 active:scale-95">キャンセル</button>
                     <button onclick="document.getElementById('chart-input').value=''"
-                        class="btn-action w-24 btn-secondary text-sm">クリア</button>
+                        class="btn-action px-6 py-2.5 btn-secondary text-xs opacity-60">クリア</button>
                 </div>
             </div>
         </div>
