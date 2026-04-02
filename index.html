@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:07 (JST)
+                最終更新: 2026/04/02 11:10 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -702,7 +702,16 @@
             function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
             function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
             function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
-            function toggleBGM(btn) { if (bgmAudio) { stopTitleBGM(); btn.innerText = "BGM PLAY"; btn.classList.add('bg-red-500/20'); } else { playTitleBGM(); btn.innerText = "BGM STOP"; btn.classList.remove('bg-red-500/20'); } }
+            function toggleBGM(btn) {
+                if (bgmAudio || (localVideo && !localVideo.paused && !isPlaying)) {
+                    stopTitleBGM(); if (localVideo) localVideo.pause();
+                    btn.innerText = "BGM PLAY"; btn.classList.add('bg-red-500/20');
+                } else {
+                    if (isVideoReady && !isPlaying) localVideo.play();
+                    else playTitleBGM();
+                    btn.innerText = "BGM STOP"; btn.classList.remove('bg-red-500/20');
+                }
+            }
             function closeChartModal() { const el = document.getElementById('chart-input'); const val = el.value.replace(/\s+/g, '').toLowerCase(); if (val === "μ'sicforever") { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); updateKonamiUI(true); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
             async function showSongList() {
                 const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
@@ -733,10 +742,12 @@
             async function selectSong(s) {
                 showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
                 const status = document.getElementById('file-status');
+                stopTitleBGM();
                 localVideo.src = s.video;
                 localVideo.oncanplaythrough = () => {
                     hideLoading();
                     status.innerText = `動画準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
+                    localVideo.play().catch(() => console.log("Auto-preview blocked"));
                     localVideo.oncanplaythrough = null;
                 };
                 localVideo.load();
@@ -744,7 +755,7 @@
                     const r = await fetch(s.chart); const txt = await r.text();
                     document.getElementById('chart-input').value = txt;
                     document.getElementById('chart-file-status').innerText = `譜面読込済: ${s.name}`;
-                    showToast(`「${s.name}」を読み込みました！後は開始ボタンを押すだけです。`);
+                    showToast(`「${s.name}」プレビュー再生中！`);
                 } catch (e) { showToast("譜面の取得に失敗しました"); hideLoading(); }
             }
             function loadChartFile(input) { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { document.getElementById('chart-input').value = e.target.result; const st = document.getElementById('chart-file-status'); st.innerText = `ファイル読込済: ${f.name}`; st.className = "text-[9px] text-green-400 font-bold mt-1"; showToast("譜面ファイルを読み込みました"); }; r.readAsText(f); }
