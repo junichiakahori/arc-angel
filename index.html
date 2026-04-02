@@ -521,7 +521,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 19:44 (JST)
+                最終更新: 2026/04/02 19:48 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -775,8 +775,6 @@
             // --- 変数管理 ---
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
-            let chromaCanvas = document.createElement('canvas');
-            let chromaCtx = chromaCanvas.getContext('2d', { willReadFrequently: true });
             let currentSelectedSong = null;
             let BACKUP_SONG_LIST = [
                 { name: "僕らのLIVE 君とのLIFE", video: "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/bokura.jpg" },
@@ -996,6 +994,7 @@
                 localVideo.oncanplaythrough = () => {
                     hideLoading();
                     status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
+                    localVideo.style.opacity = "0.6"; // 選曲画面ではプレビューとして透過
                     localVideo.play().catch(() => console.log("Auto-preview blocked"));
                     localVideo.oncanplaythrough = null;
                 };
@@ -1153,9 +1152,7 @@
                 } else { isRecording = false; }
 
                 localVideo.currentTime = 0; localVideo.style.display = 'block';
-                // 僕らのLIVEの場合は動画自体の不透明度を0にし、キャンバスでクロマキー描画する
-                const isBokura = currentSelectedSong && currentSelectedSong.name.includes("僕らのLIVE");
-                localVideo.style.opacity = isBokura ? "0" : "1";
+                localVideo.style.opacity = "1"; // プレイ中は一律不透明
                 localVideo.play();
                 isPlaying = true; requestAnimationFrame(update);
             }
@@ -1212,26 +1209,6 @@
 
             function draw(ct) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // クロマキー合成 (僕らのLIVE君とのLIFE用)
-                if (currentSelectedSong && currentSelectedSong.name.includes("僕らのLIVE") && localVideo && !localVideo.paused) {
-                    if (chromaCanvas.width !== canvas.width) {
-                        chromaCanvas.width = canvas.width;
-                        chromaCanvas.height = canvas.height;
-                    }
-                    chromaCtx.drawImage(localVideo, 0, 0, chromaCanvas.width, chromaCanvas.height);
-                    const frame = chromaCtx.getImageData(0, 0, chromaCanvas.width, chromaCanvas.height);
-                    const data = frame.data;
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i], g = data[i + 1], b = data[i + 2];
-                        // グリーンバック除去
-                        if (g > 100 && g > r * 1.2 && g > b * 1.2) {
-                            data[i + 3] = 0;
-                        }
-                    }
-                    chromaCtx.putImageData(frame, 0, 0);
-                    ctx.drawImage(chromaCanvas, 0, 0);
-                }
 
                 const isP = canvas.height > canvas.width;
                 const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
