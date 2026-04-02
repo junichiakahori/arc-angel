@@ -308,7 +308,7 @@
             bottom: max(10px, env(safe-area-inset-bottom) + 10px);
             right: 10px;
             display: grid;
-            grid-template-cols: repeat(2, 110px);
+            grid-template-columns: repeat(2, 110px);
             gap: 6px;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(15px);
@@ -320,9 +320,25 @@
         }
 
         #editor-controls button {
-            @apply py-1.5 rounded-xl text-[9px] font-black italic shadow-md active:scale-95 transition-all text-center flex items-center justify-center gap-1 leading-none;
+            padding: 6px 0;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 900;
+            font-style: italic;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            line-height: 1;
             border-bottom: 2px solid rgba(0, 0, 0, 0.3);
             white-space: nowrap;
+        }
+
+        #editor-controls button:active {
+            transform: scale(0.95);
         }
 
         #editor-timeline {
@@ -348,28 +364,52 @@
             }
 
             #editor-actions {
-                grid-template-cols: repeat(2, 80px);
+                grid-template-columns: repeat(2, 80px);
                 bottom: 5px;
                 right: 5px;
                 padding: 6px;
             }
 
             #editor-controls button {
-                text-[8px];
-                py-1;
+                font-size: 8px;
+                padding-top: 4px;
+                padding-bottom: 4px;
             }
         }
 
         .btn-diff {
-            @apply flex-grow py-3.5 px-2 rounded-2xl border-2 text-[12px] font-black italic tracking-wider transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center backdrop-blur-md shadow-lg;
+            flex-grow: 1;
+            padding: 14px 8px;
+            border-radius: 16px;
+            border-width: 2px;
+            font-size: 12px;
+            font-weight: 900;
+            font-style: italic;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.4);
             min-width: 90px;
         }
 
+        .btn-diff:hover {
+            transform: scale(1.03);
+        }
+
+        .btn-diff:active {
+            transform: scale(0.95);
+        }
+
         .btn-diff.selected {
-            @apply border-white scale-[1.05] shadow-[0_0_25px_rgba(255, 255, 255, 0.4)];
+            border-color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
             background: rgba(255, 255, 255, 0.15);
             color: #fff;
         }
@@ -481,7 +521,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 19:43 (JST)
+                最終更新: 2026/04/02 19:44 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
