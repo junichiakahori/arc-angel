@@ -522,7 +522,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 20:48 (JST)
+                最終更新: 2026/04/02 20:57 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -979,16 +979,21 @@
                     songs.forEach(s => {
                         const b = document.createElement('button');
                         b.className = "flex-shrink-0 w-[45%] max-w-[160px] h-48 bg-blue-900/40 hover:scale-95 active:scale-90 border-2 border-blue-500/20 rounded-[2rem] transition-all snap-center animate-fade-in relative overflow-hidden group flex flex-col shadow-lg";
+                        b.style.touchAction = 'pan-x'; // スワイプ優先設定
+                        b.style.webkitUserDrag = 'none';
 
                         // ジャケット画像コンテナ
                         const img = document.createElement('div');
                         img.className = "w-full aspect-square bg-cover bg-center transition-transform group-hover:scale-110";
+                        img.style.touchAction = 'pan-x';
+                        img.style.webkitUserDrag = 'none';
                         if (s.jacket) img.style.backgroundImage = `url('${s.jacket}')`;
                         else img.className += " bg-blue-600/20";
 
                         // 曲名コンテナ
                         const info = document.createElement('div');
                         info.className = "w-full p-2 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center flex-1";
+                        info.style.pointerEvents = 'none'; // テキストがスクロールを邪魔しないように
                         info.innerHTML = `<span class="text-[10px] font-black italic text-white leading-tight drop-shadow-lg text-center px-1">${s.name}</span>`;
 
                         b.appendChild(img);
