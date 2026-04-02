@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 01:51 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 01:53 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 01:51 (JST)
+                        最終更新: 2026/04/03 01:53 (JST)
                     </p>
                 </div>
 
@@ -917,38 +917,37 @@
             if (!audioCtx || !noiseBuffer) return;
             const now = audioCtx.currentTime;
 
-            // --- 1. ノイズ成分 (タンバリンの鈴・シャカシャカ感) ---
-            const nsJingle = audioCtx.createBufferSource(); 
-            nsJingle.buffer = noiseBuffer;
-            const nfJingle = audioCtx.createBiquadFilter(); 
-            nfJingle.type = 'bandpass'; 
-            // 鈴の音色を調整 (Perfectは明るめ、その他は控えめ)
-            nfJingle.frequency.setValueAtTime(judgment === 'PERFECT' ? 6500 : 4500, now);
-            nfJingle.Q.value = 1.2;
-            
-            const ngJingle = audioCtx.createGain();
-            const jingleGain = judgment === 'PERFECT' ? 0.18 : 0.08;
-            ngJingle.gain.setValueAtTime(jingleGain, now);
-            ngJingle.gain.exponentialRampToValueAtTime(0.01, now + (judgment === 'PERFECT' ? 0.2 : 0.1));
-            
-            nsJingle.connect(nfJingle); 
-            nfJingle.connect(ngJingle); 
-            ngJingle.connect(audioCtx.destination);
-            nsJingle.start(now);
+            if (judgment === 'PERFECT') {
+                // Perfect: 「シャン！」という抜けの良い音
+                // ノイズ成分 (キラキラ感)
+                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
+                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(6000, now);
+                const ng = audioCtx.createGain();
+                ng.gain.setValueAtTime(0.25, now);
+                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                ns.start(now);
 
-            // --- 2. 打撃成分 (皮を叩く「トッ」という音) ---
-            const oscThump = audioCtx.createOscillator();
-            const ogThump = audioCtx.createGain();
-            oscThump.type = 'sine';
-            // 手のひらで叩くような低い周波数
-            oscThump.frequency.setValueAtTime(judgment === 'PERFECT' ? 180 : 150, now);
-            ogThump.gain.setValueAtTime(0.12, now);
-            ogThump.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
-            
-            oscThump.connect(ogThump); 
-            ogThump.connect(audioCtx.destination);
-            oscThump.start(now); 
-            oscThump.stop(now + 0.2);
+                // サイン波成分 (音程・厚み)
+                const osc = audioCtx.createOscillator();
+                const og = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(4000, now);
+                osc.frequency.exponentialRampToValueAtTime(2000, now + 0.1);
+                og.gain.setValueAtTime(0.2, now);
+                og.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.connect(og); og.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.15);
+            } else {
+                // それ以外: 「チッ」という短いクリック音
+                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
+                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(10000, now);
+                const ng = audioCtx.createGain();
+                ng.gain.setValueAtTime(0.1, now);
+                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.04); // 極短
+                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                ns.start(now);
+            }
         }
 
         function playResultJingle(resultType) {
