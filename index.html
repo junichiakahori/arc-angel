@@ -481,7 +481,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 18:45 (JST)
+                最終更新: 2026/04/02 18:56 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -1092,7 +1092,9 @@
                     btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500');
                 } else { isRecording = false; }
 
-                localVideo.currentTime = 0; localVideo.style.display = 'block'; localVideo.play();
+                localVideo.currentTime = 0; localVideo.style.display = 'block';
+                localVideo.style.opacity = "1"; // プレイ中は不透明度を 100% に
+                localVideo.play();
                 isPlaying = true; requestAnimationFrame(update);
             }
 
@@ -1259,6 +1261,7 @@
                 activeNotes = [];
 
                 localVideo.currentTime = 0;
+                localVideo.style.opacity = "1"; // プレイ中は不透明度を 100% に
                 localVideo.play();
                 saveChartToLocal(); // プレイ開始時にも保存
             }
@@ -1332,7 +1335,23 @@
                 }
             }
 
-            function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('launcher-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
+            function backToTitle() {
+                isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false;
+                if (localVideo) {
+                    localVideo.pause();
+                    localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
+                }
+                if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); }
+                else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); }
+                document.getElementById('result-screen').style.display = 'none';
+                document.getElementById('launcher-screen').style.display = 'none';
+                document.getElementById('start-screen').style.display = 'flex';
+                document.getElementById('pause-screen').style.display = 'none';
+                document.getElementById('ui-overlay').style.opacity = '0';
+                document.getElementById('ui-overlay').style.pointerEvents = 'none';
+                document.getElementById('editor-controls').style.display = 'none';
+                document.getElementById('btn-skip-result').classList.add('hidden');
+            }
             function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = localVideo.currentTime; playTapSound(); if (isEditMode && isRecording) { recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); syncEditorNotes(); } else if (!isEditMode) judgeStart(l); else createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); }
             function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
             function judgeStart(l) { const ct = localVideo.currentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } }
