@@ -276,84 +276,55 @@
             align-items: center;
         }
 
-        /* 譜面作成用の操作パネル */
+        /* 譜面作成用の操作パネル (下部) */
         #editor-controls {
-            position: absolute;
-            top: max(20px, env(safe-area-inset-top) + 10px);
-            bottom: auto;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 450;
-            background: rgba(15, 15, 15, 0.9);
+            position: fixed;
+            bottom: max(0px, env(safe-area-inset-bottom));
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
             padding: 10px 15px;
-            border-radius: 20px;
-            border: 1px solid #555;
+            z-index: 500;
             display: none;
             flex-direction: column;
-            gap: 12px;
-            align-items: center;
-            width: 100%;
-            max-width: 600px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
-            transition: all 0.3s;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         #editor-timeline {
             width: 100%;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 10px;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 10px;
+            border-radius: 12px;
+        }
+
+        .editor-btn-row {
+            display: grid;
+            grid-template-cols: repeat(4, 1fr);
+            gap: 6px;
+            width: 100%;
         }
 
         #editor-controls button {
-            padding: 8px 15px;
-            font-size: 11px;
-            border-radius: 12px;
-            font-weight: bold;
-            white-space: nowrap;
+            @apply py-2 rounded-xl text-[9px] font-black italic shadow-lg active:scale-95 transition-all text-center flex items-center justify-center gap-1;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.3);
         }
 
         #editor-controls .status-box {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding-right: 10px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 4px;
         }
 
         @media (max-width: 500px) {
             #editor-controls {
-                top: max(10px, env(safe-area-inset-top) + 5px);
-                bottom: auto;
-                padding: 12px;
-                border-radius: 0 0 16px 16px;
-                border-top: none;
-            }
-
-            .editor-btn-row {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .editor-btn-row button {
-                flex: 1 1 45%;
-            }
-
-            #editor-controls .status-box {
-                flex: 1 1 100%;
-                justify-content: center;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding-right: 0;
-                padding-bottom: 8px;
-                margin-bottom: 5px;
-            }
-
-            #editor-controls button {
-                flex: 1 1 45%;
+                padding: 10px 12px;
             }
         }
 
@@ -405,7 +376,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 15:43 (JST)
+                最終更新: 2026/04/02 15:53 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -554,40 +525,42 @@
         </div>
 
         <!-- エディター操作パネル -->
+        <!-- 譜面作成用の操作パネル (最下部フローティング) -->
         <div id="editor-controls">
-            <!-- タイムライン & アンドゥ -->
+            <!-- タイムライン -->
             <div id="editor-timeline">
-                <div class="w-full flex items-center gap-2 px-1">
-                    <span id="editor-time-display"
-                        class="text-[11px] text-blue-300 font-mono w-10 text-right">0.00s</span>
-                    <input type="range" id="editor-seek-bar" min="0" max="100" step="0.01" value="0"
-                        class="flex-1 m-0 w-full" style="height: 28px;" oninput="seekVideo(this.value)"
-                        onmousedown="seekVideoStart()" onmouseup="seekVideoEnd()" ontouchstart="seekVideoStart()"
-                        ontouchend="seekVideoEnd()">
+                <span id="editor-time-display" class="text-[10px] text-blue-300 font-mono w-10 text-right">0.00s</span>
+                <input type="range" id="editor-seek-bar" min="0" max="100" step="0.01" value="0"
+                    class="flex-1 m-0 h-4 bg-white/10 rounded-full appearance-none cursor-pointer"
+                    oninput="seekVideo(this.value)" onmousedown="seekVideoStart()" onmouseup="seekVideoEnd()"
+                    ontouchstart="seekVideoStart()" ontouchend="seekVideoEnd()">
+            </div>
+
+            <!-- ステータス & 補助操作 -->
+            <div id="editor-status-bar" class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-2">
+                    <div id="rec-lamp" class="w-2 h-2 rounded-full bg-gray-600"></div>
+                    <span id="edit-status"
+                        class="text-[9px] font-black italic text-gray-400 tracking-widest uppercase">Recording
+                        Ready</span>
                 </div>
-                <div class="w-full flex items-center justify-between px-2">
-                    <button id="btn-editor-pause" onclick="toggleEditorPause()"
-                        class="w-16 h-10 bg-gray-800 text-white rounded-lg flex items-center justify-center border border-gray-600 shadow-md text-lg">⏸️</button>
+                <div class="flex gap-2">
+                    <button onclick="toggleEditorPause()"
+                        class="bg-white/10 px-3 py-1 rounded-md text-[10px] border border-white/5">⏸️/▶️</button>
                     <button onclick="promptDeleteNote()"
-                        class="h-10 bg-red-900/60 text-red-300 border border-red-700 px-5 rounded-lg text-xs font-bold whitespace-nowrap active:bg-red-800 shadow-md transition-colors leading-none">付近のノーツ削除</button>
+                        class="bg-red-900/40 text-red-200 border border-red-500/30 px-3 py-1 rounded-md text-[9px] font-bold">付近削除</button>
+                    <button onclick="backToTitle()"
+                        class="bg-gray-800 border border-white/10 px-3 py-1 rounded-md text-[9px] font-bold">戻る</button>
                 </div>
             </div>
 
-            <div class="editor-btn-row w-full flex items-center justify-center gap-2">
-                <div class="status-box flex items-center gap-2 pr-2 border-r border-white/10">
-                    <span id="edit-status" class="text-[10px] font-bold text-gray-400 tracking-widest">RECORDING
-                        READY</span>
-                    <div id="rec-lamp"
-                        class="w-2.5 h-2.5 rounded-full bg-gray-600 shadow-[0_0_8px_rgba(255,255,255,0.3)]"></div>
-                </div>
-                <button id="btn-rec-toggle" onclick="toggleRecording()"
-                    class="bg-red-800 text-white shadow-lg active:scale-95 transition-transform">記録停止</button>
-                <button id="btn-preview-toggle" onclick="togglePreview()"
-                    class="bg-blue-800 text-white shadow-lg active:scale-95 transition-transform">プレビュー</button>
-                <button onclick="copyChart()"
-                    class="bg-green-900 text-white shadow-lg active:scale-95 transition-transform">データ出力</button>
+            <!-- メインボタン (4列グリッド) -->
+            <div class="editor-btn-row">
+                <button id="btn-rec-toggle" onclick="toggleRecording()" class="bg-red-700 text-white">記録開始</button>
+                <button id="btn-preview-toggle" onclick="togglePreview()" class="bg-blue-700 text-white">プレビュー</button>
+                <button onclick="copyChart()" class="bg-green-800 text-white">データ出力</button>
                 <button onclick="sendChartByEmail()"
-                    class="bg-blue-600 text-white shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-1">
+                    class="bg-blue-500 text-white flex items-center justify-center gap-1">
                     <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 8l7.89 5.26a2 2 0 002.22 0L22 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
@@ -595,8 +568,6 @@
                     </svg>
                     送信
                 </button>
-                <button onclick="backToTitle()"
-                    class="bg-gray-700 text-white shadow-lg active:scale-95 transition-transform">タイトル</button>
             </div>
         </div>
 
