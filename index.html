@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 09:30 (JST)
+                最終更新: 2026/04/02 09:48 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -658,11 +658,12 @@
 
             function showLoading(txt = "準備中...") { document.getElementById('loading-text').innerText = txt; document.getElementById('loading-overlay').style.display = 'flex'; }
             function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+            function playStartSound() { if (!audioCtx) initAudio(); const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.3); g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.connect(g); g.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.3); }
             function openChartModal() { document.getElementById('chart-modal').style.display = 'flex'; }
             function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
             function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
             function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
-            function closeChartModal() { const el = document.getElementById('chart-input'); if (el.value.replace(/\s+/g, '') === '上上下下左右左右BA') { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showToast("コナミコマンドを受け付け！BGM ON！"); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
+            function closeChartModal() { const el = document.getElementById('chart-input'); if (el.value.replace(/\s+/g, '') === '上上下下左右左右BA') { isKonamiActivated = true; playSecretSound(); playTitleBGM(); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
             function loadChartFile(input) { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { document.getElementById('chart-input').value = e.target.result; const st = document.getElementById('chart-file-status'); st.innerText = `ファイル読込済: ${f.name}`; st.className = "text-[9px] text-green-400 font-bold mt-1"; showToast("譜面ファイルを読み込みました"); }; r.readAsText(f); }
 
             function resize() {
@@ -723,7 +724,7 @@
             }
 
             async function startLive(editMode = false) {
-                initAudio(); stopTitleBGM(); if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
+                initAudio(); playStartSound(); stopTitleBGM(); if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
                 isEditMode = editMode;
 
                 const speedVal = parseFloat(document.getElementById('speed-input').value) || 5.0;
