@@ -372,7 +372,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:25 (JST)
+                最終更新: 2026/04/02 11:30 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -394,7 +394,8 @@
             <p class="mb-6 text-gray-400 text-[10px] font-bold tracking-widest text-center px-4">動画ファイルを選択して開始してください</p>
 
             <div class="input-box text-left space-y-4">
-                <div class="p-5 bg-blue-600/10 border-2 border-blue-500/30 rounded-3xl shadow-lg">
+                <div id="video-selector"
+                    class="p-5 bg-blue-600/10 border-2 border-blue-500/30 rounded-3xl shadow-lg transition-all">
                     <label class="block text-[11px] text-blue-300 font-black mb-2 tracking-wider">動画ファイルを選択</label>
                     <input type="file" id="local-file-input" accept="video/*" class="cursor-pointer">
                     <p id="file-status" class="text-[9px] text-gray-500 mt-2">※ファイルを選択すると準備が完了します。</p>
@@ -413,8 +414,8 @@
                     <div id="song-list" class="flex flex-row gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x"></div>
                 </div>
 
-                <div
-                    class="mt-2 flex flex-col items-center justify-center p-3 bg-gray-800 border-2 border-dashed border-gray-600 rounded-xl w-full">
+                <div id="chart-selector"
+                    class="mt-2 flex flex-col items-center justify-center p-3 bg-gray-800 border-2 border-dashed border-gray-600 rounded-xl w-full transition-all">
                     <label
                         class="font-bold text-gray-300 text-[11px] cursor-pointer w-full text-center py-2 relative hover:bg-gray-700 transition-colors rounded-lg">
                         2. 譜面ファイルを選ぶ (任意)
@@ -718,7 +719,9 @@
             function closeChartModal() { const el = document.getElementById('chart-input'); const val = el.value.replace(/\s+/g, '').toLowerCase(); if (val === "μ'sicforever") { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); updateKonamiUI(true); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
             async function showSongList() {
                 const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
+                const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector');
                 container.classList.remove('hidden'); list.innerHTML = '<p class="text-[9px] text-blue-300 animate-pulse text-center">楽曲リストを読込中...</p>';
+                if (vSec) vSec.classList.add('hidden'); if (cSec) cSec.classList.add('hidden');
 
                 const renderList = (songs) => {
                     list.innerHTML = '';
@@ -1002,7 +1005,7 @@
             }
 
             function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
-            function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('launcher-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
+            function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('launcher-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
             function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = localVideo.currentTime; playTapSound(); if (isEditMode && isRecording) { recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); syncEditorNotes(); } else if (!isEditMode) judgeStart(l); else createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); }
             function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
             function judgeStart(l) { const ct = localVideo.currentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } }
