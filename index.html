@@ -408,7 +408,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 16:26 (JST)
+                最終更新: 2026/04/02 16:36 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -549,10 +549,11 @@
             </div>
         </div>
 
-        <!-- ポーズ画面 -->
         <div id="pause-screen" class="overlay-screen" style="display:none;">
             <h2 class="text-4xl font-black mb-6 italic text-white tracking-tighter">一時停止中</h2>
             <button onclick="togglePause()" class="btn-action">再開</button>
+            <button id="btn-back-to-editor" onclick="backToEditorFromPlay()"
+                class="btn-action bg-blue-700 hidden">エディターに戻る</button>
             <button onclick="backToTitle()" class="btn-action btn-secondary">タイトルに戻る</button>
         </div>
 
@@ -649,7 +650,7 @@
             let localVideo, isVideoReady = false;
             let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, miss: 0 };
             let isEditorPaused = false, isSeeking = false;
-            let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false;
+            let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false;
             let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
             let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
             let NOTE_TRAVEL_TIME = 2.0;
@@ -1114,11 +1115,13 @@
                 isPaused = false;
                 isRecording = false;
                 isPreviewMode = false;
+                isEditorTestPlay = true; // フラグをオン
 
                 // UI
                 document.getElementById('editor-controls').style.display = 'none';
                 document.getElementById('ui-overlay').style.opacity = '1';
                 document.getElementById('ui-overlay').style.pointerEvents = 'auto';
+                document.getElementById('btn-back-to-editor').classList.remove('hidden'); // ボタン表示
 
                 // ライブ開始
                 score = 0; combo = 0; maxCombo = 0;
@@ -1129,6 +1132,23 @@
                 localVideo.currentTime = 0;
                 localVideo.play();
                 showToast("本番プレイ開始！");
+            }
+
+            function backToEditorFromPlay() {
+                isPaused = false;
+                isPlaying = false;
+                isEditMode = true;
+                isEditorTestPlay = false;
+                document.getElementById('pause-screen').style.display = 'none';
+                localVideo.pause();
+
+                // UI復帰
+                document.getElementById('editor-controls').style.display = 'flex';
+                document.getElementById('ui-overlay').style.opacity = '0';
+                document.getElementById('ui-overlay').style.pointerEvents = 'none';
+                document.getElementById('btn-back-to-editor').classList.add('hidden');
+
+                showToast("エディターに復帰しました");
             }
 
             function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
