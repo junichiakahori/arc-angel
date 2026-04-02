@@ -1143,16 +1143,18 @@
                 const chartUrl = song.charts[diff];
                 const chartStatus = document.getElementById('chart-file-status');
 
-                // --- ローカル保存済みデータのチェック ---
+                // サーバーからの読み込みを優先するため、保存済みデータの自動復旧を一旦無効化、または後に回します
+                /*
                 const savedData = loadChartFromLocal();
                 if (savedData) {
                     recordedChart = savedData;
                     CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                    chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました (17:11)`;
+                    chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました`;
                     chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
                     syncEditorNotes();
                     return;
                 }
+                */
 
                 if (!chartUrl) {
                     CHART = []; recordedChart = [];
