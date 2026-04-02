@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 01:32 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 01:38 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 01:32 (JST)
+                        最終更新: 2026/04/03 01:38 (JST)
                     </p>
                 </div>
 
@@ -935,34 +935,33 @@
             const og = audioCtx.createGain();
             
             if (judgment === 'PERFECT') {
-                // Perfect: 二重のサイン波で「シャン！」というキンッとした音
+                // Perfect: 「シャン！」煌びやかな高音
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(10000, now);
-                osc.frequency.exponentialRampToValueAtTime(3000, now + 0.18);
-                og.gain.setValueAtTime(0.20, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.frequency.setValueAtTime(12000, now);
+                osc.frequency.exponentialRampToValueAtTime(4000, now + 0.15);
+                og.gain.setValueAtTime(0.22, now);
+                og.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
 
-                // サブのキラキラ音 (高域強調)
                 const osc2 = audioCtx.createOscillator();
                 const og2 = audioCtx.createGain();
                 osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(15000, now);
-                osc2.frequency.exponentialRampToValueAtTime(12000, now + 0.1);
-                og2.gain.setValueAtTime(0.1, now);
-                og2.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc2.frequency.setValueAtTime(16000, now);
+                osc2.frequency.exponentialRampToValueAtTime(13000, now + 0.1);
+                og2.gain.setValueAtTime(0.12, now);
+                og2.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
                 osc2.connect(og2); og2.connect(audioCtx.destination);
-                osc2.start(now); osc2.stop(now + 0.15);
+                osc2.start(now); osc2.stop(now + 0.2);
             } else {
-                // Great以下 / 空打ち: 単一の中域「パシッ」という音
-                osc.type = 'triangle'; // 少しザラつかせる
-                osc.frequency.setValueAtTime(6000, now);
-                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.08);
-                og.gain.setValueAtTime(0.12, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                // それ以外: 「チンッ」と鋭く短い金属音
+                osc.type = 'sine'; 
+                osc.frequency.setValueAtTime(7000, now);
+                osc.frequency.exponentialRampToValueAtTime(5000, now + 0.05);
+                og.gain.setValueAtTime(0.15, now);
+                og.gain.exponentialRampToValueAtTime(0.01, now + 0.08); // 非常に短い
             }
 
             osc.connect(og); og.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 0.25);
+            osc.start(now); osc.stop(now + 0.3);
         }
 
         function playResultJingle(resultType) {
