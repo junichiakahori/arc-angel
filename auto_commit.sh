@@ -14,8 +14,8 @@ while true; do
     # macOS の date コマンドと sed の書式に合わせています
     CURRENT_TIME=$(TZ=Asia/Tokyo date +"%Y/%m/%d %H:%M")
     
-    # 最終更新日時を置換
-    sed -i '' "s/最終更新: [0-9\/ :]* (JST)/最終更新: $CURRENT_TIME (JST)/" index.html
+    # 最終更新日時を置換 (区切り文字を @ に変更)
+    sed -i '' "s@最終更新: [0-9/ :]* (JST)@最終更新: $CURRENT_TIME (JST)@" index.html
     
     # Git 操作
     git add .
