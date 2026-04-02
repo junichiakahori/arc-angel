@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 02:18 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 02:22 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 02:18 (JST)
+                        最終更新: 2026/04/03 02:22 (JST)
                     </p>
                 </div>
 
@@ -918,28 +918,27 @@
             const now = audioCtx.currentTime;
 
             if (judgment === 'PERFECT') {
-                // --- 改良版: スクフェス・リスペクト「シャン！」(クリスタル・ジングル) ---
+                // --- 耳に優しく抜ける「シャン！」---
                 
-                // 1. 高域のキレのある金属音 (倍音構成)
-                const freqs = [5000, 8000, 11500]; // 抜けの良い高域に絞る
-                freqs.forEach((f, i) => {
-                    const osc = audioCtx.createOscillator();
-                    const og = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(f, now);
-                    og.gain.setValueAtTime(0.08, now);
-                    og.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                    osc.connect(og); og.connect(audioCtx.destination);
-                    osc.start(now); osc.stop(now + 0.4);
-                });
+                // 1. 中高域の「芯」(痛くない金属感)
+                const oscPunch = audioCtx.createOscillator();
+                const ogPunch = audioCtx.createGain();
+                oscPunch.type = 'sine';
+                oscPunch.frequency.setValueAtTime(3200, now); // キーンとならない音域
+                ogPunch.gain.setValueAtTime(0.18, now);
+                ogPunch.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                oscPunch.connect(ogPunch); ogPunch.connect(audioCtx.destination);
+                oscPunch.start(now); oscPunch.stop(now + 0.2);
 
-                // 2. 弾けるような煌めき層 (ノイズ)
+                // 2. フィルターノイズ (柔らかなシマー感)
                 const nsShimmer = audioCtx.createBufferSource(); nsShimmer.buffer = noiseBuffer;
                 const nfShimmer = audioCtx.createBiquadFilter(); 
-                nfShimmer.type = 'highpass'; nfShimmer.frequency.setValueAtTime(6000, now);
+                nfShimmer.type = 'bandpass'; 
+                nfShimmer.frequency.setValueAtTime(6000, now); // 少し低めに設定して耳への刺さりを抑える
+                nfShimmer.Q.value = 1.0;
                 const ngShimmer = audioCtx.createGain();
-                ngShimmer.gain.setValueAtTime(0.35, now); // 音量をアップしてアタックを強調
-                ngShimmer.gain.exponentialRampToValueAtTime(0.01, now + 0.35); 
+                ngShimmer.gain.setValueAtTime(0.3, now);
+                ngShimmer.gain.exponentialRampToValueAtTime(0.01, now + 0.4); 
                 nsShimmer.connect(nfShimmer); nfShimmer.connect(ngShimmer); ngShimmer.connect(audioCtx.destination);
                 nsShimmer.start(now);
             } else {
