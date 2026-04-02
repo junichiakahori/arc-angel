@@ -408,7 +408,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 16:05 (JST)
+                最終更新: 2026/04/02 16:26 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -586,7 +586,8 @@
             <!-- 右側パネル: メイン・アクション -->
             <div id="editor-actions">
                 <button id="btn-rec-toggle" onclick="toggleRecording()" class="bg-red-700 text-white">記録開始</button>
-                <button id="btn-preview-toggle" onclick="togglePreview()" class="bg-blue-700 text-white">プレビュー</button>
+                <button onclick="startPlayFromEditor()"
+                    class="bg-blue-700 text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] font-black">プレイ開始</button>
                 <button onclick="copyChart()" class="bg-green-800 text-white">出力</button>
                 <button onclick="sendChartByEmail()"
                     class="bg-blue-500 text-white flex items-center justify-center gap-0.5">
@@ -1098,6 +1099,36 @@
                 const btn = document.getElementById('btn-preview-toggle'), status = document.getElementById('edit-status');
                 if (isPreviewMode) { if (recordedChart.length === 0) { showToast("ノーツがありません"); isPreviewMode = false; return; } btn.innerText = "停止"; status.innerText = "PREVIEW NOW"; status.className = "text-[10px] font-bold text-blue-400 tracking-widest"; notesQueue = [...recordedChart].sort((a, b) => a.time - b.time); notesQueue.forEach((c, i) => c.isSim = notesQueue.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015)); activeNotes = []; localVideo.currentTime = 0; localVideo.play(); }
                 else { btn.innerText = "プレビュー"; status.innerText = "RECORDING READY"; status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; activeNotes = []; localVideo.pause(); }
+            }
+
+            function startPlayFromEditor() {
+                if (recordedChart.length === 0) { showToast("譜面データがありません"); return; }
+
+                // 記録した譜面を適用
+                CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
+
+                // モード切り替え
+                isEditMode = false;
+                isPlaying = true;
+                isPaused = false;
+                isRecording = false;
+                isPreviewMode = false;
+
+                // UI
+                document.getElementById('editor-controls').style.display = 'none';
+                document.getElementById('ui-overlay').style.opacity = '1';
+                document.getElementById('ui-overlay').style.pointerEvents = 'auto';
+
+                // ライブ開始
+                score = 0; combo = 0; maxCombo = 0;
+                counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+                notesQueue = [...CHART];
+                activeNotes = [];
+
+                localVideo.currentTime = 0;
+                localVideo.play();
+                showToast("本番プレイ開始！");
             }
 
             function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
