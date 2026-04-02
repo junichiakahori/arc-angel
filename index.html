@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 01:38 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 01:42 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 01:38 (JST)
+                        最終更新: 2026/04/03 01:42 (JST)
                     </p>
                 </div>
 
@@ -1354,7 +1354,7 @@
             } else { isRecording = false; }
 
             localVideo.currentTime = 0; localVideo.style.display = 'block';
-            localVideo.style.opacity = "1"; // プレイ中は一律不透明
+            localVideo.style.opacity = isEditMode ? "0.7" : "0.4"; // プレイ中は視認性を高めるため暗く(40%)する
             localVideo.loop = false; // プレイ中はループ解除
             localVideo.play();
             isPlaying = true; requestAnimationFrame(update);
