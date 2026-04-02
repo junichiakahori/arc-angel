@@ -6,8 +6,8 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
-    <link rel="apple-touch-icon" href="assets/images/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="../assets/images/favicon.png">
     <title>ArcAngel - 動画同期リズムゲーム (Last Updated: 11:51)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -569,7 +569,7 @@
                     <p class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/02 23:10 (JST)
+                        最終更新: 2026/04/02 23:26 (JST)
                     </p>
                 </div>
 
@@ -1074,9 +1074,24 @@
 
                 // API fetch replaced by JSON fetch
                 try {
-                    const r = await fetch('assets/songs.json?v=' + Date.now());
-                    if (!r.ok) throw new Error("JSON not found");
-                    AUTO_SONG_LIST = await r.json();
+                    const response = await fetch(`../assets/songs.json?v=${Date.now()}`);
+                    songsStore = await response.json();
+                    
+                    // songs.json内の全パスを、現在の階層（latestフォルダ内）に合わせて調整
+                    songsStore = songsStore.map(song => {
+                        const adjustPath = (p) => p.startsWith('assets/') ? '../' + p : p;
+                        const newCharts = {};
+                        for (let key in song.charts) {
+                            newCharts[key] = adjustPath(song.charts[key]);
+                        }
+                        return {
+                            ...song,
+                            video: adjustPath(song.video),
+                            jacket: adjustPath(song.jacket),
+                            charts: newCharts
+                        };
+                    });
+                    AUTO_SONG_LIST = songsStore;
                     renderList(AUTO_SONG_LIST);
                 } catch (e) {
                     console.log("songs.json not found or error, using backup list.");
@@ -1148,8 +1163,8 @@
                 }
                 showLoading("譜面を取得中...");
                 try {
-                    const r = await fetch(chartUrl + (chartUrl.includes('?') ? '&' : '?') + 'v=' + Date.now());
-                    const txt = await r.text();
+                    const response = await fetch(`${chartUrl}?v=${Date.now()}`);
+                    const txt = await response.text();
                     document.getElementById('chart-input').value = txt;
                     recordedChart = JSON.parse(txt.replace(/^const CHART = /, '').replace(/;$/, ''));
                     CHART = [...recordedChart].sort((a, b) => a.time - b.time);
