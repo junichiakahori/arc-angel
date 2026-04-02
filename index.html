@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 01:45 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 01:46 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 01:45 (JST)
+                        最終更新: 2026/04/03 01:46 (JST)
                     </p>
                 </div>
 
@@ -983,17 +983,9 @@
             if (isActivated) {
                 document.body.classList.add('konami-mode');
                 wrapper.classList.add('konami-mode');
-                if (jacketUrl === 'none') {
-                    document.body.style.backgroundImage = "none";
-                    wrapper.style.backgroundImage = "none";
-                } else {
-                    const imgUrl = jacketUrl || BASE_PATH + 'assets/images/takaramonos.jpg';
-                    document.body.style.backgroundImage = `url('${imgUrl}')`;
-                    wrapper.style.backgroundImage = `url('${imgUrl}')`;
-                }
-                wrapper.style.backgroundSize = "contain";
-                wrapper.style.backgroundRepeat = "no-repeat";
-                wrapper.style.backgroundPosition = "center top";
+                // 背景画像を設定する処理を削除
+                document.body.style.backgroundImage = "none";
+                wrapper.style.backgroundImage = "none";
                 wrapper.style.backgroundColor = "#000";
             } else {
                 document.body.classList.remove('konami-mode');
@@ -1165,10 +1157,10 @@
             showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
             const status = document.getElementById('file-status');
             stopTitleBGM();
-            // 動画プレビューを見せるため、静止画背景をクリア
-            if (isKonamiActivated) updateKonamiUI(true, 'none');
-            // ブラウザの再生ロックを解除するため、タップ直後に一瞬再生を試みる
-            localVideo.style.display = 'block'; // 表示をONにする
+            // 背景画像をクリア
+            updateKonamiUI(isKonamiActivated, 'none');
+            // 動画プレビューを見せるため、動画表示をON
+            localVideo.style.display = 'block'; 
             localVideo.style.opacity = "0.6";
             localVideo.loop = true; // プレビュー時はループ再生
             localVideo.play().then(() => localVideo.pause()).catch(() => { });
