@@ -100,6 +100,34 @@
             overflow-y: auto;
         }
 
+        /* 全画面モード時の要素追従修正 */
+        :fullscreen #game-wrapper,
+        :-webkit-full-screen #game-wrapper,
+        :-ms-fullscreen #game-wrapper {
+            width: 100vw !important;
+            height: 100vh !important;
+            background-color: #000;
+        }
+
+        :fullscreen .overlay-screen,
+        :-webkit-full-screen .overlay-screen,
+        :-ms-fullscreen .overlay-screen {
+            position: fixed;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1000;
+        }
+
+        :fullscreen .overlay-screen-content,
+        :-webkit-full-screen .overlay-screen-content,
+        :-ms-fullscreen .overlay-screen-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
         .launcher-btn {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white !important;
