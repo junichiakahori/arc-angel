@@ -2,19 +2,37 @@
     {
         "name": "僕らのLIVE 君とのLIFE",
         "video": "assets/videos/bokura.mp4",
-        "chart": "assets/charts/bokura.txt",
+        "charts": {
+            "EASY": "assets/charts/bokura_easy.txt",
+            "NORMAL": "assets/charts/bokura_normal.txt",
+            "HARD": "assets/charts/bokura_hard.txt",
+            "EXPERT": "assets/charts/bokura_expert.txt",
+            "MASTER": "assets/charts/bokura_master.txt"
+        },
         "jacket": "assets/images/bokura.jpg"
     },
     {
         "name": "タカラモノズ",
         "video": "assets/videos/takaramonos.mp4",
-        "chart": "assets/charts/takaramonos.txt",
+        "charts": {
+            "EASY": "assets/charts/takaramonos_easy.txt",
+            "NORMAL": "assets/charts/takaramonos_normal.txt",
+            "HARD": "assets/charts/takaramonos_hard.txt",
+            "EXPERT": "assets/charts/takaramonos_expert.txt",
+            "MASTER": "assets/charts/takaramonos_master.txt"
+        },
         "jacket": "assets/images/takaramonos.jpg"
     },
     {
         "name": "A song for You! You? You!!",
         "video": "assets/videos/asongforyou.mp4",
-        "chart": "assets/charts/asongforyou.txt",
+        "charts": {
+            "EASY": "assets/charts/asongforyou_easy.txt",
+            "NORMAL": "assets/charts/asongforyou_normal.txt",
+            "HARD": "assets/charts/asongforyou_hard.txt",
+            "EXPERT": "assets/charts/asongforyou_expert.txt",
+            "MASTER": "assets/charts/asongforyou_master.txt"
+        },
         "jacket": "assets/images/asongforyou.jpg"
     }
 ]

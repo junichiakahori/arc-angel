@@ -356,6 +356,36 @@
                 flex: 1 1 45%;
             }
         }
+
+        .btn-diff {
+            @apply p-2 rounded-xl border-2 text-[10px] font-black italic transition-all hover:scale-105 active:scale-95;
+        }
+
+        .btn-diff.inactive {
+            @apply opacity-20 cursor-not-allowed scale-90 grayscale-[0.5] border-gray-700 !text-gray-600;
+        }
+
+        .btn-diff.selected {
+            @apply scale-110 shadow-[0_0_20px_white];
+            background-color: rgba(255, 255, 255, 0.25) !important;
+            border-width: 3px;
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-up {
+            animation: slide-up 0.3s ease-out forwards;
+        }
     </style>
 </head>
 
@@ -375,7 +405,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:59 (JST)
+                最終更新: 2026/04/02 15:01 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -417,6 +447,25 @@
                     <div id="song-list"
                         class="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scroll-smooth"
                         style="-webkit-overflow-scrolling: touch; touch-action: pan-x;"></div>
+
+                    <!-- 難易度選択パネル (曲選択後に出現) -->
+                    <div id="difficulty-box" class="hidden mt-4 animate-slide-up">
+                        <p
+                            class="text-[10px] font-black italic text-gray-400 mb-2 text-center uppercase tracking-widest">
+                            Select Difficulty</p>
+                        <div class="grid grid-cols-5 gap-2">
+                            <button onclick="selectDifficulty('EASY')"
+                                class="btn-diff bg-[#55e05a]/20 border-[#55e05a] text-[#55e05a]">EASY</button>
+                            <button onclick="selectDifficulty('NORMAL')"
+                                class="btn-diff bg-[#58bff0]/20 border-[#58bff0] text-[#58bff0]">NORMAL</button>
+                            <button onclick="selectDifficulty('HARD')"
+                                class="btn-diff bg-[#f0ea58]/20 border-[#f0ea58] text-[#f0ea58]">HARD</button>
+                            <button onclick="selectDifficulty('EXPERT')"
+                                class="btn-diff bg-[#f05858]/20 border-[#f05858] text-[#f05858]">EXPERT</button>
+                            <button onclick="selectDifficulty('MASTER')"
+                                class="btn-diff bg-[#bd58f0]/20 border-[#bd58f0] text-[#bd58f0]">MASTER</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="chart-selector"
@@ -575,10 +624,11 @@
             // --- 変数管理 ---
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
+            let currentSelectedSong = null;
             let BACKUP_SONG_LIST = [
-                { name: "僕らのLIVE 君とのLIFE", video: "assets/videos/bokura.mp4", chart: "assets/charts/bokura.txt", jacket: "assets/images/bokura.jpg" },
-                { name: "タカラモノズ", video: "assets/videos/takaramonos.mp4", chart: "assets/charts/takaramonos.txt", jacket: "assets/images/takaramonos.jpg" },
-                { name: "A song for You! You? You!!", video: "assets/videos/asongforyou.mp4", chart: "assets/charts/asongforyou.txt", jacket: "assets/images/asongforyou.jpg" }
+                { name: "僕らのLIVE 君とのLIFE", video: "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/bokura.jpg" },
+                { name: "タカラモノズ", video: "assets/videos/takaramonos.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/takaramonos.jpg" },
+                { name: "A song for You! You? You!!", video: "assets/videos/asongforyou.mp4", charts: { EASY: "", NORMAL: "", HARD: "assets/charts/asongforyou.txt", EXPERT: "", MASTER: "" }, jacket: "assets/images/asongforyou.jpg" }
             ];
             let AUTO_SONG_LIST = []; // キャッシュ用
             let localVideo, isVideoReady = false;
@@ -765,23 +815,48 @@
                 }
             }
             async function selectSong(s) {
+                currentSelectedSong = s;
                 showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
                 const status = document.getElementById('file-status');
                 stopTitleBGM();
                 localVideo.src = s.video;
                 localVideo.oncanplaythrough = () => {
                     hideLoading();
-                    status.innerText = `動画準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
+                    status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
                     localVideo.play().catch(() => console.log("Auto-preview blocked"));
                     localVideo.oncanplaythrough = null;
                 };
                 localVideo.load();
+
+                // 難易度パネルの更新と表示
+                const diffBox = document.getElementById('difficulty-box');
+                diffBox.classList.remove('hidden');
+                const btns = diffBox.querySelectorAll('.btn-diff');
+                btns.forEach(b => {
+                    const diff = b.innerText;
+                    b.classList.remove('selected', 'inactive');
+                    if (!s.charts || !s.charts[diff]) b.classList.add('inactive');
+                });
+
+                showToast(`「${s.name}」プレビュー中！難易度を選んでね♪`);
+            }
+            async function selectDifficulty(diff) {
+                if (!currentSelectedSong || !currentSelectedSong.charts[diff]) {
+                    showToast("この難易度はまだ作成されていません");
+                    return;
+                }
+                const btns = document.getElementById('difficulty-box').querySelectorAll('.btn-diff');
+                btns.forEach(b => b.classList.toggle('selected', b.innerText === diff));
+
+                showLoading("譜面を取得中...");
                 try {
-                    const r = await fetch(s.chart); const txt = await r.text();
+                    const r = await fetch(currentSelectedSong.charts[diff]);
+                    const txt = await r.text();
                     document.getElementById('chart-input').value = txt;
-                    document.getElementById('chart-file-status').innerText = `譜面読込済: ${s.name}`;
-                    showToast(`「${s.name}」プレビュー再生中！`);
-                } catch (e) { showToast("譜面の取得に失敗しました"); hideLoading(); }
+                    document.getElementById('chart-file-status').innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}]`;
+                    showToast(`${diff} 譜面を読み込みました！`);
+                } catch (e) { showToast("譜面の取得に失敗しました"); }
+                hideLoading();
             }
             function loadChartFile(input) { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { document.getElementById('chart-input').value = e.target.result; const st = document.getElementById('chart-file-status'); st.innerText = `ファイル読込済: ${f.name}`; st.className = "text-[9px] text-green-400 font-bold mt-1"; showToast("譜面ファイルを読み込みました"); }; r.readAsText(f); }
 
