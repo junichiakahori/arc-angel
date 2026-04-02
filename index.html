@@ -405,7 +405,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 15:32 (JST)
+                最終更新: 2026/04/02 15:35 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -631,6 +631,9 @@
         </div>
 
         <script>
+            // --- 設定・定数 ---
+            const ADMIN_EMAIL = "drone.akahori@gmail.com";
+
             // --- 変数管理 ---
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
@@ -1132,7 +1135,7 @@
                 const subject = encodeURIComponent(`【ArcAngel】譜面投稿: ${songName} [${diffName}]`);
                 const body = encodeURIComponent(`以下の譜面データを公式譜面として申請します。\n\n曲名: ${songName}\n難易度: ${diffName}\n\n--- 譜面データ ---\n${chartData}\n\n---`);
 
-                window.location.href = `mailto:drone.akahori@gmail.com?subject=${subject}&body=${body}`;
+                window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
             }
             function showToast(m) { const t = document.getElementById('toast-msg'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
             function launchInPlace() { initAudio(); document.getElementById('launcher-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; resize(); }
