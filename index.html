@@ -368,11 +368,11 @@
         <video id="local-video" style="display:none;" playsinline webkit-playsinline crossorigin="anonymous"></video>
 
         <!-- 1. 起動画面 -->
-        <div id="start-screen" class="screen flex flex-col items-center justify-center p-6 bg-black/60 pt-16">
+        <div id="launcher-screen" class="screen flex flex-col items-center justify-center p-6 bg-black/60 pt-16">
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:21 (JST)
+                最終更新: 2026/04/02 11:25 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -1002,7 +1002,7 @@
             }
 
             function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
-            function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
+            function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('launcher-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
             function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = localVideo.currentTime; playTapSound(); if (isEditMode && isRecording) { recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); syncEditorNotes(); } else if (!isEditMode) judgeStart(l); else createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); }
             function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
             function judgeStart(l) { const ct = localVideo.currentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } }
