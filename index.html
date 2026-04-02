@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 10:23 (JST)
+                最終更新: 2026/04/02 10:29 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -718,7 +718,23 @@
                     renderList(BACKUP_SONG_LIST);
                 }
             }
-            async function selectSong(s) { showLoading("楽曲データをロード中..."); localVideo.src = s.video; localVideo.load(); try { const r = await fetch(s.chart); const txt = await r.text(); document.getElementById('chart-input').value = txt; showToast(`「${s.name}」を読み込みました！`); } catch (e) { showToast("譜面の取得に失敗しました"); } }
+            async function selectSong(s) {
+                showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
+                const status = document.getElementById('file-status');
+                localVideo.src = s.video;
+                localVideo.oncanplaythrough = () => {
+                    hideLoading();
+                    status.innerText = `動画準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
+                    localVideo.oncanplaythrough = null;
+                };
+                localVideo.load();
+                try {
+                    const r = await fetch(s.chart); const txt = await r.text();
+                    document.getElementById('chart-input').value = txt;
+                    document.getElementById('chart-file-status').innerText = `譜面読込済: ${s.name}`;
+                    showToast(`「${s.name}」を読み込みました！後は開始ボタンを押すだけです。`);
+                } catch (e) { showToast("譜面の取得に失敗しました"); hideLoading(); }
+            }
             function loadChartFile(input) { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { document.getElementById('chart-input').value = e.target.result; const st = document.getElementById('chart-file-status'); st.innerText = `ファイル読込済: ${f.name}`; st.className = "text-[9px] text-green-400 font-bold mt-1"; showToast("譜面ファイルを読み込みました"); }; r.readAsText(f); }
 
             function resize() {
