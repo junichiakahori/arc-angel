@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:05 (JST)
+                最終更新: 2026/04/02 11:07 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -403,8 +403,13 @@
                 <!-- 隠し選曲リスト (コナミコマンド後に出現) -->
                 <div id="song-list-container"
                     class="hidden mt-4 w-full p-3 bg-blue-900/40 border-2 border-blue-500/50 rounded-3xl shadow-[0_0_20px_rgba(37,99,235,0.3)] animate-pulse">
-                    <p class="text-[10px] font-black italic text-blue-300 mb-3 tracking-[0.3em] text-center uppercase">
-                        Secret Song List</p>
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">Secret Song
+                            List</p>
+                        <button onclick="toggleBGM(this)"
+                            class="bg-blue-500/20 hover:bg-blue-500/40 border border-blue-500/30 px-3 py-1 rounded-full text-[8px] font-bold text-blue-200 transition-all">BGM
+                            STOP</button>
+                    </div>
                     <div id="song-list" class="flex flex-row gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x"></div>
                 </div>
 
@@ -697,6 +702,7 @@
             function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
             function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
             function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
+            function toggleBGM(btn) { if (bgmAudio) { stopTitleBGM(); btn.innerText = "BGM PLAY"; btn.classList.add('bg-red-500/20'); } else { playTitleBGM(); btn.innerText = "BGM STOP"; btn.classList.remove('bg-red-500/20'); } }
             function closeChartModal() { const el = document.getElementById('chart-input'); const val = el.value.replace(/\s+/g, '').toLowerCase(); if (val === "μ'sicforever") { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); updateKonamiUI(true); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
             async function showSongList() {
                 const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
