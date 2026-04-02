@@ -522,7 +522,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 20:12 (JST)
+                最終更新: 2026/04/02 20:18 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -836,13 +836,13 @@
                 if (isActivated) {
                     document.body.classList.add('konami-mode');
                     wrapper.classList.add('konami-mode');
-                    if (jacketUrl) {
-                        document.body.style.backgroundImage = `url('${jacketUrl}')`;
-                        wrapper.style.backgroundImage = `url('${jacketUrl}')`;
-                    } else {
-                        // 動画プレビューを見せるために背景画像を消去
+                    if (jacketUrl === 'none') {
                         document.body.style.backgroundImage = "none";
                         wrapper.style.backgroundImage = "none";
+                    } else {
+                        const imgUrl = jacketUrl || 'assets/images/takaramonos.jpg';
+                        document.body.style.backgroundImage = `url('${imgUrl}')`;
+                        wrapper.style.backgroundImage = `url('${imgUrl}')`;
                     }
                     wrapper.style.backgroundSize = "contain";
                     wrapper.style.backgroundRepeat = "no-repeat";
@@ -999,8 +999,9 @@
                 const status = document.getElementById('file-status');
                 stopTitleBGM();
                 // 動画プレビューを見せるため、静止画背景をクリア
-                if (isKonamiActivated) updateKonamiUI(true, null);
+                if (isKonamiActivated) updateKonamiUI(true, 'none');
                 // ブラウザの再生ロックを解除するため、タップ直後に一瞬再生を試みる
+                localVideo.style.display = 'block'; // 表示をONにする
                 localVideo.style.opacity = "0.6";
                 localVideo.play().then(() => localVideo.pause()).catch(() => { });
                 localVideo.src = s.video;
