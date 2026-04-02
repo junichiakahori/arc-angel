@@ -1125,10 +1125,23 @@
 
             // API fetch replaced by JSON fetch
             try {
-                const response = await fetch(`assets/songs.json?v=${Date.now()}`);
+                const response = await fetch(`${BASE_PATH}assets/songs.json?v=${Date.now()}`);
                 songsStore = await response.json();
 
-                // index.html (root) の場合はパス調整不要 (assets/ から始まるため)
+                // songs.json内の全パスを、現在の階層に合わせて調整
+                songsStore = songsStore.map(song => {
+                    const fix = (p) => (p && p.startsWith('assets/')) ? BASE_PATH + p : p;
+                    const newCharts = {};
+                    for (let key in song.charts) {
+                        newCharts[key] = fix(song.charts[key]);
+                    }
+                    return {
+                        ...song,
+                        video: fix(song.video),
+                        jacket: fix(song.jacket),
+                        charts: newCharts
+                    };
+                });
                 AUTO_SONG_LIST = songsStore;
                 renderList(AUTO_SONG_LIST);
             } catch (e) {
