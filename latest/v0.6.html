@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 01:56 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 01:59 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 01:56 (JST)
+                        最終更新: 2026/04/03 01:59 (JST)
                     </p>
                 </div>
 
@@ -918,34 +918,46 @@
             const now = audioCtx.currentTime;
 
             if (judgment === 'PERFECT') {
-                // Perfect: 「シャン！」という煌びやかな広がり
-                // ノイズ成分 (シャーーという余韻)
-                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
-                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(8000, now);
-                const ng = audioCtx.createGain();
-                ng.gain.setValueAtTime(0.3, now);
-                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.3); // 余韻を長く
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
-                ns.start(now);
+                // --- 究極の「シャン！」(多重レイヤー構成) ---
+                
+                // 1. 煌めきレイヤー (シャーーーー)
+                const nsShimmer = audioCtx.createBufferSource(); nsShimmer.buffer = noiseBuffer;
+                const nfShimmer = audioCtx.createBiquadFilter(); nfShimmer.type = 'highpass'; nfShimmer.frequency.setValueAtTime(7000, now);
+                const ngShimmer = audioCtx.createGain();
+                ngShimmer.gain.setValueAtTime(0.35, now);
+                ngShimmer.gain.exponentialRampToValueAtTime(0.01, now + 0.4); 
+                nsShimmer.connect(nfShimmer); nfShimmer.connect(ngShimmer); ngShimmer.connect(audioCtx.destination);
+                nsShimmer.start(now);
 
-                // 高域成分 (金属的な鋭さ)
-                const osc = audioCtx.createOscillator();
-                const og = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(12000, now); // 高域固定
-                og.gain.setValueAtTime(0.1, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.connect(og); og.connect(audioCtx.destination);
-                osc.start(now); osc.stop(now + 0.2);
+                // 2. 打撃・芯レイヤー (音の厚み)
+                const oscPunch = audioCtx.createOscillator();
+                const ogPunch = audioCtx.createGain();
+                oscPunch.type = 'sine';
+                oscPunch.frequency.setValueAtTime(2500, now);
+                ogPunch.gain.setValueAtTime(0.15, now);
+                ogPunch.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                oscPunch.connect(ogPunch); ogPunch.connect(audioCtx.destination);
+                oscPunch.start(now); oscPunch.stop(now + 0.2);
+
+                // 3. 高域倍音レイヤー (金属の鳴り)
+                const oscZing = audioCtx.createOscillator();
+                const ogZing = audioCtx.createGain();
+                oscZing.type = 'sine';
+                oscZing.frequency.setValueAtTime(14000, now);
+                ogZing.gain.setValueAtTime(0.08, now);
+                ogZing.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                oscZing.connect(ogZing); ogZing.connect(audioCtx.destination);
+                oscZing.start(now); oscZing.stop(now + 0.15);
+
             } else {
                 // それ以外: 「チッ」という鋭いクリック音
-                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
-                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(10000, now);
-                const ng = audioCtx.createGain();
-                ng.gain.setValueAtTime(0.12, now);
-                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.03); // 非常に鋭く
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
-                ns.start(now);
+                const nsClick = audioCtx.createBufferSource(); nsClick.buffer = noiseBuffer;
+                const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(10000, now);
+                const ngClick = audioCtx.createGain();
+                ngClick.gain.setValueAtTime(0.12, now);
+                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.03); 
+                nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
+                nsClick.start(now);
             }
         }
 
