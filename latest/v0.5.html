@@ -1166,7 +1166,13 @@
                     const response = await fetch(`${chartUrl}?v=${Date.now()}`);
                     const txt = await response.text();
                     document.getElementById('chart-input').value = txt;
-                    recordedChart = JSON.parse(txt.replace(/^const CHART = /, '').replace(/;$/, ''));
+                    
+                    // 読み込みをより堅牢に修正（前後トリム、セミコロン削除の強化）
+                    let jsonText = txt.trim()
+                        .replace(/^const CHART\s*=\s*/, '')
+                        .replace(/;+\s*$/, '');
+                        
+                    recordedChart = JSON.parse(jsonText);
                     CHART = [...recordedChart].sort((a, b) => a.time - b.time);
                     chartStatus.innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}]`;
                     chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
