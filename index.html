@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 10:15 (JST)
+                最終更新: 2026/04/02 10:21 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -564,10 +564,7 @@
             // --- 変数管理 ---
             let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
             let isKonamiActivated = false;
-            let MAINTAINED_SONGS = [
-                { name: "タカラモノズ", video: "assets/videos/タカラモノズ.mp4", chart: "assets/charts/タカラモノズ.txt" },
-                { name: "TEST", video: "assets/videos/TEST.MOV", chart: "assets/charts/TEST.txt" }
-            ];
+            let AUTO_SONG_LIST = []; // GitHub APIから動的に取得する用
             let localVideo, isVideoReady = false;
             let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, miss: 0 };
             let isEditorPaused = false, isSeeking = false;
@@ -681,7 +678,29 @@
             function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
             function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
             function closeChartModal() { const el = document.getElementById('chart-input'); if (el.value.replace(/\s+/g, '') === '上上下下左右左右BA') { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
-            function showSongList() { const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list'); list.innerHTML = ''; MAINTAINED_SONGS.forEach(s => { const b = document.createElement('button'); b.className = "w-full text-left bg-blue-600/40 hover:bg-blue-500/60 p-2 rounded-lg text-[11px] font-bold border border-blue-500/30 transition-all truncate"; b.innerText = "♪ " + s.name; b.onclick = () => selectSong(s); list.appendChild(b); }); container.classList.remove('hidden'); }
+            async function showSongList() {
+                const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
+                container.classList.remove('hidden'); list.innerHTML = '<p class="text-[9px] text-blue-300 animate-pulse text-center">サーバーをスキャン中...</p>';
+                try {
+                    const user = "junichiakahori", repo = "arc-angel";
+                    const resV = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/assets/videos`); const videos = await resV.json();
+                    const resC = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/assets/charts`); const charts = await resC.json();
+                    if (!Array.isArray(videos) || !Array.isArray(charts)) throw new Error("API Limit or Private Repo");
+                    list.innerHTML = '';
+                    videos.forEach(v => {
+                        const baseName = v.name.split('.').slice(0, -1).join('.');
+                        const match = charts.find(c => c.name.startsWith(baseName));
+                        if (match) {
+                            const b = document.createElement('button');
+                            b.className = "w-full text-left bg-blue-600/40 hover:bg-blue-500/60 p-2 rounded-lg text-[11px] font-bold border border-blue-500/30 transition-all truncate animate-fade-in";
+                            b.innerText = "♪ " + baseName;
+                            b.onclick = () => selectSong({ name: baseName, video: v.path, chart: match.path });
+                            list.appendChild(b);
+                        }
+                    });
+                    if (list.innerHTML === '') list.innerHTML = '<p class="text-[9px] text-gray-500 text-center">利用可能な楽曲が見つかりませんでした</p>';
+                } catch (e) { list.innerHTML = '<p class="text-[9px] text-red-400 text-center">API制限等により自動取得できませんでした</p>'; }
+            }
             async function selectSong(s) { showLoading("楽曲データをロード中..."); localVideo.src = s.video; localVideo.load(); try { const r = await fetch(s.chart); const txt = await r.text(); document.getElementById('chart-input').value = txt; showToast(`「${s.name}」を読み込みました！`); } catch (e) { showToast("譜面の取得に失敗しました"); } }
             function loadChartFile(input) { const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { document.getElementById('chart-input').value = e.target.result; const st = document.getElementById('chart-file-status'); st.innerText = `ファイル読込済: ${f.name}`; st.className = "text-[9px] text-green-400 font-bold mt-1"; showToast("譜面ファイルを読み込みました"); }; r.readAsText(f); }
 
