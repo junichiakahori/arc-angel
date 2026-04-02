@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 02:22 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 02:24 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 02:22 (JST)
+                        最終更新: 2026/04/03 02:24 (JST)
                     </p>
                 </div>
 
@@ -918,39 +918,48 @@
             const now = audioCtx.currentTime;
 
             if (judgment === 'PERFECT') {
-                // --- 耳に優しく抜ける「シャン！」---
+                // --- 究極の「楽器風シャン！」構成 ---
                 
-                // 1. 中高域の「芯」(痛くない金属感)
-                const oscPunch = audioCtx.createOscillator();
-                const ogPunch = audioCtx.createGain();
-                oscPunch.type = 'sine';
-                oscPunch.frequency.setValueAtTime(3200, now); // キーンとならない音域
-                ogPunch.gain.setValueAtTime(0.18, now);
-                ogPunch.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                oscPunch.connect(ogPunch); ogPunch.connect(audioCtx.destination);
-                oscPunch.start(now); oscPunch.stop(now + 0.2);
+                // 1. ベルクラスター (複雑な複数倍音による金属の厚み)
+                const cluster = [2200, 2900, 3100, 4200, 4350, 5600, 6100, 8000];
+                cluster.forEach(f => {
+                    const osc = audioCtx.createOscillator();
+                    const og = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, now);
+                    og.gain.setValueAtTime(0.04, now);
+                    og.gain.exponentialRampToValueAtTime(0.01, now + (0.2 + Math.random() * 0.2));
+                    osc.connect(og); og.connect(audioCtx.destination);
+                    osc.start(now); osc.stop(now + 0.5);
+                });
 
-                // 2. フィルターノイズ (柔らかなシマー感)
-                const nsShimmer = audioCtx.createBufferSource(); nsShimmer.buffer = noiseBuffer;
-                const nfShimmer = audioCtx.createBiquadFilter(); 
-                nfShimmer.type = 'bandpass'; 
-                nfShimmer.frequency.setValueAtTime(6000, now); // 少し低めに設定して耳への刺さりを抑える
-                nfShimmer.Q.value = 1.0;
-                const ngShimmer = audioCtx.createGain();
-                ngShimmer.gain.setValueAtTime(0.3, now);
-                ngShimmer.gain.exponentialRampToValueAtTime(0.01, now + 0.4); 
-                nsShimmer.connect(nfShimmer); nfShimmer.connect(ngShimmer); ngShimmer.connect(audioCtx.destination);
-                nsShimmer.start(now);
+                // 2. ワイドバンド・シマー (シャーーーという空気感)
+                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
+                const nf = audioCtx.createBiquadFilter(); 
+                nf.type = 'highpass'; nf.frequency.setValueAtTime(4500, now);
+                const ng = audioCtx.createGain();
+                ng.gain.setValueAtTime(0.3, now);
+                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.45); 
+                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                ns.start(now);
             } else {
-                // --- それ以外: 「カン！」という乾いた打撃音 ---
-                const oscKan = audioCtx.createOscillator();
-                const ogKan = audioCtx.createGain();
-                oscKan.type = 'triangle';
-                oscKan.frequency.setValueAtTime(2800, now);
-                ogKan.gain.setValueAtTime(0.12, now);
-                ogKan.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                oscKan.connect(ogKan); ogKan.connect(audioCtx.destination);
-                oscKan.start(now); oscKan.stop(now + 0.1);
+                // --- それ以外: 「カン！」という手応えのある打撃音 ---
+                const osc = audioCtx.createOscillator();
+                const og = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1200, now);
+                og.gain.setValueAtTime(0.15, now);
+                og.gain.exponentialRampToValueAtTime(0.01, now + 0.08); 
+                osc.connect(og); og.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.15);
+                
+                const nsAtk = audioCtx.createBufferSource(); nsAtk.buffer = noiseBuffer;
+                const nfAtk = audioCtx.createBiquadFilter(); nfAtk.type = 'highpass'; nfAtk.frequency.setValueAtTime(5000, now);
+                const ngAtk = audioCtx.createGain();
+                ngAtk.gain.setValueAtTime(0.08, now);
+                ngAtk.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                nsAtk.connect(nfAtk); nfAtk.connect(ngAtk); ngAtk.connect(audioCtx.destination);
+                nsAtk.start(now);
             }
         }
 
