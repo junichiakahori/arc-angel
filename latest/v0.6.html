@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.6 - 2026/04/03 02:27 Update</title>
+    <title>ArcAngel v0.6 - 2026/04/03 02:30 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -586,7 +586,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[9px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 02:27 (JST)
+                        最終更新: 2026/04/03 02:30 (JST)
                     </p>
                 </div>
 
@@ -918,60 +918,35 @@
             const now = audioCtx.currentTime;
 
             if (judgment === 'PERFECT') {
-                // --- 有機的な「生シャン！」構成 (ランダム要素追加) ---
-                const rand = (min, max) => Math.random() * (max - min) + min;
-
-                // 1. 低域の重み (打撃のドンッという感触)
-                const oThump = audioCtx.createOscillator();
-                const gThump = audioCtx.createGain();
-                oThump.frequency.setValueAtTime(300, now);
-                oThump.frequency.exponentialRampToValueAtTime(80, now + 0.05);
-                gThump.gain.setValueAtTime(0.12, now);
-                gThump.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
-                oThump.connect(gThump); gThump.connect(audioCtx.destination);
-                oThump.start(now); oThump.stop(now + 0.1);
-
-                // 2. ベルクラスター (毎回微妙にピッチを変える)
-                const cluster = [2200, 2900, 3100, 4200, 4350, 5600, 6100, 8000];
-                cluster.forEach(f => {
-                    const osc = audioCtx.createOscillator();
-                    const og = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(f + rand(-20, 20), now); // ランダムピッチ
-                    og.gain.setValueAtTime(rand(0.03, 0.05), now); // 音量もゆらす
-                    og.gain.exponentialRampToValueAtTime(0.01, now + rand(0.2, 0.4));
-                    osc.connect(og); og.connect(audioCtx.destination);
-                    osc.start(now); osc.stop(now + 0.5);
-                });
-
-                // 3. ランダム・シマー (シャーーー)
+                // --- v0.5 の「シャン！」を完全復活 ---
+                // 1. ノイズ成分 (シャッ)
                 const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
-                const nf = audioCtx.createBiquadFilter(); 
-                nf.type = 'highpass'; nf.frequency.setValueAtTime(rand(4000, 5000), now);
-                const ng = audioCtx.createGain();
-                ng.gain.setValueAtTime(rand(0.28, 0.35), now);
-                ng.gain.exponentialRampToValueAtTime(0.01, now + rand(0.4, 0.5)); 
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
+                const ng = audioCtx.createGain(); 
+                ng.gain.setValueAtTime(0.15, now); 
+                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination); 
                 ns.start(now);
+
+                // 2. サイン波成分 (シャン) 8000Hz -> 6000Hz へのスウィープ
+                const osc = audioCtx.createOscillator(); 
+                osc.type = 'sine'; 
+                osc.frequency.setValueAtTime(8000, now); 
+                osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
+                const og = audioCtx.createGain(); 
+                og.gain.setValueAtTime(0.1, now); 
+                og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.connect(og); og.connect(audioCtx.destination); 
+                osc.start(now); osc.stop(now + 0.1);
             } else {
-                const rand = (min, max) => Math.random() * (max - min) + min;
-                // --- それ以外: 「タンッ！」という生楽器風の打撃音 ---
-                const osc = audioCtx.createOscillator();
-                const og = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(1200 + rand(-50, 50), now);
-                og.gain.setValueAtTime(0.15, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.08); 
-                osc.connect(og); og.connect(audioCtx.destination);
-                osc.start(now); osc.stop(now + 0.15);
-                
-                const nsAtk = audioCtx.createBufferSource(); nsAtk.buffer = noiseBuffer;
-                const nfAtk = audioCtx.createBiquadFilter(); nfAtk.type = 'highpass'; nfAtk.frequency.setValueAtTime(rand(4500, 5500), now);
-                const ngAtk = audioCtx.createGain();
-                ngAtk.gain.setValueAtTime(0.1, now);
-                ngAtk.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-                nsAtk.connect(nfAtk); nfAtk.connect(ngAtk); ngAtk.connect(audioCtx.destination);
-                nsAtk.start(now);
+                // それ以外は控えめな「チッ」
+                const nsClick = audioCtx.createBufferSource(); nsClick.buffer = noiseBuffer;
+                const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(8000, now);
+                const ngClick = audioCtx.createGain();
+                ngClick.gain.setValueAtTime(0.08, now);
+                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04); 
+                nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
+                nsClick.start(now);
             }
         }
 
