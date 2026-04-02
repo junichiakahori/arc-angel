@@ -375,7 +375,7 @@
             <h1 class="text-5xl font-black italic text-white tracking-tighter drop-shadow-2xl pt-10">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 11:51 (JST)
+                最終更新: 2026/04/02 11:59 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -406,7 +406,7 @@
 
                 <!-- 隠し選曲リスト (コナミコマンド後に出現) -->
                 <div id="song-list-container"
-                    class="hidden mt-4 w-full p-3 bg-blue-900/40 border-2 border-blue-500/50 rounded-3xl shadow-[0_0_20px_rgba(37,99,235,0.3)] animate-pulse">
+                    class="hidden mt-4 w-full p-3 bg-blue-900/40 border-2 border-blue-500/50 rounded-3xl shadow-[0_0_20px_rgba(37,99,235,0.3)] animate-pulse overflow-visible">
                     <div class="flex items-center justify-between mb-3">
                         <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">Secret Song
                             List</p>
@@ -415,8 +415,8 @@
                             STOP</button>
                     </div>
                     <div id="song-list"
-                        class="flex flex-row gap-4 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scroll-smooth"
-                        style="-webkit-overflow-scrolling: touch;"></div>
+                        class="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scroll-smooth"
+                        style="-webkit-overflow-scrolling: touch; touch-action: pan-x;"></div>
                 </div>
 
                 <div id="chart-selector"
