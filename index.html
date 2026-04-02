@@ -522,7 +522,7 @@
             <p class="text-[11px] text-blue-400 mb-6 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                 動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-12 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 20:41 (JST)
+                最終更新: 2026/04/02 20:46 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -562,8 +562,8 @@
                             STOP</button>
                     </div>
                     <div id="song-list"
-                        class="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scroll-smooth"
-                        style="-webkit-overflow-scrolling: touch; touch-action: pan-x;"></div>
+                        class="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 px-2 snap-proximity snap-x scroll-smooth no-scrollbar"
+                        style="-webkit-overflow-scrolling: touch; touch-action: pan-x; user-select: none;"></div>
 
                     <!-- 難易度選択パネル (曲選択後に出現) -->
                     <div id="difficulty-box" class="hidden mt-4 animate-slide-up">
@@ -1477,7 +1477,9 @@
                 if (isKonamiActivated) {
                     playTitleBGM();
                     showSongList();
-                    updateKonamiUI(true, 'assets/images/takaramonos.jpg');
+                    // プレイ済みの曲があればそのジャケットを表示、なければデフォルト
+                    const jacketToUse = currentSelectedSong ? currentSelectedSong.jacket : 'assets/images/takaramonos.jpg';
+                    updateKonamiUI(true, jacketToUse);
                 }
                 else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); }
                 document.getElementById('result-screen').style.display = 'none';
