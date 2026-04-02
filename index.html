@@ -372,7 +372,7 @@
             <h1 class="text-4xl font-black italic text-white tracking-tighter">ArcAngel</h1>
             <p class="text-[10px] text-blue-400 mb-6 tracking-[0.3em] font-bold text-center">動画同期リズムゲーム</p>
             <p class="text-[9px] text-gray-500 mb-10 tracking-widest font-bold opacity-60 text-center">
-                最終更新: 2026/04/02 10:55 (JST)
+                最終更新: 2026/04/02 10:57 (JST)
             </p>
 
             <button class="launcher-btn" onclick="tryOpenNewTab()">
@@ -616,6 +616,22 @@
                 });
             }
 
+            function updateKonamiUI(isActivated) {
+                const wrapper = document.getElementById('game-wrapper');
+                if (isActivated) {
+                    document.body.classList.add('konami-mode');
+                    wrapper.classList.add('konami-mode');
+                    document.body.style.backgroundImage = "url('assets/images/title.jpg')";
+                    wrapper.style.backgroundImage = "url('assets/images/title.jpg')";
+                    wrapper.style.backgroundSize = "cover";
+                    wrapper.style.backgroundPosition = "center";
+                } else {
+                    document.body.classList.remove('konami-mode');
+                    wrapper.classList.remove('konami-mode');
+                    document.body.style.backgroundImage = "";
+                    wrapper.style.backgroundImage = "";
+                }
+            }
             function toggleFullScreen() {
                 const wrapper = document.getElementById('game-wrapper');
                 const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
@@ -681,7 +697,7 @@
             function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
             function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio('assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
             function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
-            function closeChartModal() { const el = document.getElementById('chart-input'); const val = el.value.replace(/\s+/g, '').toLowerCase(); if (val === "μ'sicforever") { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
+            function closeChartModal() { const el = document.getElementById('chart-input'); const val = el.value.replace(/\s+/g, '').toLowerCase(); if (val === "μ'sicforever") { isKonamiActivated = true; playSecretSound(); playTitleBGM(); showSongList(); updateKonamiUI(true); el.value = ''; } document.getElementById('chart-modal').style.display = 'none'; }
             async function showSongList() {
                 const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
                 container.classList.remove('hidden'); list.innerHTML = '<p class="text-[9px] text-blue-300 animate-pulse text-center">楽曲リストを読込中...</p>';
@@ -954,7 +970,7 @@
             }
 
             function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
-            function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); document.body.style.backgroundImage = "url('assets/images/title.jpg')"; document.body.classList.add('konami-mode'); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; document.body.style.backgroundImage = ""; document.body.classList.remove('konami-mode'); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
+            function backToTitle() { isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; if (localVideo) localVideo.pause(); if (isKonamiActivated) { playTitleBGM(); showSongList(); updateKonamiUI(true); } else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); } document.getElementById('result-screen').style.display = 'none'; document.getElementById('start-screen').style.display = 'flex'; document.getElementById('pause-screen').style.display = 'none'; document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('editor-controls').style.display = 'none'; document.getElementById('btn-skip-result').classList.add('hidden'); }
             function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = localVideo.currentTime; playTapSound(); if (isEditMode && isRecording) { recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); syncEditorNotes(); } else if (!isEditMode) judgeStart(l); else createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); }
             function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
             function judgeStart(l) { const ct = localVideo.currentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } }
