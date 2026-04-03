@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.7 - 2026/04/03 20:10 Update</title>
+    <title>ArcAngel v0.7 - 2026/04/03 20:15 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -29,6 +29,13 @@
             touch-action: manipulation;
             /* ズーム防止しつつスクロールを許可 */
             outline: none;
+        }
+
+        /* フォーカス時の視覚的フィードバック */
+        :focus-visible {
+            outline: 3px solid #60a5fa !important;
+            outline-offset: 2px;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.8) !important;
         }
 
         body {
@@ -155,6 +162,13 @@
             cursor: pointer;
             margin-bottom: 20px;
             animation: pulse 2s infinite;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .launcher-btn:focus, .launcher-btn:hover {
+            transform: scale(1.05);
+            border-color: #60a5fa;
+            box-shadow: 0 0 50px rgba(37, 99, 235, 0.9);
         }
 
         @keyframes pulse {
@@ -200,6 +214,13 @@
             cursor: pointer;
             margin: 5px;
             pointer-events: auto;
+            transition: all 0.2s;
+        }
+
+        .btn-action:focus, .btn-action:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
         }
 
         .btn-secondary {
@@ -586,7 +607,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 20:10 (JST)
+                        最終更新: 2026/04/03 20:15 (JST)
                     </p>
                 </div>
 
