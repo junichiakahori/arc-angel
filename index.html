@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.7 - 2026/04/03 20:22 Update</title>
+    <title>ArcAngel v0.7 - 2026/04/03 20:26 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -139,9 +139,10 @@
             left: 0 !important;
             width: 100% !important;
             height: 100% !important;
-            z-index: 99999 !important;
+            z-index: 2147483647 !important;
             background: rgba(0, 0, 0, 0.4) !important;
             backdrop-filter: blur(8px) !important;
+            pointer-events: auto !important;
         }
 
         .launcher-btn {
@@ -601,7 +602,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 20:22 (JST)
+                        最終更新: 2026/04/03 20:26 (JST)
                     </p>
                 </div>
 
@@ -718,12 +719,6 @@
             </div>
 
             <div class="text-center mt-6">
-                <button onclick="toggleFullScreen()"
-                    class="text-[10px] text-blue-400 border border-blue-900 px-6 py-2 rounded-full bg-blue-950/30 hover:bg-blue-900/50 transition-colors">
-                    全画面表示の切り替え
-                </button>
-            </div>
-
             <p id="error-msg" class="mt-4 text-[11px] text-red-500 font-bold hidden px-6 leading-tight"></p>
         </div>
     </div>
@@ -1005,7 +1000,7 @@
             }
         }
         function toggleFullScreen() {
-            const wrapper = document.getElementById('game-wrapper');
+            const wrapper = document.documentElement;
             const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
             if (!isFull) {
                 const requestMethod = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen || wrapper.mozRequestFullScreen || wrapper.msRequestFullscreen;
