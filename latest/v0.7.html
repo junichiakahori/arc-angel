@@ -19,7 +19,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.7 - 2026/04/03 21:08 Update</title>
+    <title>ArcAngel v0.7 - 2026/04/03 21:40 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -592,16 +592,15 @@
 </head>
 
 <body>
+    <!-- 全画面切り替えボタン (最上位階層に配置) -->
+    <button onclick="toggleFullScreen()" 
+        class="fixed top-4 right-4 bg-white/5 hover:bg-white/20 p-2.5 rounded-full border border-white/10 z-[2147483647] backdrop-blur-md transition-all opacity-40 hover:opacity-100 pointer-events-auto">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+        </svg>
+    </button>
 
     <div id="game-wrapper" class="relative group">
-        <!-- 常に右上に固定される全画面切り替えボタン -->
-        <button onclick="toggleFullScreen()" 
-            class="fixed top-4 right-4 bg-white/5 hover:bg-white/20 p-2.5 rounded-full border border-white/10 z-[100000] backdrop-blur-md transition-all opacity-40 group-hover:opacity-100">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
-            </svg>
-        </button>
-
         <!-- ローディング表示 -->
         <div id="loading-overlay">
             <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -620,7 +619,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/03 21:08 (JST)
+                        最終更新: 2026/04/03 21:40 (JST)
                     </p>
                 </div>
 
