@@ -1167,7 +1167,18 @@
             btns.forEach(b => {
                 const diff = b.innerText;
                 b.classList.remove('selected', 'inactive');
-                if (!s.charts || !s.charts[diff]) b.classList.add('inactive');
+                // 譜面データが全く定義されていない（undefined）場合のみ inactive にする。
+                // 空文字 "" の場合は「新規作成」扱いで選択できるように維持。
+                if (!s.charts || s.charts[diff] === undefined) b.classList.add('inactive');
+                
+                // BACKUP_SONG_LIST 等で値が入っているものは強調
+                if (s.charts && s.charts[diff] && s.charts[diff] !== "") {
+                    b.style.fontWeight = "900";
+                    b.style.opacity = "1";
+                } else {
+                    b.style.fontWeight = "normal";
+                    b.style.opacity = "0.7";
+                }
             });
 
             showToast(`「${s.name}」プレビュー中！難易度を選んでね♪`);
