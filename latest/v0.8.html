@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.8 - 2026/04/04 07:40 Update</title>
+    <title>ArcAngel v0.8 - 2026/04/04 09:55 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -630,7 +630,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/04 07:40 (JST)
+                        最終更新: 2026/04/04 09:55 (JST)
                     </p>
                 </div>
 
@@ -1105,6 +1105,16 @@
             }
         }
         function closeChartModal() {
+            // GA Event: Live Finish
+            if (typeof gtag === 'function' && !isEditMode) {
+                gtag('event', 'live_finish', {
+                    'score': score,
+                    'accuracy': accuracy,
+                    'max_combo': maxCombo,
+                    'difficulty': selectedDifficultyId || 'MANUAL'
+                });
+            }
+
             const el = document.getElementById('chart-input');
             const val = el.value.replace(/\s+/g, '').toLowerCase();
             if (val === "μ'sicforever") {
@@ -1363,6 +1373,16 @@
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
             if (isEditMode && localVideo) document.getElementById('editor-seek-bar').max = localVideo.duration || 100;
+
+            // GA Event: Live Start
+            if (typeof gtag === 'function') {
+                gtag('event', 'live_start', {
+                    'difficulty': selectedDifficultyId || 'MANUAL',
+                    'is_edit_mode': editMode,
+                    'song_title': currentSong ? currentSong.title : 'External'
+                });
+            }
+
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('launcher-screen').style.display = 'none';
             document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
