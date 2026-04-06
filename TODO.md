@@ -3,8 +3,8 @@
 ## 📜 開発基本ルール (General Policy)
 - [ ] **CHANGELOGの自動更新**: バグ修正や機能追加を行った際は、必ずユーザー向けに `CHANGELOG.md` にその内容を追記する。（明示的な指示がなくても自律的に行う）
 - [ ] **バージョン管理フロー**: 
-    - 開発は `latest/vX.X.html` で行い、動作確認後に `index.html` へ反映（正式リリース）する。
-    - 正式リリース後は、次の開発用として `latest/v(X.X + 0.1).html` を新規作成する。
+    - **開発中の編集禁止**: いかなるバグ対応・機能追加であっても、作業中は **絶対に `index.html` を直接編集しない** こと。
+    - すべての作業は `latest/vX.X.html` (現在は v0.9) のみで行い、動作確認完了後のリリース時のみ `index.html` へ反映する。
 - [ ] **最終更新日時の管理**: 作業時には必ず **`assets/version_history.json`** および **`README.md`** を更新すること。
     - `version_history.json`: `latest` と `history` を更新。
     - `README.md`: 概要の最終更新日時とバージョン表記を最新化。
