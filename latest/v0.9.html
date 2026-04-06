@@ -904,6 +904,7 @@
         <!-- 右側パネル: メイン・アクション -->
         <div id="editor-actions">
             <button id="btn-rec-toggle" onclick="toggleRecording()" class="bg-red-700 text-white">記録開始</button>
+            <button onclick="resetChart()" class="bg-red-900/60 text-red-100 border border-red-500/30">全消去</button>
             <button onclick="startPlayFromEditor()"
                 class="bg-blue-700 text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] font-black">プレイ開始</button>
             <button onclick="openTextEditor()"
@@ -1841,7 +1842,7 @@
             if (!isEditMode) return; if (isPreviewMode) togglePreview();
             isRecording = !isRecording;
             const btn = document.getElementById('btn-rec-toggle'), status = document.getElementById('edit-status'), lamp = document.getElementById('rec-lamp');
-            if (isRecording) { btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500'); if (recordedChart.length > 0 && confirm("RESET?")) recordedChart = []; localVideo.currentTime = 0; localVideo.play(); }
+            if (isRecording) { btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500'); localVideo.currentTime = 0; localVideo.play(); }
             else {
                 btn.innerText = "記録開始"; btn.classList.remove('bg-red-600'); status.innerText = "RECORDING READY"; status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; lamp.classList.replace('bg-red-500', 'bg-gray-600'); localVideo.pause();
                 // 記録停止時にオートセーブ
@@ -1931,6 +1932,15 @@
         }
 
         function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
+        function resetChart() {
+            if (confirm("現在記録されているすべてのノーツを消去しますか？")) {
+                recordedChart = [];
+                CHART = [];
+                syncEditorNotes();
+                saveChartToLocal();
+                showToast("譜面を全消去しました");
+            }
+        }
         function openTextEditor() {
             if (isRecording) toggleRecording();
             const jsonStr = JSON.stringify(recordedChart, null, 2);
