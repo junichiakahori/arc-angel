@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 07:58 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:03 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1617,6 +1617,7 @@
                 // UIを一気にプレイモードへ切り替え
                 document.getElementById('start-screen').style.display = 'none';
                 document.getElementById('launcher-screen').style.display = 'none';
+                document.getElementById('ui-overlay').style.display = 'block';
                 document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
                 document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
                 document.getElementById('editor-controls').style.display = isEditMode ? 'flex' : 'none';
@@ -2133,14 +2134,17 @@
             // 完全初期化
             isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false;
             isEditorPaused = false; isSeeking = false;
+            isEditMode = false; isEditorTestPlay = false; // エディタモードを確実に終了
             currentSelectedSong = null; currentSongIndex = -1;
             activeNotes = []; hitEffects = []; notesQueue = []; CHART = []; recordedChart = [];
             
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); 
             if (localVideo) { 
-                localVideo.pause(); 
-                localVideo.src = ""; 
-                localVideo.load(); // 完全に破棄
+                try {
+                   localVideo.pause(); 
+                   localVideo.src = ""; 
+                   localVideo.load(); // 完全に破棄
+                } catch(e) { console.log("Video reset ignored:", e); }
                 localVideo.style.opacity = "0.6";
             }
             stopTitleBGM();
@@ -2152,9 +2156,13 @@
             document.getElementById('editor-controls').style.display = 'none';
             document.getElementById('launcher-screen').style.display = 'flex';
             
-            // UIオーバーレイのリセット
+            // UIオーバーレイのリセット（完全に隠す）
             const ui = document.getElementById('ui-overlay');
-            if(ui) { ui.style.opacity = '0'; ui.style.pointerEvents = 'none'; }
+            if(ui) { 
+                ui.style.opacity = '0'; 
+                ui.style.pointerEvents = 'none'; 
+                ui.style.display = 'none'; 
+            }
             
             // ファイル入力のリセット
             const fileInput = document.getElementById('local-file-input');
@@ -2162,7 +2170,7 @@
             const fileStatus = document.getElementById('file-status');
             if(fileStatus) fileStatus.innerText = "※ファイルを選択すると準備が完了します。";
             
-            showToast("アプリの状態をリセットしました");
+            showToast("アプリをリセットしタイトルに戻りました");
         }
     </script>
 </body>
