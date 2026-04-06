@@ -25,14 +25,17 @@
 
 ---
 
+---
+
 ## 🌟 ArcAngel プロジェクト概要
 
 ![ArcAngel Favicon](assets/images/favicon.png)
 
 **ArcAngel** は、ブラウザで動作するプレミアムな動画同期型リズムアクションゲームです。
 
+- **🎮 プレイ (Official URL)**: [https://junichiakahori.github.io/arc-angel/](https://junichiakahori.github.io/arc-angel/)
 - **操作**: `A S D F SPACE J K L ;` キー
-- **更新**: 2026/04/06 13:48 (JST)
-- **バージョン**: v0.8 (Stable)
+- **最終更新**: 2026/04/06 15:45 (JST)
+- **最新バージョン**: v0.9 (Latest Development)
 
 © 2026 Drone Akahori / ArcAngel Project
