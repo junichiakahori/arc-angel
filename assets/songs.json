@@ -12,6 +12,18 @@
         "jacket": "assets/images/bokura.jpg"
     },
     {
+        "name": "僕らは今のなかで",
+        "video": "assets/videos/bokuima.mp4",
+        "charts": {
+            "EASY": "assets/charts/bokuima_easy.txt",
+            "NORMAL": "assets/charts/bokuima_normal.txt",
+            "HARD": "assets/charts/bokuima_hard.txt",
+            "EXPERT": "assets/charts/bokuima_expert.txt",
+            "MASTER": "assets/charts/bokuima_master.txt"
+        },
+        "jacket": "assets/images/bokuima.jpg"
+    },
+    {
         "name": "START:DASH!!",
         "video": "assets/videos/startdash.mp4",
         "charts": {
@@ -46,17 +58,5 @@
             "MASTER": "assets/charts/asongforyou_master.txt"
         },
         "jacket": "assets/images/asongforyou.jpg"
-    },
-    {
-        "name": "僕らは今のなかで",
-        "video": "assets/videos/bokuima.mp4",
-        "charts": {
-            "EASY": "assets/charts/bokuima_easy.txt",
-            "NORMAL": "assets/charts/bokuima_normal.txt",
-            "HARD": "assets/charts/bokuima_hard.txt",
-            "EXPERT": "assets/charts/bokuima_expert.txt",
-            "MASTER": "assets/charts/bokuima_master.txt"
-        },
-        "jacket": "assets/images/bokuima.jpg"
     }
 ]
