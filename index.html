@@ -630,6 +630,12 @@
 
         <video id="local-video" style="display:none;" playsinline webkit-playsinline crossorigin="anonymous"></video>
 
+        <!-- バッファリング(ロード待ち)表示 -->
+        <div id="buffering-overlay" class="absolute inset-0 z-[600] bg-black/40 backdrop-blur-sm hidden flex-col justify-center items-center pointer-events-none">
+            <div class="w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div class="text-white font-black italic tracking-widest text-sm drop-shadow-lg">BUFFERING...</div>
+        </div>
+
         <!-- 1. 起動画面 -->
         <div id="launcher-screen" class="overlay-screen">
             <div class="overlay-screen-content">
@@ -1096,6 +1102,20 @@
             localVideo.onended = () => { if (!isEditMode && isPlaying) showResults(); };
 
             localVideo.oncanplaythrough = () => { isVideoReady = true; hideLoading(); document.getElementById('file-status').innerText = "準備完了"; document.getElementById('file-status').className = "text-[9px] text-green-400 mt-2 font-bold"; };
+            
+            // --- バッファリング対策 ---
+            localVideo.onwaiting = () => {
+                if (isPlaying && !isPaused) {
+                    document.getElementById('buffering-overlay').style.display = 'flex';
+                }
+            };
+            localVideo.onplaying = () => {
+                document.getElementById('buffering-overlay').style.display = 'none';
+            };
+            localVideo.onstalled = () => {
+                console.log("Video stalled due to network conditions");
+            };
+
             localVideo.onerror = () => { hideLoading(); document.getElementById('error-msg').classList.remove('hidden'); document.getElementById('error-msg').innerText = "この動画ファイルは読み込めませんでした。"; isVideoReady = false; };
             document.getElementById('local-file-input').onchange = (e) => {
                 const file = e.target.files[0];
