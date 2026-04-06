@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 17:35 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 17:50 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -952,7 +952,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 17:35 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 17:50 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1484,9 +1484,9 @@
         async function startLive(editMode = false) {
             initAudio(); playStartSound(); stopTitleBGM();
             
-            const song = songs[currentSongIndex];
+            const song = currentSelectedSong;
             // 既に Blob がセットされている場合を除き、プリロードを実行
-            if (!localVideo.src || !localVideo.src.startsWith('blob:')) {
+            if (isCommandActivated && song && (!localVideo.src || !localVideo.src.startsWith('blob:'))) {
                 await preloadVideo(song.video);
             }
             
