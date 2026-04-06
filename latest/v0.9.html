@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 19:35 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 19:42 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1222,7 +1222,12 @@
         window.addEventListener('DOMContentLoaded', initGame);
         window.addEventListener('load', initGame);
 
-        function showLoading(txt = "準備中...") { document.getElementById('loading-text').innerText = txt; document.getElementById('loading-overlay').style.display = 'flex'; }
+        function showLoading(txt = "準備中...") { 
+            const el = document.getElementById('loading-status') || document.getElementById('loading-text');
+            if (el) el.innerText = txt; 
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.style.display = 'flex'; 
+        }
         function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
         function playStartSound() { if (!audioCtx) initAudio(); const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.3); g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.connect(g); g.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.3); }
         function openChartModal() {
@@ -1600,7 +1605,7 @@
             
             localVideo.currentTime = 0;
             // seekedが発火しない場合の保険
-            setTimeout(() => { if (localVideo.paused) doPlay(); }, 500);
+            setTimeout(() => { if (isPlaying && localVideo.paused) { localVideo.play().catch(() => {}); } }, 500);
         }
 
         function update() {
