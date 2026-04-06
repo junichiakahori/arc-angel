@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 18:00 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 18:02 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -957,7 +957,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:00 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:02 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1158,7 +1158,15 @@
                 if (!contentLength) {
                     localVideo.src = BASE_PATH + url;
                     localVideo.load();
-                    return;
+                    return new Promise((resolve) => {
+                        const check = setInterval(() => {
+                            if (localVideo.readyState >= 3) {
+                                clearInterval(check); localVideo.oncanplay = null; localVideo.oncanplaythrough = null;
+                                isVideoReady = true; overlay.style.display = 'none'; resolve();
+                            }
+                        }, 200);
+                        localVideo.oncanplay = () => { clearInterval(check); isVideoReady = true; overlay.style.display = 'none'; resolve(); };
+                    });
                 }
 
                 const total = parseInt(contentLength, 10);
@@ -1182,11 +1190,13 @@
                 localVideo.load();
                 
                 return new Promise((resolve) => {
-                    localVideo.oncanplaythrough = () => {
-                        isVideoReady = true;
-                        overlay.style.display = 'none';
-                        resolve();
-                    };
+                    const check = setInterval(() => {
+                        if (localVideo.readyState >= 3) {
+                            clearInterval(check); localVideo.oncanplay = null; localVideo.oncanplaythrough = null;
+                            isVideoReady = true; overlay.style.display = 'none'; resolve();
+                        }
+                    }, 200);
+                    localVideo.oncanplay = () => { clearInterval(check); isVideoReady = true; overlay.style.display = 'none'; resolve(); };
                 });
             } catch (err) {
                 console.error("Preload Error:", err);
