@@ -888,7 +888,7 @@
                         class="text-[8px] font-black italic text-gray-400 uppercase tracking-tighter">Ready</span>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="toggleEditorPause()"
+                    <button id="btn-editor-pause" onclick="toggleEditorPause()"
                         class="bg-white/10 px-2 py-0.5 rounded text-[8px]">⏸️/▶️</button>
                     <button onclick="promptDeleteNote()"
                         class="bg-red-900/40 text-red-200 border border-red-500/20 px-2 py-0.5 rounded text-[8px] font-bold">付近削除</button>
@@ -1482,8 +1482,8 @@
         }
 
         function setupInput() {
-            const sH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputStart(l); };
-            const eH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
+            const sH = (l) => { if (isPaused || (isEditMode && isEditorPaused) || (!isPlaying && !isEditMode)) return; handleInputStart(l); };
+            const eH = (l) => { if (isPaused || (isEditMode && isEditorPaused) || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
 
             window.addEventListener('keydown', (e) => { 
                 if (e.repeat) return; 
@@ -1551,6 +1551,7 @@
             showLoading(editMode ? "エディット環境を構築中..." : "ライブ準備中...");
             
             isEditMode = editMode;
+            isEditorPaused = false;
             const speedVal = parseFloat(document.getElementById('speed-input').value) || 5.0;
             NOTE_TRAVEL_TIME = Math.max(0.2, 5.0 / speedVal);
 
@@ -1625,7 +1626,7 @@
         }
 
         function update() {
-            if (!isPlaying || isPaused) return;
+            if (!isPlaying || isPaused || (isEditMode && isEditorPaused)) return;
             // 動画のcurrentTimeが正常に動作しない場合のフォールバックを含めた一貫した時刻
             const videoTime = localVideo.currentTime;
             // videoTime が 0 で止まっている場合や paused の場合は performance.now をベースにする
