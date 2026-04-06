@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 18:48 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 18:57 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -966,7 +966,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:48 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:57 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1588,27 +1588,19 @@
             
             // currentTime=0後にseekが完了してからplay()する
             const doPlay = () => {
+                isPlaying = true;
+                gameStartTime = performance.now();
                 localVideo.play().catch(e => console.warn("Video play failed:", e));
+                requestAnimationFrame(update);
             };
-            
-            localVideo.onseeked = () => {
-                localVideo.onseeked = null;
-                doPlay();
-            };
-            localVideo.currentTime = 0;
-            // seekedが発火しない場合の保険
-            setTimeout(() => { if (!isPlaying || localVideo.paused) doPlay(); }, 500);
             
             isPlaying = true;
-            
-            // 3秒後もbufferingが残っていたら強制解除
-            setTimeout(() => {
-                const buf = document.getElementById('buffering-overlay');
-                if (buf && buf.style.display !== 'none') buf.style.display = 'none';
-            }, 3000);
-            
             gameStartTime = performance.now();
             requestAnimationFrame(update);
+            
+            localVideo.currentTime = 0;
+            // seekedが発火しない場合の保険
+            setTimeout(() => { if (localVideo.paused) doPlay(); }, 500);
         }
 
         function update() {
@@ -1625,25 +1617,38 @@
                     document.getElementById('editor-seek-bar').value = ct;
                     document.getElementById('editor-time-display').innerText = ct.toFixed(2) + "s";
                 }
-                if (isPreviewMode || (!isEditMode && isPlaying) || isEditMode) {
-                    while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) { activeNotes.push({ ...notesQueue.shift(), status: 'waiting' }); }
+                
+                // プレイ中またはプレビュー中、またはエディットモードなら処理継続
+                if (isPreviewMode || isPlaying || isEditMode) {
+                    // ノーツの生成（ActiveNotesへ）
+                    while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) {
+                        activeNotes.push({ ...notesQueue.shift(), status: 'waiting' });
+                    }
+                    
                     if (!isEditMode) {
                         document.getElementById('time-display').innerText = `${ct.toFixed(2)}s`;
                         const progress = (ct / localVideo.duration) * 100;
                         document.getElementById('progress-bar').style.width = `${progress}%`;
                         document.getElementById('progress-text').innerText = `${Math.floor(progress)}%`;
 
-                        // スタミナチェック
                         if (stamina <= 0) {
                             showLiveFailed();
                             return;
                         }
                     }
-                    for (let i = hitEffects.length - 1; i >= 0; i--) { let e = hitEffects[i]; if (e.type === 'ring') { e.size += e.speed; e.opacity -= 0.05; } else { e.x += e.vx; e.y += e.vy; e.opacity -= 0.04; } if (e.opacity <= 0) hitEffects.splice(i, 1); }
+                    
+                    // エフェクト更新
+                    for (let i = hitEffects.length - 1; i >= 0; i--) {
+                        let e = hitEffects[i];
+                        if (e.type === 'ring') { e.size += e.speed; e.opacity -= 0.05; }
+                        else { e.x += e.vx; e.y += e.vy; e.opacity -= 0.04; }
+                        if (e.opacity <= 0) hitEffects.splice(i, 1);
+                    }
+                    
                     draw(ct);
                 }
-                requestAnimationFrame(update);
             }
+            requestAnimationFrame(update);
         }
 
         function showLiveFailed() {
