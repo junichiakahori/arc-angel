@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:11 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:13 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2028,7 +2028,22 @@
             document.getElementById('editor-controls').style.display = 'none';
             document.getElementById('btn-skip-result').classList.add('hidden');
         }
-        function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = gameCurrentTime; if (isEditMode && isRecording) { playTapSound(); recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); syncEditorNotes(); } else if (!isEditMode) judgeStart(l); else { playTapSound(); createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); } }
+        function handleInputStart(l) { 
+            if (lanePressed[l]) return; 
+            lanePressed[l] = true; 
+            if (isEditMode) gameCurrentTime = localVideo.currentTime; // エディター時は入力時点を同期
+            lanePressStartTime[l] = gameCurrentTime; 
+            if (isEditMode && isRecording) { 
+                playTapSound(); 
+                recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
+                createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); 
+                syncEditorNotes(); 
+            } else if (!isEditMode) judgeStart(l); 
+            else { 
+                playTapSound(); 
+                createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); 
+            } 
+        }
         function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = gameCurrentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
         function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound('PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } else { playTapSound(); } }
         function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const d = Math.abs(ct - n.endTime); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(d, buttons[l]); else { playTapSound('MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); } }
