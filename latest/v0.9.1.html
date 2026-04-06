@@ -656,7 +656,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        <span id="version-display">ArcAngel v0.9</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
+                        <span id="version-display">ArcAngel v0.9.1</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
                     </p>
                 </div>
 
@@ -965,8 +965,8 @@
                 const timeDisp = document.getElementById('last-updated-display');
                 
                 // 特定バージョン版ファイル
-                const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:57 (JST)";
+                const MY_VERSION = "v0.9.1"; 
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 21:32 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
