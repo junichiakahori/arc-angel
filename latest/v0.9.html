@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 17:50 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 17:55 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -952,7 +952,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 17:50 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 17:55 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1340,10 +1340,11 @@
         }
 
         window.selectDifficulty = async (diff) => {
-            const target = event.currentTarget || event.target;
             const buttons = document.querySelectorAll('.btn-diff');
-            buttons.forEach(btn => btn.classList.remove('selected'));
-            if (target && target.classList) target.classList.add('selected');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.innerText.trim() === diff) btn.classList.add('selected');
+            });
 
             if (!currentSelectedSong) {
                 showError("先に曲を選択してください。");
