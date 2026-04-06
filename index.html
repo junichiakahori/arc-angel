@@ -642,7 +642,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/06 15:25 (JST)
+                        <span id="version-display">ArcAngel v0.9</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
                     </p>
                 </div>
 
@@ -928,6 +928,22 @@
         // --- 動的なパス解決ロジック ---
         // サブフォルダ (latest/ 等) にいてもルートにいても assets を見つけられるようにする
         const BASE_PATH = window.location.pathname.includes('/latest/') ? '../' : '';
+
+        // --- バージョン情報の動的読み込み ---
+        async function loadVersionInfo() {
+            try {
+                const response = await fetch(BASE_PATH + 'assets/version.json');
+                const data = await response.json();
+                const verDisp = document.getElementById('version-display');
+                const timeDisp = document.getElementById('last-updated-display');
+                if (verDisp) verDisp.innerText = "ArcAngel " + data.version;
+                if (timeDisp) timeDisp.innerText = data.lastUpdated;
+            } catch (e) {
+                console.log("Version Info could not be loaded", e);
+                document.getElementById('last-updated-display').innerText = "2026/04/06 15:28 (JST)";
+            }
+        }
+        window.addEventListener('DOMContentLoaded', loadVersionInfo);
 
         // --- 設定・定数 ---
         const ADMIN_EMAIL = "drone.akahori@gmail.com";
