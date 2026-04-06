@@ -866,7 +866,7 @@
                 class="bg-blue-600 px-4 py-1 rounded text-[9px] font-black hidden border border-white/40 animate-pulse shadow-[0_0_15px_rgba(37,99,235,0.8)]"
                 onclick="showResults()">リザルトへ進む</button>
             <button class="bg-white/10 px-3 py-1 rounded text-[9px] font-bold active:bg-red-500/30"
-                onclick="backToTitle()">タイトルへ</button>
+                onclick="backToTitle()">選曲画面へ</button>
         </div>
     </div>
 
@@ -959,7 +959,7 @@
                     <span>Max Combo</span><span id="res-combo">0</span>
                 </div>
             </div>
-            <button onclick="backToTitle()" class="btn-action shadow-lg px-12">メニューに戻る</button>
+            <button onclick="backToTitle()" class="btn-action shadow-lg px-12">選曲画面に戻る</button>
         </div>
     </div>
 
@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 07:52 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 07:55 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
