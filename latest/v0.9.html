@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 18:57 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 19:35 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1607,7 +1607,15 @@
             if (!isPlaying || isPaused) return;
             // 動画のcurrentTimeが正常に動作しない場合のフォールバックを含めた一貫した時刻
             const videoTime = localVideo.currentTime;
-            gameCurrentTime = (videoTime === 0 || localVideo.paused) ? (performance.now() - gameStartTime) / 1000 : videoTime;
+            // videoTime が 0 で止まっている場合や paused の場合は performance.now をベースにする
+            // ただし videoTime が進んでいるならそれを優先して同期を保つ
+            if (videoTime > 0 && !localVideo.paused) {
+                gameCurrentTime = videoTime;
+                // 内部時計も同期させておく（動画が止まった時のために）
+                gameStartTime = performance.now() - (videoTime * 1000);
+            } else {
+                gameCurrentTime = (performance.now() - gameStartTime) / 1000;
+            }
             const ct = gameCurrentTime;
             if (!isEditMode && notesQueue.length === 0 && activeNotes.length === 0 && CHART.length > 0) {
                 document.getElementById('btn-skip-result').classList.remove('hidden');
