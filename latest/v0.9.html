@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 07:55 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 07:58 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2130,22 +2130,39 @@
             resize();
         }
         function backToLauncher() {
+            // 完全初期化
             isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false;
+            isEditorPaused = false; isSeeking = false;
+            currentSelectedSong = null; currentSongIndex = -1;
+            activeNotes = []; hitEffects = []; notesQueue = []; CHART = []; recordedChart = [];
+            
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); 
-            activeNotes = []; hitEffects = []; 
-            if (localVideo) { localVideo.pause(); }
+            if (localVideo) { 
+                localVideo.pause(); 
+                localVideo.src = ""; 
+                localVideo.load(); // 完全に破棄
+                localVideo.style.opacity = "0.6";
+            }
             stopTitleBGM();
             
+            // 画面の表示切り替え
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('pause-screen').style.display = 'none';
             document.getElementById('result-screen').style.display = 'none';
             document.getElementById('editor-controls').style.display = 'none';
             document.getElementById('launcher-screen').style.display = 'flex';
             
+            // UIオーバーレイのリセット
             const ui = document.getElementById('ui-overlay');
             if(ui) { ui.style.opacity = '0'; ui.style.pointerEvents = 'none'; }
             
-            showToast("タイトルに戻りました");
+            // ファイル入力のリセット
+            const fileInput = document.getElementById('local-file-input');
+            if(fileInput) fileInput.value = "";
+            const fileStatus = document.getElementById('file-status');
+            if(fileStatus) fileStatus.innerText = "※ファイルを選択すると準備が完了します。";
+            
+            showToast("アプリの状態をリセットしました");
         }
     </script>
 </body>
