@@ -35,7 +35,7 @@
 
 - **🎮 プレイ (Official URL)**: [https://junichiakahori.github.io/arc-angel/](https://junichiakahori.github.io/arc-angel/)
 - **操作**: `A S D F SPACE J K L ;` キー
-- **最終更新**: 2026/04/06 15:45 (JST)
-- **最新バージョン**: v0.9 (Latest Development)
+- **最終更新**: 2026/04/06 16:00 (JST)
+- **最新バージョン**: v0.9.0 (Major Chart Update)
 
 © 2026 Drone Akahori / ArcAngel Project

@@ -32,9 +32,9 @@
 このファイルは、再起動時に Antigravity (AI) が以前の文脈を把握するためのメモです。
 
 ## 🏹 最近完了したこと (Recently Done)
-- [x] **新曲追加**: 『僕らは今のなかで』を楽曲リスト (`songs.json`) に追加。
-- [x] **アセット整備**: 『僕らは今のなかで』の動画ファイル名 (`bokuima.mp4`) の設定、およびジャケット画像 (`bokuima.jpg`) の作成・登録。
-- [x] **空の譜面作成**: `bokuima_easy.txt` 〜 `bokuima_master.txt` のベースファイル作成。
+- [x] **全既存楽曲の譜面刷新**: 『僕らのLIVE 君とのLIFE』〜『A song for You! You? You!!』の全難易度を最新基準（全9レーン・ロングノーツ活用）でリメイク。
+- [x] **リリース管理**: `version_history.json` を v0.9.0 へ更新。
+- [x] **README/CHANGELOG更新**: 大規模アップデートの内容を各ドキュメントに反映。
 - [x] **エディター修正**: 
   - [x] スペースキー (`Space`) がボタンフォーカスやブラウザの標準動作と干渉し、動画が止まってしまう問題を `e.preventDefault()` と `capture: true` で修正。
   - [x] 画面上のボタン表記「出力」と README 手順の「COPY CHART」を「出力」へ統一。
