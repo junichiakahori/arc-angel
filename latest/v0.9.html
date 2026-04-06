@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 19:42 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 21:32 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1150,6 +1150,15 @@
                     isVideoReady = true;
                 }
             };
+
+            window.addEventListener('resize', resize);
+            document.addEventListener('fullscreenchange', () => { resize(); if(typeof showToast === 'function') showToast("画面表示を調整しました"); });
+            document.addEventListener('webkitfullscreenchange', () => { resize(); });
+            setupInput(); resize();
+
+            if (window.location.hash === '#autolaunch') {
+                setTimeout(launchInPlace, 100);
+            }
         }
 
         // --- 動画の完全プリロード処理 (Blob方式) ---
