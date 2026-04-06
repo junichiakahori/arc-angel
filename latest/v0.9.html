@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.7 - 2026/04/04 07:30 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 17:35 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -952,7 +952,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 15:32 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 17:35 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1297,8 +1297,9 @@
         }
         async function selectSong(s) {
             currentSelectedSong = s;
-            showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
+            isVideoReady = true;
             const status = document.getElementById('file-status');
+            status.innerText = `「${s.name}」を準備中...`; status.className = "text-[9px] text-blue-400 font-bold mt-2";
             stopTitleBGM();
             // 背景画像をクリア
             updateCommandUI(isCommandActivated, 'none');
@@ -1306,13 +1307,11 @@
             localVideo.style.display = 'block';
             localVideo.style.opacity = "0.6";
             localVideo.loop = true; // プレビュー時はループ再生
-            localVideo.play().then(() => localVideo.pause()).catch(() => { });
             localVideo.src = s.video;
-            localVideo.oncanplaythrough = () => {
-                hideLoading();
+            localVideo.oncanplay = () => {
                 status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
                 localVideo.play().catch(() => console.log("Auto-preview blocked"));
-                localVideo.oncanplaythrough = null;
+                localVideo.oncanplay = null;
             };
             localVideo.load();
 
