@@ -1714,7 +1714,9 @@
                     draw(ct);
                 }
             }
-            requestAnimationFrame(update);
+            if (isPlaying && !isPaused && !(isEditMode && isEditorPaused)) {
+                requestAnimationFrame(update);
+            }
         }
 
         function showLiveFailed() {
@@ -1792,7 +1794,6 @@
             }
             hitEffects.forEach(e => { ctx.globalAlpha = e.opacity; ctx.beginPath(); if (e.type === 'ring') { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.strokeStyle = e.color; ctx.lineWidth = 3; ctx.stroke(); } else { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); } });
             ctx.globalAlpha = 1.0;
-            requestAnimationFrame(update);
         }
 
 
@@ -1803,6 +1804,7 @@
             else { 
                 localVideo.play(); 
                 document.getElementById('btn-editor-pause').innerText = "⏸️";
+                // update内での if チェックにより多重起動を防ぎつつ再開
                 requestAnimationFrame(update);
             }
         }
