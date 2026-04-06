@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 07:47 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 07:52 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2128,6 +2128,24 @@
             document.getElementById('launcher-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
             resize();
+        }
+        function backToLauncher() {
+            isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false;
+            if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            activeNotes = []; hitEffects = []; 
+            if (localVideo) { localVideo.pause(); }
+            stopTitleBGM();
+            
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('pause-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('editor-controls').style.display = 'none';
+            document.getElementById('launcher-screen').style.display = 'flex';
+            
+            const ui = document.getElementById('ui-overlay');
+            if(ui) { ui.style.opacity = '0'; ui.style.pointerEvents = 'none'; }
+            
+            showToast("タイトルに戻りました");
         }
     </script>
 </body>
