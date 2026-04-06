@@ -1,17 +1,17 @@
-[
+const CHART = [
   {
     "time": 9.14,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 9.14,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 9.95,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -26,17 +26,17 @@
   },
   {
     "time": 12.33,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 12.33,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 13.12,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -51,17 +51,17 @@
   },
   {
     "time": 14.74,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 14.74,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 15.58,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -76,17 +76,17 @@
   },
   {
     "time": 17.94,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 17.94,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 18.71,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -101,17 +101,17 @@
   },
   {
     "time": 20.72,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 20.72,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 21.13,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -126,17 +126,17 @@
   },
   {
     "time": 23.54,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 23.54,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 24.32,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -151,17 +151,17 @@
   },
   {
     "time": 26.72,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 26.72,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 27.53,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -176,17 +176,17 @@
   },
   {
     "time": 29.96,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 29.96,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 30.76,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -201,17 +201,17 @@
   },
   {
     "time": 33.16,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 33.16,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 33.96,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -226,17 +226,17 @@
   },
   {
     "time": 35.91,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 35.91,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 36.75,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -251,17 +251,17 @@
   },
   {
     "time": 38.79,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 38.79,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 39.54,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -276,17 +276,17 @@
   },
   {
     "time": 41.97,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 41.97,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 42.75,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -301,17 +301,17 @@
   },
   {
     "time": 45.17,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 45.17,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 45.96,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -326,17 +326,17 @@
   },
   {
     "time": 47.76,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 47.76,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 48.4,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -351,17 +351,17 @@
   },
   {
     "time": 50.33,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 50.33,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 51.13,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -376,17 +376,17 @@
   },
   {
     "time": 52.71,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 52.71,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 53.54,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -401,17 +401,17 @@
   },
   {
     "time": 55.49,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 55.49,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 55.92,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -426,17 +426,17 @@
   },
   {
     "time": 58.73,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 58.73,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 59.55,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -451,17 +451,17 @@
   },
   {
     "time": 61.91,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 61.91,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 62.34,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -476,17 +476,17 @@
   },
   {
     "time": 64.69,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 64.69,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 65.94,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -501,17 +501,17 @@
   },
   {
     "time": 68.36,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 68.36,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 69.2,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -526,17 +526,17 @@
   },
   {
     "time": 71.54,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 71.54,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 72.36,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -551,17 +551,17 @@
   },
   {
     "time": 74.77,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 74.77,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 75.55,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -576,17 +576,17 @@
   },
   {
     "time": 77.12,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 77.12,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 77.98,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -601,17 +601,17 @@
   },
   {
     "time": 80.37,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 80.37,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 81.17,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -626,17 +626,17 @@
   },
   {
     "time": 83.59,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 83.59,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 84.35,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -651,17 +651,17 @@
   },
   {
     "time": 86.72,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 86.72,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 87.51,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -676,17 +676,17 @@
   },
   {
     "time": 89.95,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 89.95,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 90.34,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -701,17 +701,17 @@
   },
   {
     "time": 93.14,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 93.14,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 93.96,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -726,17 +726,17 @@
   },
   {
     "time": 96.37,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 96.37,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 97.15,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -751,17 +751,17 @@
   },
   {
     "time": 99.16,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 99.16,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 99.55,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -776,17 +776,17 @@
   },
   {
     "time": 101.97,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 101.97,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 102.76,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -801,17 +801,17 @@
   },
   {
     "time": 105.11,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 105.11,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 105.53,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -819,4 +819,4 @@
     "lane": 2,
     "isSim": false
   }
-]
+];

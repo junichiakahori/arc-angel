@@ -1,12 +1,12 @@
 const CHART = [
   {
     "time": 21.92,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 22.51,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -21,12 +21,12 @@ const CHART = [
   },
   {
     "time": 24.14,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 24.68,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -66,22 +66,22 @@ const CHART = [
   },
   {
     "time": 29.13,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 29.68,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 30.24,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 30.96,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -96,12 +96,12 @@ const CHART = [
   },
   {
     "time": 32.54,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 33.2,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -141,22 +141,22 @@ const CHART = [
   },
   {
     "time": 37.72,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 38.25,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 38.8,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 39.31,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -171,12 +171,12 @@ const CHART = [
   },
   {
     "time": 40.91,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 41.47,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -216,22 +216,22 @@ const CHART = [
   },
   {
     "time": 46.25,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 46.79,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 47.36,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 47.9,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -246,12 +246,12 @@ const CHART = [
   },
   {
     "time": 49.6,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 50.14,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -291,22 +291,22 @@ const CHART = [
   },
   {
     "time": 54.47,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 54.73,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 55,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 55.83,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -321,12 +321,12 @@ const CHART = [
   },
   {
     "time": 56.95,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 57.22,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -366,22 +366,22 @@ const CHART = [
   },
   {
     "time": 61.48,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 62.18,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 62.7,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 63.21,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -396,12 +396,12 @@ const CHART = [
   },
   {
     "time": 64.9,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 65.46,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -441,22 +441,22 @@ const CHART = [
   },
   {
     "time": 69.93,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 70.5,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 71.11,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 71.67,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -471,17 +471,17 @@ const CHART = [
   },
   {
     "time": 72.86,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 72.86,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 73.13,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -491,12 +491,12 @@ const CHART = [
   },
   {
     "time": 74.51,
-    "lane": 1,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 74.51,
-    "lane": 7,
+    "lane": 6,
     "isSim": true
   },
   {
@@ -511,12 +511,12 @@ const CHART = [
   },
   {
     "time": 75.34,
-    "lane": 1,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 75.34,
-    "lane": 7,
+    "lane": 6,
     "isSim": true
   },
   {
@@ -536,27 +536,27 @@ const CHART = [
   },
   {
     "time": 77.33,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 77.88,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 78.44,
-    "lane": 1,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 78.44,
-    "lane": 7,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 78.97,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -576,12 +576,12 @@ const CHART = [
   },
   {
     "time": 80.46,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 81.22,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -621,12 +621,12 @@ const CHART = [
   },
   {
     "time": 87.16,
-    "lane": 1,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 87.16,
-    "lane": 7,
+    "lane": 6,
     "isSim": true
   },
   {
@@ -641,12 +641,12 @@ const CHART = [
   },
   {
     "time": 88.33,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 89.44,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -661,17 +661,17 @@ const CHART = [
   },
   {
     "time": 92.75,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 92.75,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 94.28,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -686,12 +686,12 @@ const CHART = [
   },
   {
     "time": 96.04,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 96.04,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
@@ -721,7 +721,7 @@ const CHART = [
   },
   {
     "time": 98.84,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
@@ -736,7 +736,7 @@ const CHART = [
   },
   {
     "time": 99.59,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
@@ -761,12 +761,12 @@ const CHART = [
   },
   {
     "time": 102.26,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 102.83,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -806,22 +806,22 @@ const CHART = [
   },
   {
     "time": 107.33,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 107.91,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 108.44,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 109.01,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -836,12 +836,12 @@ const CHART = [
   },
   {
     "time": 110.7,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 111.27,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -881,22 +881,22 @@ const CHART = [
   },
   {
     "time": 115.85,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 116.4,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 116.96,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 117.5,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -911,12 +911,12 @@ const CHART = [
   },
   {
     "time": 118.66,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 119.24,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -956,22 +956,22 @@ const CHART = [
   },
   {
     "time": 123.74,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 124.31,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 124.85,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 125.4,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -986,12 +986,12 @@ const CHART = [
   },
   {
     "time": 127.15,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 127.71,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -1006,12 +1006,12 @@ const CHART = [
   },
   {
     "time": 132.82,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 132.82,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
@@ -1041,27 +1041,27 @@ const CHART = [
   },
   {
     "time": 135.66,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 136.22,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
     "time": 136.77,
-    "lane": 1,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 136.77,
-    "lane": 7,
+    "lane": 6,
     "isSim": true
   },
   {
     "time": 137.35,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -1081,12 +1081,12 @@ const CHART = [
   },
   {
     "time": 139.02,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 139.51,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -1106,12 +1106,12 @@ const CHART = [
   },
   {
     "time": 140.91,
-    "lane": 0,
+    "lane": 2,
     "isSim": true
   },
   {
     "time": 140.91,
-    "lane": 8,
+    "lane": 6,
     "isSim": true
   },
   {
@@ -1141,7 +1141,7 @@ const CHART = [
   },
   {
     "time": 143.58,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
@@ -1156,12 +1156,12 @@ const CHART = [
   },
   {
     "time": 144.73,
-    "lane": 1,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 145.27,
-    "lane": 7,
+    "lane": 6,
     "isSim": false
   },
   {
@@ -1181,12 +1181,12 @@ const CHART = [
   },
   {
     "time": 146.93,
-    "lane": 0,
+    "lane": 2,
     "isSim": false
   },
   {
     "time": 147.48,
-    "lane": 8,
+    "lane": 6,
     "isSim": false
   },
   {
