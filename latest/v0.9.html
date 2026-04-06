@@ -1792,6 +1792,7 @@
             }
             hitEffects.forEach(e => { ctx.globalAlpha = e.opacity; ctx.beginPath(); if (e.type === 'ring') { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.strokeStyle = e.color; ctx.lineWidth = 3; ctx.stroke(); } else { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); } });
             ctx.globalAlpha = 1.0;
+            requestAnimationFrame(update);
         }
 
 
@@ -1799,7 +1800,11 @@
             if (!isEditMode || !localVideo) return;
             isEditorPaused = !isEditorPaused;
             if (isEditorPaused) { localVideo.pause(); document.getElementById('btn-editor-pause').innerText = "▶️"; }
-            else { localVideo.play(); document.getElementById('btn-editor-pause').innerText = "⏸️"; }
+            else { 
+                localVideo.play(); 
+                document.getElementById('btn-editor-pause').innerText = "⏸️";
+                requestAnimationFrame(update);
+            }
         }
 
         function seekVideoStart() { if (!isEditMode) return; isSeeking = true; if (localVideo) localVideo.pause(); }
