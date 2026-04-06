@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 18:02 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 18:10 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -957,7 +957,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:02 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:10 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1117,7 +1117,8 @@
             
             // --- バッファリング対策 ---
             localVideo.onwaiting = () => {
-                if (isPlaying && !isPaused) {
+                // ゲーム開始直後の一時的なバッファリングは無視する（currentTime≒0の場合）
+                if (isPlaying && !isPaused && localVideo.currentTime > 1.5) {
                     document.getElementById('buffering-overlay').style.display = 'flex';
                 }
             };
@@ -1556,10 +1557,25 @@
             } else { isRecording = false; }
 
             localVideo.currentTime = 0; localVideo.style.display = 'block';
-            localVideo.style.opacity = isEditMode ? "0.7" : "0.4"; // プレイ中は視認性を高めるため暗く(40%)する
-            localVideo.loop = false; // プレイ中はループ解除
-            localVideo.play();
-            isPlaying = true; requestAnimationFrame(update);
+            localVideo.style.opacity = isEditMode ? "0.7" : "0.4";
+            localVideo.loop = false;
+            
+            // バッファリング表示を一旦強制非表示（プレビューの余韻で残っている場合があるため）
+            document.getElementById('buffering-overlay').style.display = 'none';
+            
+            localVideo.play().catch(e => console.warn("Video play failed:", e));
+            isPlaying = true;
+            
+            // play()後3秒でまだbufferingが表示されていたら強制解除（safariなどのonplaying不発対策）
+            setTimeout(() => {
+                const buf = document.getElementById('buffering-overlay');
+                if (buf && buf.style.display !== 'none') {
+                    console.warn("Buffering timeout: force hiding buffering overlay");
+                    buf.style.display = 'none';
+                }
+            }, 3000);
+            
+            requestAnimationFrame(update);
         }
 
         function update() {
