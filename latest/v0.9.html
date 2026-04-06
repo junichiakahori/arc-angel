@@ -929,18 +929,22 @@
         // サブフォルダ (latest/ 等) にいてもルートにいても assets を見つけられるようにする
         const BASE_PATH = window.location.pathname.includes('/latest/') ? '../' : '';
 
-        // --- バージョン情報の動的読み込み ---
+        // --- バージョン情報の動的読み込み (履歴台帳方式) ---
         async function loadVersionInfo() {
             try {
-                const response = await fetch(BASE_PATH + 'assets/version.json');
+                const response = await fetch(BASE_PATH + 'assets/version_history.json');
                 const data = await response.json();
                 const verDisp = document.getElementById('version-display');
                 const timeDisp = document.getElementById('last-updated-display');
-                if (verDisp) verDisp.innerText = "ArcAngel " + data.version;
-                if (timeDisp) timeDisp.innerText = data.lastUpdated;
+                
+                // 特定バージョン版ファイル
+                const MY_VERSION = "v0.9"; 
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 15:32 (JST)";
+                
+                if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
+                if (timeDisp) timeDisp.innerText = updateDate;
             } catch (e) {
                 console.log("Version Info could not be loaded", e);
-                document.getElementById('last-updated-display').innerText = "2026/04/06 15:28 (JST)";
             }
         }
         window.addEventListener('DOMContentLoaded', loadVersionInfo);
