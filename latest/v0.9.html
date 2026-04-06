@@ -1051,7 +1051,7 @@
             });
         }
 
-        function updateKonamiUI(isActivated, jacketUrl) {
+        function updateCommandUI(isActivated, jacketUrl) {
             const wrapper = document.getElementById('game-wrapper');
             if (isActivated) {
                 document.body.classList.add('konami-mode');
@@ -1301,7 +1301,7 @@
             const status = document.getElementById('file-status');
             stopTitleBGM();
             // 背景画像をクリア
-            updateKonamiUI(isKonamiActivated, 'none');
+            updateCommandUI(isCommandActivated, 'none');
             // 動画プレビューを見せるため、動画表示をON
             localVideo.style.display = 'block';
             localVideo.style.opacity = "0.6";
@@ -1809,7 +1809,7 @@
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
             activeNotes = []; hitEffects = []; // 残留物を一掃
             if (localVideo) {
-                if (currentSelectedSong && isKonamiActivated) {
+                if (currentSelectedSong && isCommandActivated) {
                     localVideo.currentTime = 0;
                     localVideo.loop = true;
                     localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
@@ -1819,11 +1819,11 @@
                     localVideo.style.opacity = "0.6";
                 }
             }
-            if (isKonamiActivated) {
+            if (isCommandActivated) {
                 showSongList();
                 // プレイ済みの曲があればそのジャケットを表示
                 const jacketToUse = currentSelectedSong ? currentSelectedSong.jacket : 'assets/images/takaramonos.jpg';
-                updateKonamiUI(true, jacketToUse);
+                updateCommandUI(true, jacketToUse);
 
                 // 動画プレビューがある場合はBGMを流さない（動画の音声を優先）
                 if (currentSelectedSong && localVideo && !localVideo.paused) {
@@ -1832,7 +1832,7 @@
                     playTitleBGM();
                 }
             }
-            else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); }
+            else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateCommandUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); }
             document.getElementById('result-screen').style.display = 'none';
             document.getElementById('launcher-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
