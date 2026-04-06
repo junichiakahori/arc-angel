@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:13 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:17 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1498,14 +1498,42 @@
 
         function getNearestLane(x, y) {
             const rect = canvas.getBoundingClientRect();
-            const canvasX = x - rect.left;
-            const canvasY = y - rect.top;
+            const canvasX = (x - rect.left) * (canvas.width / rect.width);
+            const canvasY = (y - rect.top) * (canvas.height / rect.height);
             let idx = -1, min = buttonRadius * 3.5;
             buttons.forEach((btn, i) => {
                 const d = Math.hypot(btn.x - canvasX, btn.y - canvasY);
                 if (d < min) { min = d; idx = i; }
             });
             return idx;
+        }
+
+        function tryDeleteNoteAt(mx, my) {
+            if (!isEditMode) return false;
+            const rect = canvas.getBoundingClientRect();
+            const x = (mx - rect.left) * (canvas.width / rect.width);
+            const y = (my - rect.top) * (canvas.height / rect.height);
+            const isP = canvas.height > canvas.width;
+            const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
+            const ct = localVideo.currentTime;
+            
+            for (let i = activeNotes.length - 1; i >= 0; i--) {
+                const n = activeNotes[i];
+                const tb = buttons[n.lane];
+                const sp = (ct - (n.time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
+                if (sp < 0 || sp > 1.2) continue; 
+                const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
+                const dist = Math.hypot(x - hx, y - hy);
+                if (dist < buttonRadius * 1.5) {
+                    recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - n.time) < 0.005 && rn.lane === n.lane));
+                    activeNotes.splice(i, 1);
+                    syncEditorNotes();
+                    draw(ct); 
+                    showToast("ノートを削除しました");
+                    return true;
+                }
+            }
+            return false;
         }
 
         function setupInput() {
@@ -1539,6 +1567,7 @@
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
+                    if (isEditMode && tryDeleteNoteAt(t.clientX, t.clientY)) continue;
                     const l = getNearestLane(t.clientX, t.clientY);
                     if (l !== -1) {
                         activeTouches.set(t.identifier, l);
@@ -1546,6 +1575,12 @@
                     }
                 }
             }, { passive: false });
+
+            canvas.addEventListener('mousedown', (e) => {
+                if (isEditMode && tryDeleteNoteAt(e.clientX, e.clientY)) return;
+                const l = getNearestLane(e.clientX, e.clientY);
+                if (l !== -1) sH(l);
+            });
 
             const handleEnd = (e) => {
                 e.preventDefault();
