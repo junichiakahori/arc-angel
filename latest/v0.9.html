@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:17 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:31 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2203,10 +2203,20 @@
             
             // 全画面・全モーダルを隠す
             const screens = ['start-screen', 'pause-screen', 'result-screen', 'editor-controls', 'chart-input-modal'];
-            screens.forEach(s => { const el = document.getElementById(s); if(el) el.style.display = 'none'; });
+            screens.forEach(s => { 
+                const el = document.getElementById(s); 
+                if(el) {
+                    el.style.display = 'none';
+                    el.style.pointerEvents = 'none'; // クリック阻害を確実に防ぐ
+                }
+            });
             
             // ランチャー表示
-            document.getElementById('launcher-screen').style.display = 'flex';
+            const launcher = document.getElementById('launcher-screen');
+            if(launcher) {
+                launcher.style.display = 'flex';
+                launcher.style.pointerEvents = 'auto'; // 操作可能にする
+            }
             
             // UIオーバーレイのリセット
             const ui = document.getElementById('ui-overlay');
