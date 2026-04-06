@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 18:33 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 18:36 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -674,6 +674,15 @@
                     </p>
                 </div>
 
+                <!-- バージョン切り替えリンク -->
+                <div class="mt-6 pt-4 border-t border-white/5 w-full max-w-xs text-center">
+                    <p class="text-[9px] text-gray-500 font-bold tracking-widest mb-2 uppercase opacity-50">バージョン切り替え</p>
+                    <a href="../index.html"
+                        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 text-green-400 text-[10px] font-black tracking-wider hover:bg-green-500/20 transition-all">
+                        ✅ v0.8（安定版）へ
+                    </a>
+                </div>
+
                 <!-- 著作権・免責事項 -->
                 <div class="mt-8 pt-6 border-t border-white/5 w-full max-w-xs text-center">
                     <p class="text-[9px] text-gray-600 font-bold tracking-tight opacity-50 mb-1">
@@ -957,7 +966,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:33 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:36 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
