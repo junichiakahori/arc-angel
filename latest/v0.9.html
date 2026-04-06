@@ -1576,7 +1576,7 @@
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
             score = 0; combo = 0; maxCombo = 0; counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
-            stamina = 100;
+            stamina = 100; gameCurrentTime = 0;
             recordedChart = isEditMode ? JSON.parse(JSON.stringify(CHART)) : [];
             notesQueue = isEditMode ? [] : [...CHART];
             activeNotes = []; hitEffects = [];
@@ -1605,6 +1605,7 @@
                 if (isCommandActivated) updateCommandUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
                 
                 isPlaying = true;
+                gameCurrentTime = 0;
                 gameStartTime = performance.now();
                 requestAnimationFrame(update);
                 
