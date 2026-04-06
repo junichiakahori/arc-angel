@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 18:10 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 18:22 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -957,7 +957,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:10 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:22 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1515,9 +1515,11 @@
             initAudio(); playStartSound(); stopTitleBGM();
             
             const song = currentSelectedSong;
-            // 既に Blob がセットされている場合を除き、プリロードを実行
-            if (isCommandActivated && song && (!localVideo.src || !localVideo.src.startsWith('blob:'))) {
-                await preloadVideo(song.video);
+            
+            // selectSong時点でsrcはセット済み。ただし全くsrcがない場合は警告
+            if (isCommandActivated && song && !localVideo.src) {
+                localVideo.src = song.video;
+                localVideo.load();
             }
             
             if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
@@ -1556,23 +1558,32 @@
                 btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500');
             } else { isRecording = false; }
 
-            localVideo.currentTime = 0; localVideo.style.display = 'block';
+            localVideo.style.display = 'block';
             localVideo.style.opacity = isEditMode ? "0.7" : "0.4";
             localVideo.loop = false;
             
-            // バッファリング表示を一旦強制非表示（プレビューの余韻で残っている場合があるため）
+            // バッファリング表示を一旦強制非表示
             document.getElementById('buffering-overlay').style.display = 'none';
             
-            localVideo.play().catch(e => console.warn("Video play failed:", e));
+            // currentTime=0後にseekが完了してからplay()する
+            const doPlay = () => {
+                localVideo.play().catch(e => console.warn("Video play failed:", e));
+            };
+            
+            localVideo.onseeked = () => {
+                localVideo.onseeked = null;
+                doPlay();
+            };
+            localVideo.currentTime = 0;
+            // seekedが発火しない場合の保険
+            setTimeout(() => { if (!isPlaying || localVideo.paused) doPlay(); }, 500);
+            
             isPlaying = true;
             
-            // play()後3秒でまだbufferingが表示されていたら強制解除（safariなどのonplaying不発対策）
+            // 3秒後もbufferingが残っていたら強制解除
             setTimeout(() => {
                 const buf = document.getElementById('buffering-overlay');
-                if (buf && buf.style.display !== 'none') {
-                    console.warn("Buffering timeout: force hiding buffering overlay");
-                    buf.style.display = 'none';
-                }
+                if (buf && buf.style.display !== 'none') buf.style.display = 'none';
             }, 3000);
             
             requestAnimationFrame(update);
