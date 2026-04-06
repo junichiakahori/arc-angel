@@ -751,6 +751,11 @@
                                 class="btn-diff btn-diff-master">MASTER</button>
                         </div>
                     </div>
+
+                    <button onclick="backToLauncher()"
+                        class="w-full mt-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-bold text-gray-500 transition-all uppercase tracking-widest">
+                        タイトル画面(ランチャー)に戻る
+                    </button>
                 </div>
 
                 <div id="chart-selector"
@@ -871,7 +876,8 @@
             <button onclick="togglePause()" class="btn-action w-64">再開</button>
             <button id="btn-back-to-editor" onclick="backToEditorFromPlay()"
                 class="btn-action bg-blue-700 hidden w-64">エディターに戻る</button>
-            <button onclick="backToTitle()" class="btn-action btn-secondary w-64">タイトルに戻る</button>
+            <button onclick="backToTitle()" class="btn-action btn-secondary w-64">選曲画面に戻る</button>
+            <button onclick="backToLauncher()" class="btn-action bg-gray-800 w-64 text-[10px]">タイトル画面に戻る</button>
         </div>
     </div>
 
