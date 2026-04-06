@@ -1005,15 +1005,15 @@
         let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false;
         // --- 9レーンカラー定義 (虹色グラデーション) ---
         const LANE_COLORS = [
-            '255, 77, 77',   // 0: Red (A)
-            '255, 140, 0',   // 1: Orange (S)
-            '255, 215, 0',   // 2: Gold (D)
-            '50, 205, 50',   // 3: Lime (F)
-            '0, 255, 255',   // 4: Cyan (Space)
-            '30, 144, 255',  // 5: Blue (J)
-            '147, 112, 219', // 6: MediumPurple (K)
-            '255, 105, 180', // 7: HotPink (L)
-            '255, 20, 147'   // 8: DeepPink (;)
+            '147, 112, 219', // 0: Purple (A)
+            '50, 205, 50',   // 1: Green (S)
+            '255, 215, 0',   // 2: Yellow (D)
+            '30, 144, 255',  // 3: Blue (F)
+            '255, 140, 0',   // 4: Orange (Space)
+            '255, 255, 255', // 5: White (J)
+            '255, 68, 68',   // 6: Red (K)
+            '255, 105, 180', // 7: Pink (L)
+            '0, 255, 255'    // 8: Aqua (;)
         ];
         let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
