@@ -9,16 +9,6 @@
     <link id="favicon" rel="icon" type="image/png" href="assets/images/favicon.png">
     <link id="apple-touch-icon" rel="apple-touch-icon" href="assets/images/favicon.png">
 
-    <!-- Google tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M1677MTMKN"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-M1677MTMKN');
-    </script>
-
     <script>
         // JS実行前にhrefを調整 (サブフォルダ対応)
         (function () {
@@ -30,7 +20,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.7 - 2026/04/04 07:30 Update</title>
+    <title>ArcAngel v0.8 - 2026/04/06 13:20 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -142,34 +132,27 @@
             background-color: #000;
         }
 
-        :fullscreen .overlay-screen,
-        :-webkit-full-screen .overlay-screen {
+        :fullscreen .overlay-screen, :-webkit-full-screen .overlay-screen {
             position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
+            top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
             z-index: 2147483647 !important;
             background: rgba(0, 0, 0, 0.4) !important;
             backdrop-filter: blur(8px) !important;
             pointer-events: auto !important;
         }
 
-        :fullscreen #game-canvas,
-        :-webkit-full-screen #game-canvas {
+        :fullscreen #game-canvas, :-webkit-full-screen #game-canvas {
             z-index: 10000 !important;
         }
 
-        :fullscreen #ui-overlay,
-        :-webkit-full-screen #ui-overlay {
+        :fullscreen #ui-overlay, :-webkit-full-screen #ui-overlay {
             z-index: 2147483647 !important;
             background: rgba(0, 0, 0, 0.7) !important;
             backdrop-filter: none !important;
         }
 
         /* エディターUIも全画面時は最前面へ */
-        :fullscreen #editor-controls,
-        :-webkit-full-screen #editor-controls {
+        :fullscreen #editor-controls, :-webkit-full-screen #editor-controls {
             z-index: 2147483647 !important;
         }
 
@@ -188,8 +171,7 @@
             transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }
 
-        .launcher-btn:focus,
-        .launcher-btn:hover {
+        .launcher-btn:focus, .launcher-btn:hover {
             transform: scale(1.05);
             border-color: #60a5fa;
             box-shadow: 0 0 50px rgba(37, 99, 235, 0.9);
@@ -241,8 +223,7 @@
             transition: all 0.2s;
         }
 
-        .btn-action:focus,
-        .btn-action:hover {
+        .btn-action:focus, .btn-action:hover {
             transform: translateY(-2px);
             filter: brightness(1.1);
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
@@ -613,11 +594,10 @@
 
 <body>
     <!-- 全画面切り替えボタン (最上位階層に配置) -->
-    <button onclick="toggleFullScreen()"
+    <button onclick="toggleFullScreen()" 
         class="fixed top-4 right-4 bg-white/5 hover:bg-white/20 p-2.5 rounded-full border border-white/10 z-[2147483647] backdrop-blur-md transition-all opacity-40 hover:opacity-100 pointer-events-auto">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
         </svg>
     </button>
 
@@ -630,25 +610,17 @@
 
         <video id="local-video" style="display:none;" playsinline webkit-playsinline crossorigin="anonymous"></video>
 
-        <!-- バッファリング(ロード待ち)表示 -->
-        <div id="buffering-overlay" class="absolute inset-0 z-[600] bg-black/40 backdrop-blur-sm hidden flex-col justify-center items-center pointer-events-none">
-            <div class="w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div class="text-white font-black italic tracking-widest text-sm drop-shadow-lg">BUFFERING...</div>
-        </div>
-
         <!-- 1. 起動画面 -->
         <div id="launcher-screen" class="overlay-screen">
             <div class="overlay-screen-content">
                 <div class="mb-12">
-                    <h1
-                        class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl mb-4 text-rainbow">
-                        ArcAngel
+                    <h1 class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl mb-4 text-rainbow">ArcAngel
                     </h1>
                     <p
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        <span id="version-display">ArcAngel v0.9</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
+                        最終更新: 2026/04/06 13:20 (JST)
                     </p>
                 </div>
 
@@ -935,26 +907,6 @@
         // サブフォルダ (latest/ 等) にいてもルートにいても assets を見つけられるようにする
         const BASE_PATH = window.location.pathname.includes('/latest/') ? '../' : '';
 
-        // --- バージョン情報の動的読み込み (履歴台帳方式) ---
-        async function loadVersionInfo() {
-            try {
-                const response = await fetch(BASE_PATH + 'assets/version_history.json');
-                const data = await response.json();
-                const verDisp = document.getElementById('version-display');
-                const timeDisp = document.getElementById('last-updated-display');
-                
-                // index.html は常に latest 版を表示
-                const currentVer = data.latest;
-                const updateDate = data.history[currentVer] || "2026/04/06 15:32 (JST)";
-                
-                if (verDisp) verDisp.innerText = "ArcAngel " + currentVer;
-                if (timeDisp) timeDisp.innerText = updateDate;
-            } catch (e) {
-                console.log("Version Info could not be loaded", e);
-            }
-        }
-        window.addEventListener('DOMContentLoaded', loadVersionInfo);
-
         // --- 設定・定数 ---
         const ADMIN_EMAIL = "drone.akahori@gmail.com";
 
@@ -1002,21 +954,21 @@
                 // 1. ノイズ成分 (シャッ)
                 const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
                 const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
-                const ng = audioCtx.createGain();
-                ng.gain.setValueAtTime(0.15, now);
+                const ng = audioCtx.createGain(); 
+                ng.gain.setValueAtTime(0.15, now); 
                 ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination); 
                 ns.start(now);
 
                 // 2. サイン波成分 (シャン) 8000Hz -> 6000Hz へのスウィープ
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(8000, now);
+                const osc = audioCtx.createOscillator(); 
+                osc.type = 'sine'; 
+                osc.frequency.setValueAtTime(8000, now); 
                 osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
-                const og = audioCtx.createGain();
-                og.gain.setValueAtTime(0.1, now);
+                const og = audioCtx.createGain(); 
+                og.gain.setValueAtTime(0.1, now); 
                 og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.connect(og); og.connect(audioCtx.destination);
+                osc.connect(og); og.connect(audioCtx.destination); 
                 osc.start(now); osc.stop(now + 0.1);
             } else {
                 // それ以外は控えめな「チッ」
@@ -1024,7 +976,7 @@
                 const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(8000, now);
                 const ngClick = audioCtx.createGain();
                 ngClick.gain.setValueAtTime(0.08, now);
-                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04); 
                 nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
                 nsClick.start(now);
             }
@@ -1102,20 +1054,6 @@
             localVideo.onended = () => { if (!isEditMode && isPlaying) showResults(); };
 
             localVideo.oncanplaythrough = () => { isVideoReady = true; hideLoading(); document.getElementById('file-status').innerText = "準備完了"; document.getElementById('file-status').className = "text-[9px] text-green-400 mt-2 font-bold"; };
-            
-            // --- バッファリング対策 ---
-            localVideo.onwaiting = () => {
-                if (isPlaying && !isPaused) {
-                    document.getElementById('buffering-overlay').style.display = 'flex';
-                }
-            };
-            localVideo.onplaying = () => {
-                document.getElementById('buffering-overlay').style.display = 'none';
-            };
-            localVideo.onstalled = () => {
-                console.log("Video stalled due to network conditions");
-            };
-
             localVideo.onerror = () => { hideLoading(); document.getElementById('error-msg').classList.remove('hidden'); document.getElementById('error-msg').innerText = "この動画ファイルは読み込めませんでした。"; isVideoReady = false; };
             document.getElementById('local-file-input').onchange = (e) => {
                 const file = e.target.files[0];
@@ -1243,7 +1181,7 @@
             // 背景画像をクリア
             updateKonamiUI(isKonamiActivated, 'none');
             // 動画プレビューを見せるため、動画表示をON
-            localVideo.style.display = 'block';
+            localVideo.style.display = 'block'; 
             localVideo.style.opacity = "0.6";
             localVideo.loop = true; // プレビュー時はループ再生
             localVideo.play().then(() => localVideo.pause()).catch(() => { });
@@ -1266,7 +1204,7 @@
                 // 譜面データが全く定義されていない（undefined）場合のみ inactive にする。
                 // 空文字 "" の場合は「新規作成」扱いで選択できるように維持。
                 if (!s.charts || s.charts[diff] === undefined) b.classList.add('inactive');
-
+                
                 // BACKUP_SONG_LIST 等で値が入っているものは強調
                 if (s.charts && s.charts[diff] && s.charts[diff] !== "") {
                     b.style.fontWeight = "900";
@@ -1371,28 +1309,8 @@
             const sH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputStart(l); };
             const eH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
 
-            window.addEventListener('keydown', (e) => { 
-                if (e.repeat) return; 
-                let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
-                if (l === -1 && k === 'h') l = 4; 
-                if (l !== -1) {
-                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    sH(l); 
-                }
-                if (e.key === 'Escape') togglePause(); 
-            }, {capture: true});
-            window.addEventListener('keyup', (e) => { 
-                let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
-                if (l === -1 && k === 'h') l = 4; 
-                if (l !== -1) {
-                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    eH(l); 
-                }
-            }, {capture: true});
+            window.addEventListener('keydown', (e) => { if (e.repeat) return; let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) sH(l); if (e.key === 'Escape') togglePause(); });
+            window.addEventListener('keyup', (e) => { let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) eH(l); });
 
             canvas.addEventListener('touchstart', (e) => {
                 e.preventDefault();
@@ -1785,7 +1703,7 @@
             else if (d < 0.15) { judgment = "GOOD"; score += 400; counts.good++; combo = 0; stamina -= 2; showJ("GOOD", "text-green-400"); createHitEffect(tb.x, tb.y, '#4ade80'); }
             else if (d < 0.22) { judgment = "BAD"; score += 200; counts.bad++; combo = 0; stamina -= 5; showJ("BAD", "text-blue-400"); createHitEffect(tb.x, tb.y, '#60a5fa'); }
             else { judgment = "MISS"; counts.miss++; combo = 0; stamina -= 10; showJ("MISS", "text-red-500"); }
-
+            
             playTapSound(judgment);
 
             // スタミナの範囲補正

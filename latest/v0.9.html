@@ -622,10 +622,18 @@
     </button>
 
     <div id="game-wrapper" class="relative group">
-        <!-- ローディング表示 -->
-        <div id="loading-overlay">
-            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div id="loading-text" class="text-xl font-black italic tracking-widest text-blue-400">動画を準備中...</div>
+        <!-- ローディング表示 (プリロード対応) -->
+        <div id="loading-overlay" class="absolute inset-0 z-[1100] bg-black/80 backdrop-blur-md hidden flex-col justify-center items-center">
+            <div class="overlay-screen-content text-center">
+                <div class="mb-4">
+                    <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                    <p class="text-xl font-black italic tracking-tighter text-white mb-2">PRE-LOADING ASSETS...</p>
+                    <div class="w-64 h-3 bg-gray-800 rounded-full overflow-hidden mx-auto shadow-inner border border-white/5">
+                        <div id="loading-progress" class="w-0 h-full bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-200"></div>
+                    </div>
+                    <p id="loading-status" class="text-[10px] text-blue-400 mt-4 font-bold tracking-[0.2em] uppercase opacity-80">Initializing Download...</p>
+                </div>
+            </div>
         </div>
 
         <video id="local-video" style="display:none;" playsinline webkit-playsinline crossorigin="anonymous"></video>
@@ -695,12 +703,11 @@
                     <p id="file-status" class="text-[9px] text-gray-500 mt-2">※ファイルを選択すると準備が完了します。</p>
                 </div>
 
-                <!-- 隠し選曲リスト (コナミコマンド後に出現) -->
+                <!-- 選曲リスト (隠しコマンド後に出現) -->
                 <div id="song-list-container"
                     class="hidden mt-4 w-full p-3 bg-blue-900/40 border-2 border-blue-500/50 rounded-3xl shadow-[0_0_20px_rgba(37,99,235,0.3)] animate-pulse overflow-visible">
                     <div class="flex items-center justify-between mb-3">
-                        <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">Secret Song
-                            List</p>
+                        <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">SONG LIST</p>
                         <button onclick="toggleBGM(this)"
                             class="bg-blue-500/20 hover:bg-blue-500/40 border border-blue-500/30 px-3 py-1 rounded-full text-[8px] font-bold text-blue-200 transition-all">BGM
                             STOP</button>
@@ -960,7 +967,7 @@
 
         // --- 変数管理 ---
         let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
-        let isKonamiActivated = false;
+        let isCommandActivated = false; // 隠しコマンド
         let currentSelectedSong = null;
         let currentSongIndex = -1;
         let songsStore = [];
@@ -1101,7 +1108,7 @@
             localVideo = document.getElementById('local-video');
             localVideo.onended = () => { if (!isEditMode && isPlaying) showResults(); };
 
-            localVideo.oncanplaythrough = () => { isVideoReady = true; hideLoading(); document.getElementById('file-status').innerText = "準備完了"; document.getElementById('file-status').className = "text-[9px] text-green-400 mt-2 font-bold"; };
+            localVideo.oncanplaythrough = () => { isVideoReady = true; };
             
             // --- バッファリング対策 ---
             localVideo.onwaiting = () => {
@@ -1119,15 +1126,68 @@
             localVideo.onerror = () => { hideLoading(); document.getElementById('error-msg').classList.remove('hidden'); document.getElementById('error-msg').innerText = "この動画ファイルは読み込めませんでした。"; isVideoReady = false; };
             document.getElementById('local-file-input').onchange = (e) => {
                 const file = e.target.files[0];
-                if (file) { showLoading("動画を解析中..."); localVideo.src = URL.createObjectURL(file); localVideo.load(); }
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    localVideo.src = url;
+                    localVideo.load();
+                    isVideoReady = true;
+                }
             };
-            window.addEventListener('resize', resize);
-            document.addEventListener('fullscreenchange', () => { resize(); showToast("画面表示を調整しました"); });
-            document.addEventListener('webkitfullscreenchange', () => { resize(); });
-            setupInput(); resize();
+        }
 
-            if (window.location.hash === '#autolaunch') {
-                setTimeout(launchInPlace, 100);
+        // --- 動画の完全プリロード処理 (Blob方式) ---
+        async function preloadVideo(url) {
+            const overlay = document.getElementById('loading-overlay');
+            const progressEl = document.getElementById('loading-progress');
+            const statusEl = document.getElementById('loading-status');
+            
+            overlay.style.display = 'flex';
+            progressEl.style.width = '0%';
+            statusEl.innerText = 'Connecting...';
+            
+            try {
+                const response = await fetch(BASE_PATH + url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const contentLength = response.headers.get('content-length');
+                if (!contentLength) {
+                    localVideo.src = BASE_PATH + url;
+                    localVideo.load();
+                    return;
+                }
+
+                const total = parseInt(contentLength, 10);
+                let loaded = 0;
+                const reader = response.body.getReader();
+                const chunks = [];
+                
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    loaded += value.length;
+                    const percent = Math.round((loaded / total) * 100);
+                    progressEl.style.width = `${percent}%`;
+                    statusEl.innerText = `Downloading... ${percent}% (${Math.round(loaded/1024/1024*10)/10}MB / ${Math.round(total/1024/1024*10)/10}MB)`;
+                }
+
+                const blob = new Blob(chunks, { type: 'video/mp4' });
+                const blobUrl = URL.createObjectURL(blob);
+                localVideo.src = blobUrl;
+                localVideo.load();
+                
+                return new Promise((resolve) => {
+                    localVideo.oncanplaythrough = () => {
+                        isVideoReady = true;
+                        overlay.style.display = 'none';
+                        resolve();
+                    };
+                });
+            } catch (err) {
+                console.error("Preload Error:", err);
+                localVideo.src = BASE_PATH + url;
+                localVideo.load();
+                overlay.style.display = 'none';
             }
         }
 
@@ -1160,13 +1220,13 @@
             const el = document.getElementById('chart-input');
             const val = el.value.replace(/\s+/g, '').toLowerCase();
             if (val === "μ'sicforever") {
-                isKonamiActivated = true;
+                isCommandActivated = true;
                 // 動画要素のロック解除
                 if (localVideo) localVideo.play().then(() => localVideo.pause()).catch(() => { });
                 playSecretSound();
                 playTitleBGM();
                 showSongList();
-                updateKonamiUI(true);
+                updateCommandUI(true);
                 el.value = '';
                 document.getElementById('chart-input-modal').style.display = 'none';
                 return;
@@ -1423,7 +1483,15 @@
         }
 
         async function startLive(editMode = false) {
-            initAudio(); playStartSound(); stopTitleBGM(); if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
+            initAudio(); playStartSound(); stopTitleBGM();
+            
+            const song = songs[currentSongIndex];
+            // 既に Blob がセットされている場合を除き、プリロードを実行
+            if (!localVideo.src || !localVideo.src.startsWith('blob:')) {
+                await preloadVideo(song.video);
+            }
+            
+            if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
             isEditMode = editMode;
 
             const speedVal = parseFloat(document.getElementById('speed-input').value) || 5.0;
@@ -1451,7 +1519,7 @@
             lanePressed.fill(false); activeTouches.clear(); updateUI();
             const jEl = document.getElementById('judge-display'); jEl.innerText = "READY?"; jEl.className = "text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest";
             syncEditorNotes();
-            if (isKonamiActivated) updateKonamiUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
+            if (isCommandActivated) updateCommandUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
 
             if (isEditMode) {
                 isRecording = true;
