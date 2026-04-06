@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/06 18:22 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/06 18:33 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -957,7 +957,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:22 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/06 18:33 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1526,11 +1526,21 @@
             isEditMode = editMode;
 
             const speedVal = parseFloat(document.getElementById('speed-input').value) || 5.0;
-            // 速度計算を2倍速ベースに変更 (5.0設定時に約1.0秒で到達)
             NOTE_TRAVEL_TIME = Math.max(0.2, 5.0 / speedVal);
 
-            const raw = document.getElementById('chart-input').value.trim();
-            CHART = raw ? JSON.parse(raw.replace(/^const CHART = /, '').replace(/;$/, '')).sort((a, b) => a.time - b.time) : [];
+            // selectDifficulty で既に CHART はセット済み。
+            // CHART が空の場合のみ、textareaの内容から parse を試みる（手動入力フォールバック）
+            if (!CHART || CHART.length === 0) {
+                const raw = document.getElementById('chart-input').value.trim();
+                if (raw) {
+                    try {
+                        CHART = JSON.parse(raw.replace(/^const CHART\s*=\s*/, '').replace(/;+\s*$/, '')).sort((a, b) => a.time - b.time);
+                    } catch(e) {
+                        console.warn("Chart parse failed:", e);
+                        CHART = [];
+                    }
+                }
+            }
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
             if (isEditMode && localVideo) document.getElementById('editor-seek-bar').max = localVideo.duration || 100;
