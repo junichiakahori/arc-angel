@@ -2,6 +2,7 @@
     {
         "name": "僕らのLIVE 君とのLIFE",
         "video": "assets/videos/bokura.mp4",
+        "release_date": "2010/08/13",
         "charts": {
             "EASY": "assets/charts/bokura_easy.txt",
             "NORMAL": "assets/charts/bokura_normal.txt",
@@ -14,6 +15,7 @@
     {
         "name": "僕らは今のなかで",
         "video": "assets/videos/bokuima.mp4",
+        "release_date": "2013/01/23",
         "charts": {
             "EASY": "assets/charts/bokuima_easy.txt",
             "NORMAL": "assets/charts/bokuima_normal.txt",
@@ -26,6 +28,7 @@
     {
         "name": "START:DASH!!",
         "video": "assets/videos/startdash.mp4",
+        "release_date": "2013/04/03",
         "charts": {
             "EASY": "assets/charts/startdash_easy.txt",
             "NORMAL": "assets/charts/startdash_normal.txt",
@@ -38,6 +41,7 @@
     {
         "name": "タカラモノズ",
         "video": "assets/videos/takaramonos.mp4",
+        "release_date": "2014/01/29",
         "charts": {
             "EASY": "assets/charts/takaramonos_easy.txt",
             "NORMAL": "assets/charts/takaramonos_normal.txt",
@@ -50,6 +54,7 @@
     {
         "name": "A song for You! You? You!!",
         "video": "assets/videos/asongforyou.mp4",
+        "release_date": "2020/03/25",
         "charts": {
             "EASY": "assets/charts/asongforyou_easy.txt",
             "NORMAL": "assets/charts/asongforyou_normal.txt",
