@@ -1003,6 +1003,18 @@
         let stamina = 100, maxStamina = 100;
         let isEditorPaused = false, isSeeking = false;
         let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false;
+        // --- 9レーンカラー定義 (虹色グラデーション) ---
+        const LANE_COLORS = [
+            '255, 77, 77',   // 0: Red (A)
+            '255, 140, 0',   // 1: Orange (S)
+            '255, 215, 0',   // 2: Gold (D)
+            '50, 205, 50',   // 3: Lime (F)
+            '0, 255, 255',   // 4: Cyan (Space)
+            '30, 144, 255',  // 5: Blue (J)
+            '147, 112, 219', // 6: MediumPurple (K)
+            '255, 105, 180', // 7: HotPink (L)
+            '255, 20, 147'   // 8: DeepPink (;)
+        ];
         let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
         let gameCurrentTime = 0; // 一貫性のあるゲーム内時刻
@@ -1721,9 +1733,14 @@
             const isP = canvas.height > canvas.width;
             const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
             buttons.forEach((btn, idx) => {
-                ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2); ctx.strokeStyle = lanePressed[idx] ? '#fff' : '#00f0ff'; ctx.lineWidth = lanePressed[idx] ? 4 : 2; ctx.stroke();
-                ctx.fillStyle = 'rgba(0, 240, 255, 0.15)'; ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = `bold ${buttonRadius / 2.5}px Arial`; ctx.textAlign = 'center'; ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
+                const c = LANE_COLORS[idx] || '0, 240, 255';
+                ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2); 
+                ctx.strokeStyle = lanePressed[idx] ? '#fff' : `rgb(${c})`; 
+                ctx.lineWidth = lanePressed[idx] ? 4 : 2; 
+                ctx.stroke();
+                ctx.fillStyle = lanePressed[idx] ? `rgba(${c}, 0.5)` : `rgba(${c}, 0.15)`; 
+                ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = `bold ${buttonRadius / 2.5}px Arial`; ctx.textAlign = 'center'; ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
             });
             const timeG = {}; activeNotes.forEach(n => { if (n.status === 'waiting') { const k = n.time.toFixed(3); if (!timeG[k]) timeG[k] = []; timeG[k].push(n); } });
             Object.values(timeG).forEach(g => {
@@ -1745,8 +1762,14 @@
                         if (ep >= 0) { ctx.beginPath(); ctx.arc(tx, ty, noteSize * 0.7, 0, Math.PI * 2); ctx.fillStyle = '#facc15'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); }
                     }
                     if (n.status !== 'holding') {
-                        if (n.isSim) { ctx.beginPath(); ctx.arc(hx, hy, noteSize + 5, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke(); }
-                        ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2); ctx.fillStyle = n.endTime ? '#facc15' : '#ff00ff'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+                        const noteColor = n.endTime ? '250, 204, 21' : (LANE_COLORS[n.lane] || '59, 130, 246');
+                        if (n.isSim) { 
+                            ctx.beginPath(); ctx.arc(hx, hy, noteSize + 4, 0, Math.PI * 2); 
+                            ctx.strokeStyle = 'white'; ctx.lineWidth = 3; ctx.stroke(); 
+                        }
+                        ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2); 
+                        ctx.fillStyle = `rgb(${noteColor})`; ctx.fill(); 
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
                     }
                 }
                 if (ct > (n.endTime || n.time) + 0.4) {
