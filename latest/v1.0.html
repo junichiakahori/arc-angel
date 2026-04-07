@@ -967,15 +967,15 @@
                 class="w-full h-[50vh] bg-black/50 text-sky-300 font-mono text-[11px] p-6 rounded-2xl border border-white/10 mb-6 custom-scrollbar focus:border-orange-500/50 outline-none transition-all"></textarea>
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="closeChartModal()"
-                    class="col-span-2 btn-action py-4 bg-gradient-to-r from-orange-600 to-orange-800 text-sm shadow-[0_4px_20px_rgba(234,88,12,0.4)] hover:scale-[1.02] active:scale-95 transition-all">
+                    class="col-span-2 btn-action py-4 bg-gradient-to-r from-orange-600 to-orange-800 text-sm shadow-[0_4px_20px_rgba(234,88,12,0.4)] hover:scale-[1.02] active:scale-95 transition-all whitespace-nowrap px-4">
                     完了 (反映)
                 </button>
                 <button onclick="closeTextChart()"
-                    class="btn-action py-3 btn-secondary text-xs hover:bg-white/10 transition-all">
+                    class="btn-action py-3 btn-secondary text-[11px] hover:bg-white/10 transition-all whitespace-nowrap px-2">
                     キャンセル
                 </button>
                 <button onclick="document.getElementById('chart-input').value=''"
-                    class="btn-action py-3 btn-secondary text-[10px] opacity-40 hover:opacity-100 transition-all">
+                    class="btn-action py-3 btn-secondary text-[10px] opacity-40 hover:opacity-100 transition-all whitespace-nowrap px-2">
                     クリア
                 </button>
             </div>
@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:15 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:19 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
