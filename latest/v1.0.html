@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:19 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:23 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1329,6 +1329,7 @@
         let currentSelectedSong = null;
         let currentSongIndex = -1;
         let songsStore = [];
+        let askedRestoreKeys = new Set(); 
         let BACKUP_SONG_LIST = [
             { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", preview_start: 76, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
             { name: "僕らは今のなかで", video: BASE_PATH + "assets/videos/bokuima.mp4", preview_start: 61, charts: { EASY: BASE_PATH + "assets/charts/bokuima_easy.txt", NORMAL: "", HARD: "", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokuima.jpg" },
@@ -1885,16 +1886,21 @@
             const chartUrl = song.charts[diff];
             const chartStatus = document.getElementById('chart-file-status');
 
-            const savedData = loadChartFromLocal();
-            if (savedData && savedData.length > 0) {
-                // ローカルにデータがある場合は確認
-                if (confirm(`この曲の保存済み譜面データ(${savedData.length}個)が見つかりました。復旧しますか？\n(キャンセルするとサーバーのデフォルト譜面をロードします)`)) {
-                    recordedChart = savedData;
-                    CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                    chartStatus.innerText = `[${diff}] ローカル保存済みの譜面を復旧しました`;
-                    chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
-                    syncEditorNotes();
-                    return;
+            // ローカル保存譜面の復旧確認 (同一セッション内では1回のみ)
+            const restoreKey = `${song.name}_${diff}`;
+            if (!askedRestoreKeys.has(restoreKey)) {
+                const savedData = loadChartFromLocal();
+                if (savedData && savedData.length > 0) {
+                    askedRestoreKeys.add(restoreKey);
+                    if (confirm(`この曲の保存済み譜面データ(${savedData.length}個)が見つかりました。復旧しますか？\n(キャンセルするとサーバーのデフォルト譜面をロードします)`)) {
+                        recordedChart = savedData;
+                        CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                        chartStatus.innerText = `[${diff}] ローカル保存済みの譜面を復旧しました`;
+                        chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                        syncEditorNotes();
+                        updateStartButtons(true);
+                        return;
+                    }
                 }
             }
 
