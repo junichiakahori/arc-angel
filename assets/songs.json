@@ -82,5 +82,19 @@
             "MASTER": ""
         },
         "jacket": "assets/images/soreboku.jpg"
+    },
+    {
+        "name": "Snow Halation",
+        "video": "assets/videos/snohala.mp4",
+        "release_date": "2010/12/22",
+        "preview_start": 78,
+        "charts": {
+            "EASY": "",
+            "NORMAL": "",
+            "HARD": "",
+            "EXPERT": "",
+            "MASTER": ""
+        },
+        "jacket": "assets/images/snohala.jpg"
     }
 ]
