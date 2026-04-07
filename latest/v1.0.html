@@ -1031,7 +1031,10 @@
                     <span>Max Combo</span><span id="res-combo">0</span>
                 </div>
             </div>
-            <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-12">選曲画面に戻る</button>
+            <div class="flex gap-3 mt-2">
+                <button id="btn-result-retry" onclick="retryLive()" class="btn-action shadow-lg px-6 bg-blue-600 hover:bg-blue-500 text-xs">もう一度プレイ</button>
+                <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-6 btn-secondary text-xs">選曲画面に戻る</button>
+            </div>
         </div>
     </div>
 
@@ -1116,7 +1119,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 16:25 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 16:29 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2491,6 +2494,13 @@
             document.getElementById('editor-controls').style.display = 'none';
             document.getElementById('btn-skip-result').classList.add('hidden');
         }
+
+        function retryLive() {
+            document.getElementById('result-screen').style.display = 'none';
+            // 現在の難易度や速度などの設定を維持して再開
+            startLive(false);
+        }
+
         function handleInputStart(l) { 
             if (lanePressed[l]) return; 
             lanePressed[l] = true; 
