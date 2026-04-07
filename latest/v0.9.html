@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 10:57 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 11:00 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1009,7 +1009,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:57 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 11:00 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1988,14 +1988,33 @@
         }
 
         function syncEditorNotes() {
-            if (!isEditMode) return;
+            if (!isEditMode || !localVideo) return;
+            const ct = localVideo.currentTime;
+            
+            // データをソート
+            const sortedChart = [...recordedChart].sort((a, b) => a.time - b.time);
+            
             activeNotes = [];
-            notesQueue = [...recordedChart].sort((a, b) => a.time - b.time);
-            for (let i = 0; i < notesQueue.length; i++) {
-                const c = notesQueue[i];
-                c.isSim = notesQueue.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015);
+            notesQueue = [];
+            
+            for (let i = 0; i < sortedChart.length; i++) {
+                const n = sortedChart[i];
+                // 同時押しフラグの再計算
+                n.isSim = sortedChart.some((other, idx) => idx !== i && Math.abs(other.time - n.time) < 0.015);
+                
+                const startTime = n.time - NOTE_TRAVEL_TIME;
+                const endTime = (n.endTime || n.time) + 0.4;
+                
+                if (ct >= startTime && ct <= endTime) {
+                    // 現在の再生時間で画面上に存在するべきノーツ
+                    activeNotes.push({ ...n, status: 'waiting' });
+                } else if (n.time > ct + NOTE_TRAVEL_TIME) {
+                    // まだ未来にある（これから流れてくる）ノーツ
+                    notesQueue.push(n);
+                }
             }
-            if (localVideo) draw(localVideo.currentTime);
+            
+            draw(ct);
         }
 
         function promptDeleteNote() {
