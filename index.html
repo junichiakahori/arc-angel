@@ -1116,13 +1116,19 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 15:46 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 16:10 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
 
                 // --- タイトルの動的更新 ---
                 document.title = `ArcAngel ${MY_VERSION} - ${updateDate} Update`;
+
+                // --- ロゴパスの解決 (相対パス禁止対応) ---
+                const lLogo = document.getElementById('launcher-logo');
+                const cLogo = document.getElementById('song-confirm-logo');
+                if (lLogo) lLogo.src = BASE_PATH + 'assets/images/favicon.png';
+                if (cLogo) cLogo.src = BASE_PATH + 'assets/images/favicon.png';
 
                 // --- 動的バージョン誘導ロジック ---
                 const switchContainer = document.getElementById('version-switch-container');
@@ -1649,7 +1655,8 @@
             }
             showLoading("譜面を取得中...");
             try {
-                const response = await fetch(`${chartUrl}?v=${Date.now()}`);
+                // 開発版・安定版のいずれからでもアクセスできるようにパスを解決
+                const response = await fetch(`${BASE_PATH}${chartUrl}?v=${Date.now()}`);
                 const txt = await response.text();
                 document.getElementById('chart-input').value = txt;
 
@@ -1838,7 +1845,7 @@
             
             const song = currentSelectedSong;
             if (isCommandActivated && song && !localVideo.src) {
-                localVideo.src = song.video;
+                localVideo.src = BASE_PATH + song.video;
                 localVideo.load();
             }
             
