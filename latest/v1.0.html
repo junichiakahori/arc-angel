@@ -137,6 +137,35 @@
             z-index: 2000;
         }
 
+        #note-selector-screen {
+            z-index: 5000;
+        }
+
+        .note-item-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .note-item-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .note-item-btn.selected {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
         /* 全画面モード時の要素追従修正 */
         :fullscreen #game-wrapper,
         :-webkit-full-screen #game-wrapper,
@@ -1097,6 +1126,21 @@
             </div>
         </div>
     </div>
+    <!-- ノートセレクター (密集対策) -->
+    <div id="note-selector-screen" class="overlay-screen" style="display: none;">
+        <div class="overlay-screen-content w-full max-w-sm">
+            <h2 class="text-3xl font-black mb-1 italic text-blue-400 tracking-tighter uppercase">Dense Notes</h2>
+            <p class="text-[9px] text-gray-400 mb-6 font-bold uppercase tracking-widest">長押しで検出されたノーツの一覧です</p>
+            
+            <div id="note-selector-list" class="w-full mb-8 max-h-[300px] overflow-y-auto px-1">
+                <!-- JavaScriptで生成 -->
+            </div>
+
+            <div class="flex gap-4 w-full">
+                <button onclick="closeNoteSelector()" class="flex-1 btn-action py-3 bg-gray-800 hover:bg-gray-700 text-xs shadow-none border-gray-600">キャンセル</button>
+            </div>
+        </div>
+    </div>
 
     <!-- リザルト画面 -->
     <div id="result-screen" class="overlay-screen" style="display: none;">
@@ -1308,6 +1352,9 @@
         let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [], userPlayRecord = [];
         let ghostRecordIndex = 0;
         let editorSelectedNote = null;
+        let longPressTimer = null;
+        let isLongPressing = false;
+        let touchStartPos = { x: 0, y: 0 };
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
         let gameCurrentTime = 0; // 一貫性のあるゲーム内時刻
         let NOTE_TRAVEL_TIME = 2.0;
@@ -1828,7 +1875,7 @@
             return idx;
         }
 
-        function tryInteractNoteAt(mx, my) {
+        function tryInteractNoteAt(mx, my, isLongPress = false) {
             if (!isEditMode) return false;
             const rect = canvas.getBoundingClientRect();
             const x = (mx - rect.left) * (canvas.width / rect.width);
@@ -1837,6 +1884,7 @@
             const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
             const ct = localVideo.currentTime;
             
+            const candidates = [];
             for (let i = activeNotes.length - 1; i >= 0; i--) {
                 const n = activeNotes[i];
                 const tb = buttons[n.lane];
@@ -1845,26 +1893,100 @@
                 const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
                 const dist = Math.hypot(x - hx, y - hy);
                 if (dist < buttonRadius * 1.5) {
-                    if (editorSelectedNote && Math.abs(editorSelectedNote.time - n.time) < 0.005 && editorSelectedNote.lane === n.lane) {
-                        recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - n.time) < 0.005 && rn.lane === n.lane));
-                        activeNotes.splice(i, 1);
-                        editorSelectedNote = null;
-                        syncEditorNotes();
-                        draw(ct); 
-                        showToast("ノートを削除しました", 1500);
-                    } else {
-                        editorSelectedNote = { time: n.time, lane: n.lane };
-                        draw(ct);
-                        showToast("選択状態 (再度押すと削除)", 1500);
-                    }
+                    candidates.push(n);
+                }
+            }
+
+            if (candidates.length === 0) return false;
+
+            if (isLongPress && candidates.length > 0) {
+                openNoteSelector(candidates);
+                return true;
+            }
+
+            // 通常タップ: 重なっている場合は、選択されていないものを優先的に選ぶ
+            let target = candidates[0];
+            if (editorSelectedNote) {
+                const alreadySelected = candidates.find(c => Math.abs(c.time - editorSelectedNote.time) < 0.005 && c.lane === editorSelectedNote.lane);
+                if (alreadySelected) {
+                    // すでに選択されているものを再度タップした場合は削除
+                    deleteNote(alreadySelected.time, alreadySelected.lane);
                     return true;
                 }
             }
-            if (editorSelectedNote) {
-                editorSelectedNote = null;
-                draw(ct);
-            }
-            return false;
+
+            editorSelectedNote = { time: target.time, lane: target.lane };
+            draw(ct);
+            showToast("選択状態 (再度押すと削除 / 長押しで一覧表示)", 2000);
+            return true;
+        }
+
+        function deleteNote(time, lane) {
+            recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - time) < 0.005 && rn.lane === lane));
+            activeNotes = activeNotes.filter(n => !(Math.abs(n.time - time) < 0.005 && n.lane === lane));
+            editorSelectedNote = null;
+            syncEditorNotes();
+            draw(localVideo.currentTime);
+            showToast("ノートを削除しました", 1500);
+        }
+
+        function openNoteSelector(notes) {
+            const list = document.getElementById('note-selector-list');
+            list.innerHTML = '';
+            
+            // 時間順にソート
+            notes.sort((a, b) => a.time - b.time);
+
+            notes.forEach(n => {
+                const btn = document.createElement('div');
+                btn.className = 'note-item-btn cursor-pointer';
+                if (editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane) {
+                    btn.classList.add('selected');
+                }
+                
+                const timeStr = n.time.toFixed(3);
+                const laneNames = ['LEFT 1', 'LEFT 2', 'LEFT 3', 'LEFT 4', 'CENTER', 'RIGHT 4', 'RIGHT 3', 'RIGHT 2', 'RIGHT 1'];
+                const laneName = laneNames[n.lane];
+                const typeName = n.endTime ? "HOLD" : "TAP";
+                
+                btn.innerHTML = `
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-2">
+                             <span class="w-1.5 h-1.5 rounded-full" style="background: rgb(${LANE_COLORS[n.lane]})"></span>
+                             <span class="text-[10px] font-black italic text-white">${laneName}</span>
+                        </div>
+                        <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${typeName} @ ${timeStr}s</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 bg-blue-600/40 hover:bg-blue-500/60 rounded-lg text-[8px] font-bold uppercase tracking-widest">選択</button>
+                        <button class="px-3 py-1 bg-red-600/40 hover:bg-red-500/60 rounded-lg text-[8px] font-bold uppercase tracking-widest">削除</button>
+                    </div>
+                `;
+
+                // 選択ボタン
+                btn.querySelectorAll('button')[0].onclick = (e) => {
+                    e.stopPropagation();
+                    editorSelectedNote = { time: n.time, lane: n.lane };
+                    closeNoteSelector();
+                    draw(localVideo.currentTime);
+                    showToast("ノートを選択しました");
+                };
+
+                // 削除ボタン
+                btn.querySelectorAll('button')[1].onclick = (e) => {
+                    e.stopPropagation();
+                    deleteNote(n.time, n.lane);
+                    closeNoteSelector();
+                };
+
+                list.appendChild(btn);
+            });
+            
+            document.getElementById('note-selector-screen').style.display = 'flex';
+        }
+
+        function closeNoteSelector() {
+            document.getElementById('note-selector-screen').style.display = 'none';
         }
 
         function setupInput() {
@@ -1929,7 +2051,14 @@
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
-                    if (isEditMode && tryInteractNoteAt(t.clientX, t.clientY)) continue;
+                    if (isEditMode) {
+                        touchStartPos = { x: t.clientX, y: t.clientY };
+                        isLongPressing = false;
+                        longPressTimer = setTimeout(() => {
+                            isLongPressing = true;
+                            tryInteractNoteAt(t.clientX, t.clientY, true);
+                        }, 500);
+                    }
                     const l = getNearestLane(t.clientX, t.clientY);
                     if (l !== -1) {
                         activeTouches.set(t.identifier, l);
@@ -1939,16 +2068,44 @@
             }, { passive: false });
 
             canvas.addEventListener('mousedown', (e) => {
-                e.preventDefault(); // ダブルクリック時のテキスト全選択を防止
-                if (isEditMode && tryInteractNoteAt(e.clientX, e.clientY)) return;
+                e.preventDefault(); 
+                if (isEditMode) {
+                    touchStartPos = { x: e.clientX, y: e.clientY };
+                    isLongPressing = false;
+                    longPressTimer = setTimeout(() => {
+                        isLongPressing = true;
+                        tryInteractNoteAt(e.clientX, e.clientY, true);
+                    }, 500);
+                }
                 const l = getNearestLane(e.clientX, e.clientY);
                 if (l !== -1) sH(l);
             });
 
+            const handleMove = (e) => {
+                if (longPressTimer) {
+                    const pos = e.touches ? e.touches[0] : e;
+                    const dist = Math.hypot(pos.clientX - touchStartPos.x, pos.clientY - touchStartPos.y);
+                    if (dist > 10) { clearTimeout(longPressTimer); longPressTimer = null; }
+                }
+            };
+            canvas.addEventListener('mousemove', handleMove);
+            canvas.addEventListener('touchmove', handleMove);
+
             const handleEnd = (e) => {
+                if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+                if (isLongPressing) { isLongPressing = false; return; }
+                
+                if (isEditMode && e.clientX !== undefined) {
+                    // マウスアップ時に通常選択判定を実行 (マウスのみ)
+                    if (tryInteractNoteAt(e.clientX, e.clientY)) return;
+                }
+
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
+                    // タッチエンド時に通常選択判定
+                    if (isEditMode && tryInteractNoteAt(t.clientX, t.clientY)) continue;
+
                     const l = activeTouches.get(t.identifier);
                     if (l !== undefined) {
                         eH(l);
@@ -1959,6 +2116,7 @@
 
             canvas.addEventListener('touchend', handleEnd, { passive: false });
             canvas.addEventListener('touchcancel', handleEnd, { passive: false });
+            canvas.addEventListener('mouseup', handleEnd);
         }
 
         async function startLive(editMode = false, autoPlay = false, ghostReplay = false) {
