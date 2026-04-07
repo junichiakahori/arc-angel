@@ -48,7 +48,7 @@
 
 ## 🛠 現在進行中・次のタスク (Next Steps)
 - [ ] **譜面作成 (Chart Creation)**: 
-  - [ ] 『僕らは今のなかで』(`bokuima`) の全難易度（EASY〜MASTER）の作成。
+  - [ ] 『僕らは今のなかで』(`bokuima`) の難易度作成 ([x] EASY, [ ] NORMAL, [ ] EXPERT, [ ] MASTER)。
   - [ ] 『僕らのLIVE 君とのLIFE』(`borara`) の譜面増強。
 
 ## 💡 留意点・メモ
