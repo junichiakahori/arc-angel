@@ -1120,7 +1120,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 16:30 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 17:01 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1665,8 +1665,8 @@
             }
             showLoading("譜面を取得中...");
             try {
-                // 開発版・安定版のいずれからでもアクセスできるようにパスを解決
-                const response = await fetch(`${BASE_PATH}${chartUrl}?v=${Date.now()}`);
+                // `chartUrl` はすでに showSongList で BASE_PATH が付与されているため、そのまま使用する
+                const response = await fetch(`${chartUrl}?v=${Date.now()}`);
                 const txt = await response.text();
                 document.getElementById('chart-input').value = txt;
 
