@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 12:06 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 12:13 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1047,7 +1047,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:06 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:13 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2182,6 +2182,7 @@
                 document.getElementById('ui-overlay').style.opacity = '1';
                 document.getElementById('ui-overlay').style.pointerEvents = 'auto';
                 document.getElementById('btn-back-to-editor').classList.remove('hidden');
+                document.getElementById('keyboard-help').classList.add('hidden');
 
                 const jEl = document.getElementById('judge-display'); 
                 jEl.innerText = "TEST PLAY"; 
@@ -2248,6 +2249,8 @@
             document.getElementById('editor-controls').style.display = 'flex';
             document.getElementById('ui-overlay').style.opacity = '0';
             document.getElementById('ui-overlay').style.pointerEvents = 'none';
+            document.getElementById('keyboard-help').classList.remove('hidden');
+            document.getElementById('keyboard-help').style.opacity = "1.0";
             document.getElementById('btn-back-to-editor').classList.add('hidden');
 
             // 描画ループ再開
@@ -2296,7 +2299,11 @@
         function backToTitle() {
             isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; isEditMode = false;
             // ヘルプパネルの項目も適宜隠す等の処理があればここだが、まずはフラグのリセットを優先
-            document.getElementById('keyboard-help').style.opacity = "0.4"; // 非アクティブ時は薄くするなどの演出可能
+            const kh = document.getElementById('keyboard-help');
+            if (kh) {
+                kh.classList.remove('hidden');
+                kh.style.opacity = "0.4";
+            }
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
             activeNotes = []; hitEffects = []; // 残留物を一掃
             if (localVideo) {
