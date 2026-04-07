@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 12:34 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 12:40 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -998,19 +998,19 @@
 
     <!-- PC専用ショートカットガイド -->
     <div id="keyboard-help"
-        class="hidden lg:flex fixed left-1/2 -translate-x-1/2 top-4 bg-black/40 backdrop-blur-2xl p-4 rounded-3xl border border-white/10 text-[9px] text-gray-300 pointer-events-none z-[100] w-[460px] shadow-2xl transition-all animate-fade-in items-start gap-4">
+        class="hidden lg:flex fixed left-1/2 -translate-x-1/2 top-4 bg-black/40 backdrop-blur-2xl p-4 rounded-3xl border border-white/10 text-[9px] text-gray-300 pointer-events-none z-[100] w-[400px] shadow-2xl transition-all animate-fade-in items-start gap-3">
         
         <!-- アイコンセクション -->
-        <div class="flex flex-col items-center gap-1 border-r border-white/10 pr-3">
+        <div class="flex flex-col items-center gap-1 border-r border-white/10 pr-2">
             <svg class="w-4 h-4 text-blue-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span class="text-[8px] font-black text-blue-500 uppercase tracking-tighter">Guides</span>
         </div>
 
-        <div class="flex-1 grid grid-cols-3 gap-6">
+        <div class="flex-1 grid grid-cols-3 gap-2">
             <!-- Gameplay -->
-            <div class="space-y-2 col-span-1">
+            <div class="space-y-2 col-span-1 border-r border-white/5 pr-2">
                 <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Gameplay</p>
                 <div class="grid grid-cols-3 gap-1.5 w-max">
                     <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(255,215,0);">A</div>
@@ -1026,7 +1026,7 @@
             </div>
 
             <!-- Editor -->
-            <div class="space-y-2">
+            <div class="space-y-2 border-r border-white/5 pr-2">
                 <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Editor</p>
                 <div class="grid grid-cols-1 gap-1.5">
                     <div class="flex justify-between items-center">
@@ -1077,7 +1077,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:34 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:40 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
