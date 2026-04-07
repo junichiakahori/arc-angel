@@ -458,7 +458,7 @@
         }
 
         #editor-seek-bar {
-            height: 24px;
+            height: 12px;
             flex: 1;
         }
 
@@ -509,6 +509,18 @@
             #editor-speed-select {
                 padding: 4px;
                 font-size: 8px;
+            }
+
+            #editor-seek-bar {
+                height: 8px; /* 極限まで薄く */
+                border-radius: 4px;
+                margin: 0;
+            }
+
+            #editor-timeline {
+                padding: 2px 8px; /* パディングを極限まで削減 */
+                gap: 6px;
+                min-height: 28px;
             }
         }
 
@@ -1104,7 +1116,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:45 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:55 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
