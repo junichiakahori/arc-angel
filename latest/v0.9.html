@@ -1116,7 +1116,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:55 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:57 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2613,9 +2613,11 @@
                 return;
             }
 
-            const chartData = JSON.stringify(currentChartData, null, 2);
+            // iOSメールアプリ等での改行不具合を防ぐため、改行コードを CRLF (\r\n) に変換してからエンコード
+            const chartData = JSON.stringify(currentChartData, null, 2).replace(/\n/g, '\r\n');
             const subject = encodeURIComponent(`【ArcAngel】譜面投稿: ${songName} [${diffName}]`);
-            const body = encodeURIComponent(`以下の譜面データを公式譜面として申請します。\n\n曲名: ${songName}\n難易度: ${diffName}\n\n--- 譜面データ (JSON) ---\n${chartData}\n\n---`);
+            const bodyText = `以下の譜面データを公式譜面として申請します。\r\n\r\n曲名: ${songName}\r\n難易度: ${diffName}\r\n\r\n--- 譜面データ (JSON) ---\r\n${chartData}\r\n\r\n---`;
+            const body = encodeURIComponent(bodyText);
 
             window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
         }
