@@ -33,6 +33,19 @@
     <title>ArcAngel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            /* z-index レイヤー管理 */
+            --z-base: 0;
+            --z-game: 100;
+            --z-ui: 500;
+            --z-status: 800;
+            --z-overlay: 1000;
+            --z-modal: 2000;
+            --z-toast: 3000;
+            --z-system: 10000;
+            --z-max: 2147483647;
+        }
+
         * {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -97,7 +110,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 3000;
+            z-index: var(--z-overlay);
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             width: 100%;
@@ -125,20 +138,20 @@
         }
 
         #launcher-screen {
-            z-index: 10000;
+            z-index: var(--z-system);
         }
 
         #start-screen {
-            z-index: 400;
+            z-index: var(--z-overlay);
             overflow-y: auto;
         }
 
         #key-config-screen {
-            z-index: 2000;
+            z-index: var(--z-modal);
         }
 
         #note-selector-screen {
-            z-index: 5000;
+            z-index: var(--z-modal);
         }
 
         .note-item-btn {
@@ -376,7 +389,7 @@
             padding: 10px 24px;
             border-radius: 20px;
             font-weight: bold;
-            z-index: 800;
+            z-index: 10000;
             display: none;
             pointer-events: none;
         }
@@ -1267,7 +1280,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:22 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:25 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
