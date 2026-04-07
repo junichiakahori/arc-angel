@@ -1618,7 +1618,7 @@
             const eH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
 
             window.addEventListener('keydown', (e) => { 
-                if (e.repeat) return; 
+                if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return; 
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
                 if (l !== -1) {
                     if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
@@ -1643,6 +1643,7 @@
                 }
             }, {capture: true});
             window.addEventListener('keyup', (e) => { 
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
                 if (l !== -1) {
                     if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
