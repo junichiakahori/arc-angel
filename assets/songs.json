@@ -68,5 +68,19 @@
             "MASTER": "assets/charts/asongforyou_master.txt"
         },
         "jacket": "assets/images/asongforyou.jpg"
+    },
+    {
+        "name": "それは僕たちの奇跡",
+        "video": "assets/videos/soreboku.mp4",
+        "release_date": "2014/04/23",
+        "preview_start": 58,
+        "charts": {
+            "EASY": "",
+            "NORMAL": "",
+            "HARD": "",
+            "EXPERT": "",
+            "MASTER": ""
+        },
+        "jacket": "assets/images/soreboku.jpg"
     }
 ]
