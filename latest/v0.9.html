@@ -1086,7 +1086,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:48 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:55 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1122,6 +1122,7 @@
                         `;
                     }
                 }
+                showHelpOnPC(); // バージョン読み込み後にヘルプの表示を確定させる
             } catch (e) {
                 console.log("Version Info could not be loaded", e);
             }
@@ -1175,16 +1176,23 @@
         function showHelpOnPC() {
             const kh = document.getElementById('keyboard-help');
             if (!kh) return;
-            const isPC = window.innerWidth >= 1024;
-            kh.style.display = isPC ? 'flex' : 'none';
-            kh.style.opacity = "1.0";
+            // タッチデバイス判定と画面幅の組み合わせ
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isWide = window.innerWidth >= 1024;
+            
+            if (!isTouch && isWide) {
+                kh.style.display = 'flex';
+                kh.style.opacity = "1.0";
+            } else {
+                kh.style.display = 'none';
+            }
         }
-        function hideHelpOnMobile() {
+        function hideHelpPanel() {
             const kh = document.getElementById('keyboard-help');
             if (kh) kh.style.display = 'none';
         }
         // 初期起動時にも適用
-        window.addEventListener('load', () => { setTimeout(showHelpOnPC, 500); });
+        window.addEventListener('load', () => { setTimeout(showHelpOnPC, 300); });
 
         // --- 音響処理 ---
         function initAudio() {
@@ -1854,7 +1862,7 @@
                 document.getElementById('ui-overlay').style.display = 'block';
                 document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
                 document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
-                hideHelpOnMobile(); // ヘルプはプレイ開始時に必ず消す
+                hideHelpPanel(); // ヘルプはプレイ開始時に必ず消す
                 document.getElementById('editor-controls').style.display = isEditMode ? 'flex' : 'none';
                 if (isEditMode) document.getElementById('editor-seek-bar').max = localVideo.duration || 100;
                 if (isCommandActivated) updateCommandUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
