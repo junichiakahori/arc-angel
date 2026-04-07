@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 10:22 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 10:44 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -988,7 +988,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:22 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:44 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1798,20 +1798,43 @@
 
             const isP = canvas.height > canvas.width;
             const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
+            // --- 背景が明るい場合の視認性向上 (ディミンググラデーション) ---
+            const gradient = ctx.createLinearGradient(0, canvas.height, 0, cy - buttonRadius * 2);
+            gradient.addColorStop(0, 'rgba(0,0,0,0.6)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, cy - buttonRadius * 2, canvas.width, canvas.height - (cy - buttonRadius * 2));
+
             buttons.forEach((btn, idx) => {
                 const c = LANE_COLORS[idx] || '0, 240, 255';
+                
+                // ボタンの外枠・影
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                
                 ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2); 
                 ctx.strokeStyle = lanePressed[idx] ? '#fff' : `rgb(${c})`; 
-                ctx.lineWidth = lanePressed[idx] ? 4 : 2; 
+                ctx.lineWidth = lanePressed[idx] ? 5 : 3; // 枠線を少し太く
                 ctx.stroke();
-                ctx.fillStyle = lanePressed[idx] ? `rgba(${c}, 0.5)` : `rgba(${c}, 0.15)`; 
+                
+                ctx.fillStyle = lanePressed[idx] ? `rgba(${c}, 0.6)` : `rgba(${c}, 0.25)`; 
                 ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = `bold ${buttonRadius / 2.5}px Arial`; ctx.textAlign = 'center'; ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
+                ctx.restore();
+
+                // キーラベルの縁取り
+                ctx.font = `bold ${buttonRadius / 2.2}px Arial`; 
+                ctx.textAlign = 'center'; 
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 4;
+                ctx.strokeText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
+                ctx.fillStyle = 'rgba(255,255,255,1.0)'; 
+                ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
             });
             const timeG = {}; activeNotes.forEach(n => { if (n.status === 'waiting') { const k = n.time.toFixed(3); if (!timeG[k]) timeG[k] = []; timeG[k].push(n); } });
             Object.values(timeG).forEach(g => {
                 if (g.length > 1) {
-                    g.sort((a, b) => a.lane - b.lane); ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 4;
+                    g.sort((a, b) => a.lane - b.lane); ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'; ctx.lineWidth = 5;
                     for (let i = 0; i < g.length; i++) { const sp = (ct - (g[i].time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME; const hx = cx + (buttons[g[i].lane].x - cx) * sp, hy = cy + (buttons[g[i].lane].y - cy) * sp; if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy); }
                     ctx.stroke();
                 }
@@ -1829,9 +1852,15 @@
                     }
                     if (n.status !== 'holding') {
                         const noteColor = n.endTime ? '250, 204, 21' : (LANE_COLORS[n.lane] || '59, 130, 246');
+                        
+                        // ノーツの影と縁取り
+                        ctx.save();
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = 'rgba(0,0,0,0.7)';
+
                         if (n.isSim) { 
-                            ctx.beginPath(); ctx.arc(hx, hy, noteSize + 4, 0, Math.PI * 2); 
-                            ctx.strokeStyle = 'white'; ctx.lineWidth = 3; ctx.stroke(); 
+                            ctx.beginPath(); ctx.arc(hx, hy, noteSize + 5, 0, Math.PI * 2); 
+                            ctx.strokeStyle = 'white'; ctx.lineWidth = 4; ctx.stroke(); 
                         }
                         if (isEditMode && editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane) {
                             ctx.beginPath(); ctx.arc(hx, hy, noteSize + 10, 0, Math.PI * 2); 
@@ -1840,7 +1869,8 @@
                         }
                         ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2); 
                         ctx.fillStyle = `rgb(${noteColor})`; ctx.fill(); 
-                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
+                        ctx.restore();
                     }
                 }
                 if (ct > (n.endTime || n.time) + 0.4) {
