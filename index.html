@@ -33,6 +33,19 @@
     <title>ArcAngel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            /* z-index レイヤー管理 */
+            --z-base: 0;
+            --z-game: 100;
+            --z-ui: 500;
+            --z-status: 800;
+            --z-overlay: 1000;
+            --z-modal: 2000;
+            --z-toast: 3000;
+            --z-system: 10000;
+            --z-max: 2147483647;
+        }
+
         * {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -97,17 +110,17 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 300;
+            z-index: var(--z-overlay);
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             width: 100%;
-            height: 100.1%;
+            height: 100%;
             /* 微妙に大きくしてスクロール可能に */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
+            padding: 80px 20px 40px;
             text-align: center;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
@@ -125,12 +138,45 @@
         }
 
         #launcher-screen {
-            z-index: 10000;
+            z-index: var(--z-system);
         }
 
         #start-screen {
-            z-index: 400;
+            z-index: var(--z-overlay);
             overflow-y: auto;
+        }
+
+        #key-config-screen {
+            z-index: var(--z-modal);
+        }
+
+        #note-selector-screen {
+            z-index: var(--z-modal);
+        }
+
+        .note-item-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .note-item-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .note-item-btn.selected {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
         }
 
         /* 全画面モード時の要素追従修正 */
@@ -343,7 +389,7 @@
             padding: 10px 24px;
             border-radius: 20px;
             font-weight: bold;
-            z-index: 800;
+            z-index: 10000;
             display: none;
             pointer-events: none;
         }
@@ -673,6 +719,65 @@
             z-index: 1000;
             animation: blink-red 2s infinite;
         }
+
+        /* コンボシェイクとマイルストーン演出 */
+        @keyframes shake-screen {
+            0%, 100% { transform: translate(0, 0); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-4px, 2px) rotate(-0.5deg); }
+            20%, 40%, 60%, 80% { transform: translate(4px, -2px) rotate(0.5deg); }
+        }
+        .animate-shake-screen {
+            animation: shake-screen 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+        @keyframes combo-burst {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; filter: brightness(1) drop-shadow(0 0 0px #fff); }
+            20% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; filter: brightness(2) drop-shadow(0 0 20px #fff); }
+            80% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; filter: brightness(1) drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; filter: brightness(1) drop-shadow(0 0 0px #fff); }
+        }
+        .animate-combo-burst {
+            animation: combo-burst 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* キーコンフィグ画面用 */
+        .key-config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+        .key-config-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .key-config-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            animation: pulse-border 1.5s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: #3b82f6; }
+            50% { border-color: rgba(59, 130, 246, 0.3); }
+        }
+        .key-config-label {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-family: monospace;
+            font-weight: 900;
+            color: #60a5fa;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -688,7 +793,7 @@
 
     <div id="game-wrapper" class="relative group">
         <!-- ローディング表示 (プリロード対応) -->
-        <div id="loading-overlay" class="absolute inset-0 z-[1100] bg-black/80 backdrop-blur-md hidden flex-col justify-center items-center">
+        <div id="loading-overlay" class="absolute inset-0 z-[20000] bg-black/90 backdrop-blur-xl hidden flex-col justify-center items-center">
             <div class="overlay-screen-content text-center">
                 <div class="mb-4">
                     <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
@@ -715,15 +820,15 @@
                 <div class="mb-12">
                     <div class="flex flex-col items-center justify-center gap-2 mb-4">
                         <img id="launcher-logo" src="" alt="Logo" class="w-20 h-20 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] animate-pulse">
-                        <h1 class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl text-rainbow">
+                        <h1 class="text-6xl font-black italic text-white tracking-tight drop-shadow-2xl text-rainbow px-4 py-2 overflow-visible">
                             ArcAngel
                         </h1>
                     </div>
                     <p
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
-                        動画同期リズムゲーム</p>
+                        動画同期型リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        <span id="version-display">ArcAngel v0.9</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
+                        <span id="version-display">ArcAngel v1.0</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
                     </p>
                 </div>
 
@@ -814,7 +919,17 @@
 
                     <button onclick="backToLauncher()"
                         class="w-full mt-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-bold text-gray-500 transition-all uppercase tracking-widest">
-                        タイトル画面(ランチャー)に戻る
+                        タイトル画面に戻る
+                    </button>
+                </div>
+
+                <!-- 設定セクション -->
+                <div class="mt-4 pt-4 border-t border-white/5 w-full flex justify-center gap-3">
+                    <button onclick="openKeyConfig()" class="flex items-center gap-2 px-3 py-2 bg-gray-800/60 hover:bg-gray-700/80 border border-gray-600/40 rounded-xl text-[10px] font-bold text-gray-300 transition-all">
+                        キー変更
+                    </button>
+                    <button onclick="openSeSettings()" class="flex items-center gap-2 px-3 py-2 bg-gray-800/60 hover:bg-gray-700/80 border border-gray-600/40 rounded-xl text-[10px] font-bold text-gray-300 transition-all">
+                        SE設定
                     </button>
                 </div>
 
@@ -865,14 +980,19 @@
                 JSON形式で0.01秒単位の微調整が可能です</p>
             <textarea id="chart-input" placeholder='[{"time": 1.5, "lane": 0}, {"time": 2.0, "lane": 3}]'
                 class="w-full h-[50vh] bg-black/50 text-sky-300 font-mono text-[11px] p-6 rounded-2xl border border-white/10 mb-6 custom-scrollbar focus:border-orange-500/50 outline-none transition-all"></textarea>
-            <div class="flex flex-wrap justify-center gap-3">
+            <div class="grid grid-cols-2 gap-3">
                 <button onclick="closeChartModal()"
-                    class="btn-action px-8 py-2.5 bg-gradient-to-r from-orange-600 to-orange-800 text-sm shadow-[0_4px_15px_rgba(234,88,12,0.3)] hover:scale-105 active:scale-95">完了
-                    (反映)</button>
+                    class="col-span-2 btn-action py-4 bg-gradient-to-r from-orange-600 to-orange-800 text-sm shadow-[0_4px_20px_rgba(234,88,12,0.4)] hover:scale-[1.02] active:scale-95 transition-all whitespace-nowrap px-4">
+                    完了 (反映)
+                </button>
                 <button onclick="closeTextChart()"
-                    class="btn-action px-8 py-2.5 btn-secondary text-sm hover:scale-105 active:scale-95">キャンセル</button>
+                    class="btn-action py-3 btn-secondary text-[11px] hover:bg-white/10 transition-all whitespace-nowrap px-2">
+                    キャンセル
+                </button>
                 <button onclick="document.getElementById('chart-input').value=''"
-                    class="btn-action px-6 py-2.5 btn-secondary text-xs opacity-60">クリア</button>
+                    class="btn-action py-3 btn-secondary text-[10px] opacity-40 hover:opacity-100 transition-all whitespace-nowrap px-2">
+                    クリア
+                </button>
             </div>
         </div>
     </div>
@@ -919,6 +1039,7 @@
         <div id="judge-display"
             class="text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest">
             READY?</div>
+        <div id="judge-detail-display" class="text-[12px] font-bold text-center h-4 opacity-80 tracking-widest"></div>
         <div class="flex flex-wrap justify-center gap-2 mt-1 pt-1 border-t border-white/10">
             <button class="bg-white/10 px-3 py-1 rounded text-[9px] font-bold active:bg-white/20"
                 onclick="togglePause()">一時停止</button>
@@ -1002,10 +1123,44 @@
         </div>
     </div>
 
+    <div id="combo-milestone-display" class="fixed top-[40%] left-1/2 pointer-events-none z-[450] opacity-0 text-[9vw] sm:text-7xl md:text-8xl whitespace-nowrap font-black italic text-transparent bg-clip-text bg-gradient-to-tr from-yellow-300 via-white to-pink-400"></div>
+
     <div id="chart-output" onclick="this.style.display='none'"
         style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; height: 70%; background: #111; color: #0f0; font-family: monospace; padding: 20px; border-radius: 15px; border: 2px solid #555; display: none; z-index: 600; overflow-y: auto; font-size: 11px;">
     </div>
     <div id="toast-msg" class="toast"></div>
+
+    <!-- キーコンフィグ画面 -->
+    <div id="key-config-screen" class="overlay-screen" style="display: none;">
+        <div class="overlay-screen-content w-full max-w-sm">
+            <h2 class="text-3xl font-black mb-1 italic text-blue-400 tracking-tighter">Key Config</h2>
+            <p class="text-[9px] text-gray-500 mb-6 font-bold uppercase tracking-widest">各レーンのキー割り当てを変更できます</p>
+            
+            <div id="key-config-list" class="grid grid-cols-1 gap-2 w-full mb-8">
+                <!-- JavaScriptで生成 -->
+            </div>
+
+            <div class="flex gap-4 w-full">
+                <button onclick="resetKeyConfig()" class="flex-1 py-3 bg-red-900/40 hover:bg-red-800/60 border border-red-500/30 rounded-2xl text-[10px] font-bold text-red-200 transition-all uppercase tracking-widest">初期化</button>
+                <button onclick="closeKeyConfig()" class="flex-[1.5] btn-action">閉じる</button>
+            </div>
+        </div>
+    </div>
+    <!-- ノートセレクター (密集対策) -->
+    <div id="note-selector-screen" class="overlay-screen" style="display: none;">
+        <div class="overlay-screen-content w-full max-w-sm">
+            <h2 class="text-3xl font-black mb-1 italic text-blue-400 tracking-tighter uppercase">Dense Notes</h2>
+            <p class="text-[9px] text-gray-400 mb-6 font-bold uppercase tracking-widest">長押しで検出されたノーツの一覧です</p>
+            
+            <div id="note-selector-list" class="w-full mb-8 max-h-[300px] overflow-y-auto px-1">
+                <!-- JavaScriptで生成 -->
+            </div>
+
+            <div class="flex gap-4 w-full">
+                <button onclick="closeNoteSelector()" class="flex-1 btn-action py-3 bg-gray-800 hover:bg-gray-700 text-xs shadow-none border-gray-600">キャンセル</button>
+            </div>
+        </div>
+    </div>
 
     <!-- リザルト画面 -->
     <div id="result-screen" class="overlay-screen" style="display: none;">
@@ -1026,12 +1181,21 @@
                         id="res-bad">0</span></div>
                 <div class="flex justify-between text-red-400 mb-3 text-xs font-bold"><span>MISS</span><span
                         id="res-miss">0</span></div>
+                <div class="flex justify-between text-blue-300 mb-0.5 mt-[-4px] opacity-80 text-[10px] font-bold"><span>FAST</span><span
+                        id="res-fast">0</span></div>
+                <div class="flex justify-between text-red-300 mb-3 opacity-80 text-[10px] font-bold"><span>SLOW</span><span
+                        id="res-slow">0</span></div>
                 <div
                     class="pt-2 mt-2 border-t border-gray-800 flex justify-between font-bold text-white text-lg italic tracking-wider">
                     <span>Max Combo</span><span id="res-combo">0</span>
                 </div>
             </div>
-            <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-12">選曲画面に戻る</button>
+            <div class="flex flex-wrap justify-center gap-3 mt-2">
+                <button id="btn-result-ghost" onclick="startGhostReplay()" class="btn-action shadow-lg px-6 bg-pink-600 hover:bg-pink-500 text-xs hidden">自分のプレイを再生</button>
+                <button id="btn-result-replay" onclick="startReplay()" class="btn-action shadow-lg px-6 bg-purple-600 hover:bg-purple-500 text-xs">鑑賞リプレイ</button>
+                <button id="btn-result-retry" onclick="retryLive()" class="btn-action shadow-lg px-6 bg-blue-600 hover:bg-blue-500 text-xs">再挑戦 (Retry)</button>
+                <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-6 btn-secondary text-xs">選曲画面へ</button>
+            </div>
         </div>
     </div>
 
@@ -1115,8 +1279,8 @@
                 const timeDisp = document.getElementById('last-updated-display');
                 
                 // 特定バージョン版ファイル
-                const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 16:21 (JST)";
+                const MY_VERSION = "v1.0"; 
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 08:18 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1180,19 +1344,23 @@
         let currentSelectedSong = null;
         let currentSongIndex = -1;
         let songsStore = [];
+        let askedRestoreKeys = new Set(); 
         let BACKUP_SONG_LIST = [
-            { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
-            { name: "START:DASH!!", video: BASE_PATH + "assets/videos/startdash.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/startdash_hard.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/startdash.jpg" },
-            { name: "タカラモノズ", video: BASE_PATH + "assets/videos/takaramonos.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/takaramonos.jpg" },
-            { name: "A song for You! You? You!!", video: BASE_PATH + "assets/videos/asongforyou.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/asongforyou.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/asongforyou.jpg" }
+            { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", preview_start: 76, charts: { EASY: BASE_PATH + "assets/charts/bokura_easy.txt", NORMAL: BASE_PATH + "assets/charts/bokura_normal.txt", HARD: BASE_PATH + "assets/charts/bokura_hard.txt", EXPERT: BASE_PATH + "assets/charts/bokura_expert.txt", MASTER: BASE_PATH + "assets/charts/bokura_master.txt" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
+            { name: "Snow Halation", video: BASE_PATH + "assets/videos/snohala.mp4", preview_start: 52, charts: { EASY: BASE_PATH + "assets/charts/snohala_easy.txt", NORMAL: BASE_PATH + "assets/charts/snohala_normal.txt", HARD: BASE_PATH + "assets/charts/snohala_hard.txt", EXPERT: BASE_PATH + "assets/charts/snohala_expert.txt", MASTER: BASE_PATH + "assets/charts/snohala_master.txt" }, jacket: BASE_PATH + "assets/images/snohala.jpg" },
+            { name: "僕らは今のなかで", video: BASE_PATH + "assets/videos/bokuima.mp4", preview_start: 61, charts: { EASY: BASE_PATH + "assets/charts/bokuima_easy.txt", NORMAL: BASE_PATH + "assets/charts/bokuima_normal.txt", HARD: BASE_PATH + "assets/charts/bokuima_hard.txt", EXPERT: BASE_PATH + "assets/charts/bokuima_expert.txt", MASTER: BASE_PATH + "assets/charts/bokuima_master.txt" }, jacket: BASE_PATH + "assets/images/bokuima.jpg" },
+            { name: "START:DASH!!", video: BASE_PATH + "assets/videos/startdash.mp4", preview_start: 64, charts: { EASY: BASE_PATH + "assets/charts/startdash_easy.txt", NORMAL: BASE_PATH + "assets/charts/startdash_normal.txt", HARD: BASE_PATH + "assets/charts/startdash_hard.txt", EXPERT: BASE_PATH + "assets/charts/startdash_expert.txt", MASTER: BASE_PATH + "assets/charts/startdash_master.txt" }, jacket: BASE_PATH + "assets/images/startdash.jpg" },
+            { name: "タカラモノズ", video: BASE_PATH + "assets/videos/takaramonos.mp4", preview_start: 60, charts: { EASY: BASE_PATH + "assets/charts/takaramonos_easy.txt", NORMAL: BASE_PATH + "assets/charts/takaramonos_normal.txt", HARD: BASE_PATH + "assets/charts/takaramonos_hard.txt", EXPERT: BASE_PATH + "assets/charts/takaramonos_expert.txt", MASTER: BASE_PATH + "assets/charts/takaramonos_master.txt" }, jacket: BASE_PATH + "assets/images/takaramonos.jpg" },
+            { name: "それは僕たちの奇跡", video: BASE_PATH + "assets/videos/soreboku.mp4", preview_start: 58, charts: { EASY: BASE_PATH + "assets/charts/soreboku_easy.txt", NORMAL: BASE_PATH + "assets/charts/soreboku_normal.txt", HARD: BASE_PATH + "assets/charts/soreboku_hard.txt", EXPERT: BASE_PATH + "assets/charts/soreboku_expert.txt", MASTER: BASE_PATH + "assets/charts/soreboku_master.txt" }, jacket: BASE_PATH + "assets/images/soreboku.jpg" },
+            { name: "A song for You! You? You!!", video: BASE_PATH + "assets/videos/asongforyou.mp4", preview_start: 98, charts: { EASY: BASE_PATH + "assets/charts/asongforyou_easy.txt", NORMAL: BASE_PATH + "assets/charts/asongforyou_normal.txt", HARD: BASE_PATH + "assets/charts/asongforyou_hard.txt", EXPERT: BASE_PATH + "assets/charts/asongforyou_expert.txt", MASTER: BASE_PATH + "assets/charts/asongforyou_master.txt" }, jacket: BASE_PATH + "assets/images/asongforyou.jpg" }
         ];
         let AUTO_SONG_LIST = []; // キャッシュ用
         let localVideo, isVideoReady = false;
         let gameStartTime = 0; // ゲーム開始時刻 (performance.now())
-        let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
+        let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0, fast: 0, slow: 0 };
         let stamina = 100, maxStamina = 100;
         let isEditorPaused = false, isSeeking = false;
-        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false;
+        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false, isAutoPlay = false, isGhostReplay = false;
         // --- 9レーンカラー定義 (虹色グラデーション) ---
         const LANE_COLORS = [
             '255, 215, 0',   // 0: Yellow (A)
@@ -1205,12 +1373,30 @@
             '147, 112, 219', // 7: Purple (L)
             '255, 105, 180'  // 8: Pink (;)
         ];
-        let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
+        let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [], userPlayRecord = [];
+        let ghostRecordIndex = 0;
         let editorSelectedNote = null;
+        let longPressTimer = null;
+        let isLongPressing = false;
+        let touchStartPos = { x: 0, y: 0 };
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
         let gameCurrentTime = 0; // 一貫性のあるゲーム内時刻
         let NOTE_TRAVEL_TIME = 2.0;
-        const KEY_LABELS = ['A', 'S', 'D', 'F', 'SPACE', 'J', 'K', 'L', ';'], KEY_MAP = ['a', 's', 'd', 'f', ' ', 'j', 'k', 'l', ';'];
+        let KEY_LABELS = ['A', 'S', 'D', 'F', 'SPACE', 'J', 'K', 'L', ';'];
+        let KEY_MAP = ['a', 's', 'd', 'f', ' ', 'j', 'k', 'l', ';'];
+
+        // キーコンフィグ初期化
+        function initKeyConfig() {
+            const savedMap = localStorage.getItem('arcangel_key_map');
+            const savedLabels = localStorage.getItem('arcangel_key_labels');
+            if (savedMap && savedLabels) {
+                try {
+                    KEY_MAP = JSON.parse(savedMap);
+                    KEY_LABELS = JSON.parse(savedLabels);
+                } catch(e) { console.error(e); }
+            }
+        }
+        initKeyConfig();
 
         const activeTouches = new Map();
 
@@ -1235,49 +1421,228 @@
         window.addEventListener('load', () => { setTimeout(showHelpOnPC, 300); });
 
         // --- 音響処理 ---
+        let currentSeSet = localStorage.getItem('arcangel_se_set') || 'drums';
+        let seMasterGain;
+        let seVol = parseFloat(localStorage.getItem('arcangel_se_vol') || '1.0');
+        let bgmVol = parseFloat(localStorage.getItem('arcangel_bgm_vol') || '0.5');
+
+        function saveSeSet(set) { currentSeSet = set; localStorage.setItem('arcangel_se_set', set); showToast(`SEを ${set.toUpperCase()} に変更しました`); }
+
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                seMasterGain = audioCtx.createGain();
+                seMasterGain.gain.setValueAtTime(seVol, audioCtx.currentTime);
+                seMasterGain.connect(audioCtx.destination);
+
                 const bufferSize = audioCtx.sampleRate * 0.1; noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const d = noiseBuffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) d[i] = Math.random() * 2 - 1;
             }
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        function playTapSound(judgment = 'NONE') {
+        function updateSeVolume(val) {
+            seVol = val / 100;
+            localStorage.setItem('arcangel_se_vol', seVol);
+            const valDisp = document.getElementById('se-vol-value');
+            if (valDisp) valDisp.innerText = val + '%';
+            if (seMasterGain) {
+                seMasterGain.gain.setTargetAtTime(seVol, audioCtx.currentTime, 0.05);
+            }
+        }
+
+        function updateBgmVolume(val) {
+            bgmVol = val / 100;
+            localStorage.setItem('arcangel_bgm_vol', bgmVol);
+            const valDisp = document.getElementById('bgm-vol-value');
+            if (valDisp) valDisp.innerText = val + '%';
+            if (bgmAudio) bgmAudio.volume = bgmVol;
+            // プレイ中の動画音量は、現在のフェード目標を反映させるのが難しいため、
+            // 次回のフェードイベントまたは直接設定時に反映される。
+            // 鑑賞モード等で一定音量の場合は、即座に反映させる。
+            if (localVideo && !isPlaying && !localVideo.paused) {
+                localVideo.volume = bgmVol;
+            }
+        }
+
+        function playTapSound(lane = 0, judgment = 'NONE', overrideSet = null) {
             if (!audioCtx || !noiseBuffer) return;
             const now = audioCtx.currentTime;
 
-            if (judgment === 'PERFECT') {
-                // --- v0.5 の「シャン！」を完全復活 ---
-                // 1. ノイズ成分 (シャッ)
-                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
-                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
-                const ng = audioCtx.createGain();
-                ng.gain.setValueAtTime(0.15, now);
-                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
-                ns.start(now);
+            // 優先順位: overrideSet > 状況に応じたデフォルト
+            let effectiveSet = overrideSet;
+            if (!effectiveSet) {
+                // 隠しコマンド有効かつ設定がデフォルト（未保存）の場合は tambourine を優先
+                if (isCommandActivated && !localStorage.getItem('arcangel_se_set')) {
+                    effectiveSet = 'tambourine';
+                } else {
+                    effectiveSet = currentSeSet;
+                }
+            }
 
-                // 2. サイン波成分 (シャン) 8000Hz -> 6000Hz へのスウィープ
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(8000, now);
-                osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
-                const og = audioCtx.createGain();
-                og.gain.setValueAtTime(0.1, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.connect(og); og.connect(audioCtx.destination);
-                osc.start(now); osc.stop(now + 0.1);
-            } else {
-                // それ以外は控えめな「チッ」
-                const nsClick = audioCtx.createBufferSource(); nsClick.buffer = noiseBuffer;
-                const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(8000, now);
-                const ngClick = audioCtx.createGain();
-                ngClick.gain.setValueAtTime(0.08, now);
-                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-                nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
-                nsClick.start(now);
+            if (effectiveSet === 'tambourine') {
+                if (judgment === 'PERFECT' || judgment === 'NONE') {
+                    const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
+                    const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
+                    const ng = audioCtx.createGain();
+                    ng.gain.setValueAtTime(0.15, now);
+                    ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    ns.connect(nf); nf.connect(ng); ng.connect(seMasterGain);
+                    ns.start(now);
+                    const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(8000, now); osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
+                    const og = audioCtx.createGain(); og.gain.setValueAtTime(0.1, now); og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.connect(og); og.connect(seMasterGain); osc.start(now); osc.stop(now + 0.1);
+                } else {
+                    const nsClick = audioCtx.createBufferSource(); nsClick.buffer = noiseBuffer;
+                    const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(8000, now);
+                    const ngClick = audioCtx.createGain(); ngClick.gain.setValueAtTime(0.08, now); ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                    nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(seMasterGain);
+                    nsClick.start(now);
+                }
+                return;
+            }
+
+            if (effectiveSet === 'click') {
+                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
+                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(judgment === 'PERFECT' ? 10000 : 12000, now);
+                const ng = audioCtx.createGain();
+                ng.gain.setValueAtTime(judgment === 'PERFECT' ? 0.2 : 0.1, now);
+                ng.gain.exponentialRampToValueAtTime(0.01, now + (judgment === 'PERFECT' ? 0.05 : 0.03));
+                ns.connect(nf); nf.connect(ng); ng.connect(seMasterGain);
+                ns.start(now);
+                return;
+            }
+
+            const freqs = [130.81, 146.83, 164.81, 196.00, 220.00, 261.63, 293.66, 329.63, 392.00]; // C Major Pentatonic
+            const freq = freqs[lane] || 261.63;
+
+            if (effectiveSet === 'piano') {
+                const o1 = audioCtx.createOscillator(); const o2 = audioCtx.createOscillator();
+                const g = audioCtx.createGain(); o1.type = 'triangle'; o2.type = 'sine'; o1.frequency.setValueAtTime(freq, now); o2.frequency.setValueAtTime(freq * 2, now);
+                g.gain.setValueAtTime(0.3, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                o1.connect(g); o2.connect(g); g.connect(seMasterGain);
+                o1.start(now); o1.stop(now + 0.3); o2.start(now); o2.stop(now + 0.3);
+                return;
+            }
+
+            if (effectiveSet === 'elec-guitar') {
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); const dist = audioCtx.createWaveShaper();
+                function makeDist(a){let k=a,n=44100,c=new Float32Array(n),i=0,x;for(;i<n;i++){x=i*2/n-1;c[i]=(3+k)*x*20*deg/(Math.PI+(k*Math.abs(x)))}return c;};
+                const deg = Math.PI / 180; dist.curve = makeDist(100);
+                o.type = 'sawtooth'; o.frequency.setValueAtTime(freq, now);
+                g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                o.connect(dist); dist.connect(g); g.connect(seMasterGain);
+                o.start(now); o.stop(now + 0.25);
+                return;
+            }
+
+            if (effectiveSet === 'acou-guitar') {
+                const o1 = audioCtx.createOscillator(); const o2 = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                const noise = audioCtx.createBufferSource(); const nf = audioCtx.createBiquadFilter(); const ng = audioCtx.createGain();
+                const lp = audioCtx.createBiquadFilter();
+
+                o1.type = 'triangle'; o1.frequency.setValueAtTime(freq, now);
+                o2.type = 'sine'; o2.frequency.setValueAtTime(freq * 2, now);
+                noise.buffer = noiseBuffer; nf.type = 'highpass'; nf.frequency.setValueAtTime(8000, now);
+                
+                ng.gain.setValueAtTime(0.1, now); ng.gain.exponentialRampToValueAtTime(0.01, now + 0.03); 
+                g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                lp.type = 'lowpass'; lp.frequency.setValueAtTime(10000, now); lp.frequency.exponentialRampToValueAtTime(1000, now + 0.4);
+
+                o1.connect(lp); o2.connect(lp); noise.connect(nf); nf.connect(ng); 
+                ng.connect(seMasterGain); lp.connect(g); g.connect(seMasterGain);
+                
+                o1.start(now); o1.stop(now + 0.4); o2.start(now); o2.stop(now + 0.4); noise.start(now); noise.stop(now + 0.03);
+                return;
+            }
+
+            if (effectiveSet === 'bass') {
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(freq / 2, now);
+                g.gain.setValueAtTime(0.4, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                o.connect(g); g.connect(seMasterGain); o.start(now); o.stop(now + 0.4);
+                return;
+            }
+
+            // --- Drum Set Mode ---
+            // (既存のドラム合成ロジック...)
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const noise = audioCtx.createBufferSource();
+            const filter = audioCtx.createBiquadFilter();
+            
+            noise.buffer = noiseBuffer;
+            osc.connect(gain);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(seMasterGain);
+
+            switch (lane) {
+                case 0: // Kick
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                    break;
+                case 1: // Snare
+                    osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(1000, now);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1); noise.start(now);
+                    break;
+                case 2: // Closed HH
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(8000, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                    noise.start(now);
+                    break;
+                case 3: // Open HH
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(6000, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    noise.start(now);
+                    break;
+                case 4: // Low Tom
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                    break;
+                case 5: // Mid Tom
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                    break;
+                case 6: // High Tom
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(140, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now); osc.stop(now + 0.12);
+                    break;
+                case 7: // Crash
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(2000, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                    noise.start(now);
+                    break;
+                case 8: // Ride
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(3000, now);
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(5000, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now); osc.stop(now + 0.5); noise.start(now);
+                    break;
+                default: 
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(8000, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                    noise.start(now);
             }
         }
 
@@ -1467,13 +1832,53 @@
         function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
         function playStartSound() { if (!audioCtx) initAudio(); const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.3); g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.connect(g); g.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.3); }
         function openChartModal() {
-            document.getElementById('chart-input').value = ''; // スタート画面からはクリア
+            // エディター内(recordedChart)にデータがあればそれを初期値に、なければ現在の入力を維持
+            if (recordedChart && recordedChart.length > 0) {
+                document.getElementById('chart-input').value = JSON.stringify(recordedChart, null, 2);
+            }
             document.getElementById('chart-input-modal').style.display = 'flex';
+            if (localVideo) localVideo.pause();
         }
         function clearChartInput() { if (confirm("入力内容をすべて消去しますか？")) { document.getElementById('chart-input').value = ''; } }
         function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
-        function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
+        function playTitleBGM(force = false) { 
+            // すでに再生中の場合は一度停止してリセット
+            if (bgmAudio) {
+                bgmAudio.pause();
+                bgmAudio = null;
+            }
+            // 動画再生中（プレビュー中）であれば、タイトルBGMは再生しない（強制フラグが立っていない場合のみ）
+            if (!force && localVideo && !localVideo.paused && localVideo.volume > 0.1) return;
+            
+            bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); 
+            bgmAudio.loop = true; 
+            bgmAudio.volume = bgmVol; 
+            bgmAudio.play().catch(e => {
+                console.log('BGM Playback failed:', e);
+                // 失敗した場合はトーストで通知
+                showToast("BGMの自動再生がブロックされました。画面をクリックしてください。");
+            }); 
+        }
         function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
+        
+        function fadeVideoVolume(target, duration = 500) {
+            if (!localVideo) return;
+            if (localVideo._fadeInterval) clearInterval(localVideo._fadeInterval);
+            const start = localVideo.volume;
+            const effectiveTarget = target * bgmVol;
+            const diff = effectiveTarget - start;
+            const steps = 20;
+            const stepTime = duration / steps;
+            let i = 0;
+            localVideo._fadeInterval = setInterval(() => {
+                i++;
+                localVideo.volume = Math.max(0, Math.min(bgmVol, start + (diff * (i / steps))));
+                if (i >= steps) {
+                    clearInterval(localVideo._fadeInterval);
+                    localVideo._fadeInterval = null;
+                }
+            }, stepTime);
+        }
         function toggleBGM(btn) {
             if (bgmAudio || (localVideo && !localVideo.paused && !isPlaying)) {
                 stopTitleBGM(); if (localVideo) localVideo.pause();
@@ -1486,19 +1891,35 @@
         }
         function closeChartModal() {
             const el = document.getElementById('chart-input');
-            const val = el.value.replace(/\s+/g, '').toLowerCase();
-            if (val === "μ'sicforever") {
+            const rawVal = el.value.trim();
+            const val = rawVal.toLowerCase().replace(/\s+/g, ''); // 小文字化して全てのスペースを除去
+            
+            if (val === "μ'sicforever" || val === "musicforever") {
                 isCommandActivated = true;
-                // 動画要素のロック解除
-                if (localVideo) localVideo.play().then(() => localVideo.pause()).catch(() => { });
-                playSecretSound();
-                playTitleBGM();
+                
+                stopTitleBGM(); // 確実にリセット
+                playSecretSound(); // 合言葉成立音（SE: シャン！）
+                playTitleBGM(true); // ★即座にBGM開始（動画の状態を無視）
+                
+                // 動画要素のロック解除（BGMとは並行して実行）
+                if (localVideo) {
+                    localVideo.play().then(() => localVideo.pause()).catch(() => { });
+                }
+
                 showSongList();
                 updateCommandUI(true);
                 el.value = '';
                 document.getElementById('chart-input-modal').style.display = 'none';
+                showToast("μ'sic forever! 選曲リストを解放しました。");
                 return;
             }
+
+            // 合言葉に似ているが一致しない場合の救済（JSONとして明らかに不正な場合）
+            if (rawVal.includes("'sic") || rawVal.includes("forever")) {
+                showToast("合言葉が少し違うようです。確認してみてください。");
+                return;
+            }
+
             // 合言葉でなければ通常の譜面として反映
             applyTextChart();
         }
@@ -1512,7 +1933,7 @@
                 list.innerHTML = '';
                 songs.forEach(s => {
                     const b = document.createElement('button');
-                    b.className = "flex-shrink-0 w-[45%] max-w-[160px] h-48 bg-blue-900/40 hover:scale-95 active:scale-90 border-2 border-blue-500/20 rounded-[2rem] transition-all snap-center animate-fade-in relative overflow-hidden group flex flex-col shadow-lg";
+                    b.className = "flex-shrink-0 w-[45%] max-w-[160px] h-52 bg-blue-900/40 hover:scale-95 active:scale-90 border-2 border-blue-500/20 rounded-[2rem] transition-all snap-center animate-fade-in relative overflow-hidden group flex flex-col shadow-lg";
                     b.style.touchAction = 'pan-x'; // スワイプ優先設定
                     b.style.webkitUserDrag = 'none';
 
@@ -1526,12 +1947,12 @@
 
                     // 曲名コンテナ
                     const info = document.createElement('div');
-                    info.className = "w-full p-2 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center flex-1";
+                    info.className = "w-full p-1.5 bg-gradient-to-t from-black/95 to-transparent flex items-center justify-center flex-1";
                     info.style.pointerEvents = 'none'; // テキストがスクロールを邪魔しないように
                     info.innerHTML = `
-                        <div class="flex flex-col items-center">
-                            <span class="text-[10px] font-black italic text-white leading-tight drop-shadow-lg text-center px-1">${s.name}</span>
-                            <span class="text-[7px] text-blue-300/80 font-bold opacity-80 mt-1 tracking-wider">${s.release_date || ''}</span>
+                        <div class="flex flex-col items-center justify-center">
+                            <span class="text-[9px] font-black italic text-white leading-[1.1] drop-shadow-lg text-center px-1 mb-0.5">${s.name}</span>
+                            <span class="text-[7px] text-blue-300/80 font-bold opacity-80 tracking-wider">${s.release_date || ''}</span>
                         </div>`;
 
                     b.appendChild(img);
@@ -1557,7 +1978,8 @@
                         ...song,
                         video: fix(song.video),
                         jacket: fix(song.jacket),
-                        charts: newCharts
+                        charts: newCharts,
+                        preview_start: song.preview_start || 0
                     };
                 });
                 AUTO_SONG_LIST = songsStore;
@@ -1567,6 +1989,27 @@
                 renderList(BACKUP_SONG_LIST);
             }
         }
+        function updateStartButtons(enabled) {
+            const startBtn = document.getElementById('btn-start-game');
+            const editBtn = document.getElementById('btn-start-edit');
+            if (startBtn) {
+                if (enabled) {
+                    startBtn.classList.remove('opacity-30', 'pointer-events-none');
+                    startBtn.innerText = "プレイ開始";
+                } else {
+                    startBtn.classList.add('opacity-30', 'pointer-events-none');
+                    startBtn.innerText = "難易度を選択してください";
+                }
+            }
+            if (editBtn) {
+                if (enabled) {
+                    editBtn.classList.remove('opacity-30', 'pointer-events-none');
+                } else {
+                    editBtn.classList.add('opacity-30', 'pointer-events-none');
+                }
+            }
+        }
+
         async function selectSong(s) {
             currentSelectedSong = s;
             isVideoReady = true;
@@ -1590,15 +2033,53 @@
             localVideo.style.opacity = "0.6";
             localVideo.loop = true; // プレビュー時はループ再生
             localVideo.src = s.video;
-            localVideo.oncanplay = () => {
-                prevStatus.innerText = `🎵 プレビュー再生準備完了: ${s.name}`; 
-                prevStatus.className = "text-[10px] text-green-400 font-bold";
-                if(status) { status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2"; }
+            
+            // サビ再生用イベントの設定
+            const previewStart = s.preview_start || 0;
+            const previewEnd = previewStart + 30; // 30秒間プレビュー
+            
+            // 既存のプレビューループリスナーを削除
+            if (localVideo._previewLoopListener) {
+                localVideo.removeEventListener('timeupdate', localVideo._previewLoopListener);
+                localVideo._previewLoopListener = null;
+            }
+
+            localVideo.onloadedmetadata = () => {
+                prevStatus.innerText = `🎵 「${s.name}」 サビプレビュー準備中...`; 
+                prevStatus.className = "text-[10px] text-blue-400 font-bold";
+                if(status) { status.innerText = `楽曲情報読込済: ${s.name}`; status.className = "text-[9px] text-blue-400 font-bold mt-2"; }
                 
-                localVideo.play().catch(() => console.log("Auto-preview blocked"));
-                localVideo.oncanplay = null;
+                const doPreview = () => {
+                    localVideo.volume = 0;
+                    localVideo.play().then(() => {
+                        prevStatus.innerText = `🎵 「${s.name}」 サビプレビュー再生中...`; 
+                        prevStatus.className = "text-[10px] text-green-400 font-bold";
+                        fadeVideoVolume(1.0, 300);
+                    }).catch(() => console.log("Auto-preview blocked"));
+                    localVideo.onloadedmetadata = null;
+                    localVideo.onseeked = null;
+                };
+
+                // サビ位置にシーク
+                if (previewStart > 0 && Math.abs(localVideo.currentTime - previewStart) > 0.5) {
+                    localVideo.onseeked = doPreview;
+                    localVideo.currentTime = previewStart;
+                    // シークが遅い場合でも3秒後には強制再生
+                    setTimeout(() => { if(localVideo.onseeked) doPreview(); }, 3000);
+                } else {
+                    doPreview();
+                }
+
+                // サビ終了位置でループさせるリスナー
+                localVideo._previewLoopListener = () => {
+                    if (localVideo.currentTime >= previewEnd) {
+                        localVideo.currentTime = previewStart;
+                    }
+                };
+                localVideo.addEventListener('timeupdate', localVideo._previewLoopListener);
             };
             localVideo.load();
+            updateStartButtons(false);
 
             // 難易度パネルの更新と表示
             const diffBox = document.getElementById('difficulty-box');
@@ -1639,30 +2120,36 @@
             const chartUrl = song.charts[diff];
             const chartStatus = document.getElementById('chart-file-status');
 
-            // サーバーからの読み込みを優先するため、保存済みデータの自動復旧を一旦無効化、または後に回します
-            /*
-            const savedData = loadChartFromLocal();
-            if (savedData) {
-                recordedChart = savedData;
-                CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました`;
-                chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
-                syncEditorNotes();
-                return;
+            // ローカル保存譜面の復旧確認 (同一セッション内では1回のみ)
+            const restoreKey = `${song.name}_${diff}`;
+            if (!askedRestoreKeys.has(restoreKey)) {
+                const savedData = loadChartFromLocal();
+                if (savedData && savedData.length > 0) {
+                    askedRestoreKeys.add(restoreKey);
+                    if (confirm(`この曲の保存済み譜面データ(${savedData.length}個)が見つかりました。復旧しますか？\n(キャンセルするとサーバーのデフォルト譜面をロードします)`)) {
+                        recordedChart = savedData;
+                        CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                        chartStatus.innerText = `[${diff}] ローカル保存済みの譜面を復旧しました`;
+                        chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                        syncEditorNotes();
+                        updateStartButtons(true);
+                        return;
+                    }
+                }
             }
-            */
 
             if (!chartUrl) {
                 CHART = []; recordedChart = [];
                 chartStatus.innerText = `[${diff}] 新規作成 (譜面データなし)`;
                 chartStatus.className = "text-[9px] text-yellow-400 mt-1";
                 syncEditorNotes();
+                updateStartButtons(true);
                 return;
             }
             showLoading("譜面を取得中...");
             try {
-                // 開発版・安定版のいずれからでもアクセスできるようにパスを解決
-                const response = await fetch(`${BASE_PATH}${chartUrl}?v=${Date.now()}`);
+                // `chartUrl` はすでに showSongList で BASE_PATH が付与されているため、そのまま使用する
+                const response = await fetch(`${chartUrl}?v=${Date.now()}`);
                 const txt = await response.text();
                 document.getElementById('chart-input').value = txt;
 
@@ -1686,6 +2173,7 @@
                 }
                 showToast(`${diff} 譜面を読み込みました！`);
                 syncEditorNotes();
+                updateStartButtons(true);
             } catch (e) { showToast("譜面の取得に失敗しました"); }
             hideLoading();
         }
@@ -1713,7 +2201,7 @@
             return idx;
         }
 
-        function tryInteractNoteAt(mx, my) {
+        function tryInteractNoteAt(mx, my, isLongPress = false) {
             if (!isEditMode) return false;
             const rect = canvas.getBoundingClientRect();
             const x = (mx - rect.left) * (canvas.width / rect.width);
@@ -1722,6 +2210,7 @@
             const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
             const ct = localVideo.currentTime;
             
+            const candidates = [];
             for (let i = activeNotes.length - 1; i >= 0; i--) {
                 const n = activeNotes[i];
                 const tb = buttons[n.lane];
@@ -1730,26 +2219,100 @@
                 const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
                 const dist = Math.hypot(x - hx, y - hy);
                 if (dist < buttonRadius * 1.5) {
-                    if (editorSelectedNote && Math.abs(editorSelectedNote.time - n.time) < 0.005 && editorSelectedNote.lane === n.lane) {
-                        recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - n.time) < 0.005 && rn.lane === n.lane));
-                        activeNotes.splice(i, 1);
-                        editorSelectedNote = null;
-                        syncEditorNotes();
-                        draw(ct); 
-                        showToast("ノートを削除しました", 1500);
-                    } else {
-                        editorSelectedNote = { time: n.time, lane: n.lane };
-                        draw(ct);
-                        showToast("選択状態 (再度押すと削除)", 1500);
-                    }
+                    candidates.push(n);
+                }
+            }
+
+            if (candidates.length === 0) return false;
+
+            if (isLongPress && candidates.length > 0) {
+                openNoteSelector(candidates);
+                return true;
+            }
+
+            // 通常タップ: 重なっている場合は、選択されていないものを優先的に選ぶ
+            let target = candidates[0];
+            if (editorSelectedNote) {
+                const alreadySelected = candidates.find(c => Math.abs(c.time - editorSelectedNote.time) < 0.005 && c.lane === editorSelectedNote.lane);
+                if (alreadySelected) {
+                    // すでに選択されているものを再度タップした場合は削除
+                    deleteNote(alreadySelected.time, alreadySelected.lane);
                     return true;
                 }
             }
-            if (editorSelectedNote) {
-                editorSelectedNote = null;
-                draw(ct);
-            }
-            return false;
+
+            editorSelectedNote = { time: target.time, lane: target.lane };
+            draw(ct);
+            showToast("選択状態 (再度押すと削除 / 長押しで一覧表示)", 2000);
+            return true;
+        }
+
+        function deleteNote(time, lane) {
+            recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - time) < 0.005 && rn.lane === lane));
+            activeNotes = activeNotes.filter(n => !(Math.abs(n.time - time) < 0.005 && n.lane === lane));
+            editorSelectedNote = null;
+            syncEditorNotes();
+            draw(localVideo.currentTime);
+            showToast("ノートを削除しました", 1500);
+        }
+
+        function openNoteSelector(notes) {
+            const list = document.getElementById('note-selector-list');
+            list.innerHTML = '';
+            
+            // 時間順にソート
+            notes.sort((a, b) => a.time - b.time);
+
+            notes.forEach(n => {
+                const btn = document.createElement('div');
+                btn.className = 'note-item-btn cursor-pointer';
+                if (editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane) {
+                    btn.classList.add('selected');
+                }
+                
+                const timeStr = n.time.toFixed(3);
+                const laneNames = ['LEFT 1', 'LEFT 2', 'LEFT 3', 'LEFT 4', 'CENTER', 'RIGHT 4', 'RIGHT 3', 'RIGHT 2', 'RIGHT 1'];
+                const laneName = laneNames[n.lane];
+                const typeName = n.endTime ? "HOLD" : "TAP";
+                
+                btn.innerHTML = `
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-2">
+                             <span class="w-1.5 h-1.5 rounded-full" style="background: rgb(${LANE_COLORS[n.lane]})"></span>
+                             <span class="text-[10px] font-black italic text-white">${laneName}</span>
+                        </div>
+                        <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${typeName} @ ${timeStr}s</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 bg-blue-600/40 hover:bg-blue-500/60 rounded-lg text-[8px] font-bold uppercase tracking-widest">選択</button>
+                        <button class="px-3 py-1 bg-red-600/40 hover:bg-red-500/60 rounded-lg text-[8px] font-bold uppercase tracking-widest">削除</button>
+                    </div>
+                `;
+
+                // 選択ボタン
+                btn.querySelectorAll('button')[0].onclick = (e) => {
+                    e.stopPropagation();
+                    editorSelectedNote = { time: n.time, lane: n.lane };
+                    closeNoteSelector();
+                    draw(localVideo.currentTime);
+                    showToast("ノートを選択しました");
+                };
+
+                // 削除ボタン
+                btn.querySelectorAll('button')[1].onclick = (e) => {
+                    e.stopPropagation();
+                    deleteNote(n.time, n.lane);
+                    closeNoteSelector();
+                };
+
+                list.appendChild(btn);
+            });
+            
+            document.getElementById('note-selector-screen').style.display = 'flex';
+        }
+
+        function closeNoteSelector() {
+            document.getElementById('note-selector-screen').style.display = 'none';
         }
 
         function setupInput() {
@@ -1760,7 +2323,9 @@
                 if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return; 
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
                 if (l !== -1) {
-                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+                    const ae = document.activeElement;
+                    const isTextInput = ae && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && !['range', 'checkbox', 'radio', 'button', 'submit'].includes(ae.type)));
+                    if (isTextInput) return;
                     e.preventDefault();
                     e.stopPropagation();
                     sH(l); 
@@ -1803,7 +2368,9 @@
                 if (e.ctrlKey || e.metaKey || e.altKey) return;
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
                 if (l !== -1) {
-                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+                    const ae = document.activeElement;
+                    const isTextInput = ae && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && !['range', 'checkbox', 'radio', 'button', 'submit'].includes(ae.type)));
+                    if (isTextInput) return;
                     e.preventDefault();
                     e.stopPropagation();
                     eH(l); 
@@ -1814,7 +2381,14 @@
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
-                    if (isEditMode && tryInteractNoteAt(t.clientX, t.clientY)) continue;
+                    if (isEditMode) {
+                        touchStartPos = { x: t.clientX, y: t.clientY };
+                        isLongPressing = false;
+                        longPressTimer = setTimeout(() => {
+                            isLongPressing = true;
+                            tryInteractNoteAt(t.clientX, t.clientY, true);
+                        }, 500);
+                    }
                     const l = getNearestLane(t.clientX, t.clientY);
                     if (l !== -1) {
                         activeTouches.set(t.identifier, l);
@@ -1824,16 +2398,44 @@
             }, { passive: false });
 
             canvas.addEventListener('mousedown', (e) => {
-                e.preventDefault(); // ダブルクリック時のテキスト全選択を防止
-                if (isEditMode && tryInteractNoteAt(e.clientX, e.clientY)) return;
+                e.preventDefault(); 
+                if (isEditMode) {
+                    touchStartPos = { x: e.clientX, y: e.clientY };
+                    isLongPressing = false;
+                    longPressTimer = setTimeout(() => {
+                        isLongPressing = true;
+                        tryInteractNoteAt(e.clientX, e.clientY, true);
+                    }, 500);
+                }
                 const l = getNearestLane(e.clientX, e.clientY);
                 if (l !== -1) sH(l);
             });
 
+            const handleMove = (e) => {
+                if (longPressTimer) {
+                    const pos = e.touches ? e.touches[0] : e;
+                    const dist = Math.hypot(pos.clientX - touchStartPos.x, pos.clientY - touchStartPos.y);
+                    if (dist > 10) { clearTimeout(longPressTimer); longPressTimer = null; }
+                }
+            };
+            canvas.addEventListener('mousemove', handleMove);
+            canvas.addEventListener('touchmove', handleMove);
+
             const handleEnd = (e) => {
+                if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+                if (isLongPressing) { isLongPressing = false; return; }
+                
+                if (isEditMode && e.clientX !== undefined) {
+                    // マウスアップ時に通常選択判定を実行 (マウスのみ)
+                    if (tryInteractNoteAt(e.clientX, e.clientY)) return;
+                }
+
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
+                    // タッチエンド時に通常選択判定
+                    if (isEditMode && tryInteractNoteAt(t.clientX, t.clientY)) continue;
+
                     const l = activeTouches.get(t.identifier);
                     if (l !== undefined) {
                         eH(l);
@@ -1844,10 +2446,22 @@
 
             canvas.addEventListener('touchend', handleEnd, { passive: false });
             canvas.addEventListener('touchcancel', handleEnd, { passive: false });
+            canvas.addEventListener('mouseup', handleEnd);
         }
 
-        async function startLive(editMode = false) {
+        async function startLive(editMode = false, autoPlay = false, ghostReplay = false) {
+            // 前回のプレイ状態を完全に断ち切る
+            isPlaying = false;
+            isEditMode = false; 
+            isEditorTestPlay = false;
+
             initAudio(); playStartSound(); stopTitleBGM();
+            isAutoPlay = autoPlay;
+            isGhostReplay = ghostReplay;
+            ghostRecordIndex = 0;
+            if (!isAutoPlay && !isGhostReplay && !editMode) {
+                userPlayRecord = []; // 新しい実際のプレイ開始時に記録をリセット
+            }
             
             const song = currentSelectedSong;
             if (isCommandActivated && song && !localVideo.src) {
@@ -1877,32 +2491,75 @@
             }
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
-            score = 0; combo = 0; maxCombo = 0; counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
-            stamina = 100; gameCurrentTime = 0;
-            recordedChart = isEditMode ? JSON.parse(JSON.stringify(CHART)) : [];
-            notesQueue = isEditMode ? [] : [...CHART];
-            activeNotes = []; hitEffects = [];
-            lanePressed.fill(false); activeTouches.clear(); updateUI();
-            
             const jEl = document.getElementById('judge-display'); 
             jEl.innerText = "READY?"; 
             jEl.className = "text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest";
-            syncEditorNotes();
+            
+            // 重要な変数を先行してリセット（非同期のdoPlay待ちの間、古い判定が走らないようにする）
+            stamina = 100; score = 0; combo = 0; maxCombo = 0;
+            activeNotes = []; notesQueue = []; hitEffects = [];
+            updateUI();
 
             // 動画の設定
             localVideo.style.display = 'block';
             localVideo.style.opacity = isEditMode ? "0.7" : "0.4";
             localVideo.loop = false;
+            
+            // 再生速度の初期化
+            if (isEditMode) {
+                const speedSel = document.getElementById('editor-speed-select');
+                if (speedSel) localVideo.playbackRate = parseFloat(speedSel.value) || 1.0;
+            } else {
+                localVideo.playbackRate = 1.0;
+            }
+
+            // 1. サビプレビューに関連するすべてのイベントとリスナーを強制解除
+            localVideo.onloadedmetadata = null;
+            localVideo.oncanplay = null;
+            localVideo.onseeked = null;
+            
+            if (localVideo._previewLoopListener) {
+                localVideo.removeEventListener('timeupdate', localVideo._previewLoopListener);
+                localVideo._previewLoopListener = null;
+            }
+            
+            // 2. 音声フェードの中断とミュート準備
+            if (window._fadeTimer) {
+                clearInterval(window._fadeTimer);
+                window._fadeTimer = null;
+            }
+            localVideo.volume = 0;
+
             document.getElementById('buffering-overlay').style.display = 'none';
 
             // ゲーム開始・UI遷移の実行
             const doPlay = async () => {
+                // 二重起動防止
+                if (isPlaying) return;
+
                 // UIを一気にプレイモードへ切り替え
                 document.getElementById('start-screen').style.display = 'none';
                 document.getElementById('launcher-screen').style.display = 'none';
                 document.getElementById('ui-overlay').style.display = 'block';
                 document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
                 document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
+                // doPlay 直前ですべてのリセットを実行
+                score = 0; combo = 0; maxCombo = 0; stamina = 100;
+                counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0, fast: 0, slow: 0 };
+                
+                // エディットモード有効時のみ、CHARTからrecordedChartを初期化。
+                // プレイモード開始時は、既存のrecordedChart（エディット中の内容）を保護する。
+                if (isEditMode) {
+                    recordedChart = JSON.parse(JSON.stringify(CHART));
+                }
+                
+                notesQueue = isEditMode ? [] : [...CHART];
+                activeNotes = []; hitEffects = [];
+                lanePressed.fill(false); activeTouches.clear();
+                gameCurrentTime = 0;
+                updateUI();
+                syncEditorNotes();
+
                 if (isEditMode) {
                     showHelpOnPC(); // エディター時のみ表示を検討
                 } else {
@@ -1918,7 +2575,9 @@
                 requestAnimationFrame(update);
                 
                 try {
+                    localVideo.volume = 0;
                     await localVideo.play();
+                    fadeVideoVolume(1.0, 800);
                 } catch(e) {
                     console.warn("Video play failed:", e);
                 }
@@ -1979,6 +2638,30 @@
                     while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) {
                         activeNotes.push({ ...notesQueue.shift(), status: 'waiting' });
                     }
+
+                    // オートプレイ（鑑賞リプレイ）ロジック
+                    if (isAutoPlay && !isEditMode) {
+                        for (let i = activeNotes.length - 1; i >= 0; i--) {
+                            const n = activeNotes[i];
+                            if (n.status === 'waiting' && ct >= n.time) {
+                                activeNotes.splice(i, 1);
+                                processResult(0, buttons[n.lane], n.lane);
+                            }
+                        }
+                    }
+
+                    // ゴーストプレイ（ユーザー記録リプレイ）ロジック
+                    if (isGhostReplay && !isEditMode) {
+                        while (ghostRecordIndex < userPlayRecord.length && userPlayRecord[ghostRecordIndex].time <= ct) {
+                            const action = userPlayRecord[ghostRecordIndex];
+                            if (action.type === 'start') {
+                                handleInputStart(action.lane, true);
+                            } else if (action.type === 'end') {
+                                handleInputEnd(action.lane, true);
+                            }
+                            ghostRecordIndex++;
+                        }
+                    }
                     
                     if (!isEditMode) {
                         document.getElementById('time-display').innerText = `${ct.toFixed(2)}s`;
@@ -2014,6 +2697,12 @@
             resultTitle.innerText = "LIVE FAILED";
             resultTitle.className = "text-5xl font-black mb-4 italic text-red-600 animate-pulse tracking-tighter text-center px-12 overflow-visible min-w-full";
 
+            const ghostBtn = document.getElementById('btn-result-ghost');
+            if (ghostBtn) {
+                if (userPlayRecord.length > 0) ghostBtn.classList.remove('hidden');
+                else ghostBtn.classList.add('hidden');
+            }
+
             document.getElementById('ui-overlay').style.opacity = '0';
             document.getElementById('result-screen').style.display = 'flex';
 
@@ -2036,6 +2725,10 @@
             document.getElementById('res-good').innerText = counts.good;
             document.getElementById('res-bad').innerText = counts.bad;
             document.getElementById('res-miss').innerText = counts.miss;
+            const fastEl = document.getElementById('res-fast');
+            if (fastEl) fastEl.innerText = counts.fast || 0;
+            const slowEl = document.getElementById('res-slow');
+            if (slowEl) slowEl.innerText = counts.slow || 0;
             document.getElementById('res-combo').innerText = maxCombo;
         }
 
@@ -2124,8 +2817,11 @@
                         activeNotes.splice(i, 1);
                         if (n.status === 'holding') laneCurrentHoldNote[n.lane] = null;
                         if (!isEditMode) {
-                            counts.miss++; combo = 0; stamina -= 10;
-                            showJ("MISS", "text-red-500"); updateUI();
+                            // 開始1秒間はタイムジャンプ等による理不尽なミスを防ぐための保護期間
+                            if (ct > 1.0) {
+                                counts.miss++; combo = 0; stamina -= 10;
+                                showJ("MISS", "text-red-500"); updateUI();
+                            }
                         }
                     }
                 }
@@ -2330,13 +3026,19 @@
                 jEl.innerText = "TEST PLAY"; 
                 jEl.className = "text-2xl font-black text-blue-400 h-8 flex items-center justify-center italic tracking-widest";
 
-                // ライブ開始
+                // テストプレイ時は必ず 1倍速
+                localVideo.playbackRate = 1.0;
+
+                // 準備完了直前にリセットを実行
                 score = 0; combo = 0; maxCombo = 0; stamina = 100; gameCurrentTime = 0;
                 counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
+                recordedChart = JSON.parse(JSON.stringify(CHART)); // CHARTの内容をコピーして recordedChart に戻す
                 notesQueue = [...CHART];
                 activeNotes = []; hitEffects = [];
                 lanePressed.fill(false); activeTouches.clear();
                 updateUI();
+
+                // ライブ開始
 
                 gameStartTime = performance.now();
                 requestAnimationFrame(update);
@@ -2401,6 +3103,12 @@
             showHelpOnPC(); // PCならヘルプを出す
             document.getElementById('btn-back-to-editor').classList.add('hidden');
 
+            // 再生速度をエディターの設定に戻す
+            const speedSel = document.getElementById('editor-speed-select');
+            if (speedSel && localVideo) {
+                localVideo.playbackRate = parseFloat(speedSel.value) || 1.0;
+            }
+
             // 描画ループ再開
             requestAnimationFrame(update);
             showToast("エディターに復帰しました");
@@ -2429,12 +3137,18 @@
         }
         function applyTextChart() {
             const rawTxt = document.getElementById('chart-input').value.trim();
-            // 変数宣言や末尾セミコロンがあれば除去
-            const cleanTxt = rawTxt.replace(/^(const|let|var)\s+CHART\s*=\s*/, '').replace(/;\s*$/, '');
+            // 先頭や末尾にある変数定義、コメント、セミコロン等をより強力に削除
+            const cleanTxt = rawTxt
+                .replace(/^(\/\/.*|\/\*[\s\S]*?\*\/)/gm, '') // コメント削除
+                .replace(/^(const|let|var)\s+CHART\s*=\s*/, '')
+                .replace(/;\s*$/, '')
+                .trim();
             try {
                 let data = cleanTxt ? JSON.parse(cleanTxt) : [];
                 if (!Array.isArray(data)) throw new Error("配列形式である必要があります");
                 recordedChart = data;
+                // CHARTにも反映
+                CHART = [...recordedChart].sort((a, b) => a.time - b.time);
                 syncEditorNotes();
                 saveChartToLocal();
                 closeTextChart();
@@ -2448,6 +3162,12 @@
             isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; isEditMode = false;
             updateRecordingUI();
 
+            // 重要：サビプレビューのリピートを解除
+            if (localVideo && localVideo._previewLoopListener) {
+                localVideo.removeEventListener('timeupdate', localVideo._previewLoopListener);
+                localVideo._previewLoopListener = null;
+            }
+
             // ライブ中UIの「戻る」ボタンを元に戻す
             const liveBackBtn = document.getElementById('btn-live-back');
             if (liveBackBtn) {
@@ -2458,24 +3178,35 @@
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
             activeNotes = []; hitEffects = []; // 残留物を一掃
             if (localVideo) {
-                if (currentSelectedSong && isCommandActivated) {
-                    localVideo.currentTime = 0;
-                    localVideo.loop = true;
-                    localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
-                    localVideo.play().catch(() => { });
-                } else {
-                    localVideo.pause();
-                    localVideo.style.opacity = "0.6";
-                }
+                // フェードアウトしてから停止またはタイトル用に再設定
+                fadeVideoVolume(0, 400); 
+                setTimeout(() => {
+                    if (currentSelectedSong && isCommandActivated) {
+                        // 選曲画面（コマンド有効）へ戻る場合は、最後に選んでいた曲のサビプレビューを再開させる
+                        selectSong(currentSelectedSong);
+                    } else if (currentSelectedSong) {
+                        // コマンド無効（通常のスタート画面）へ戻る場合は背景動画として再生
+                        localVideo.currentTime = 0;
+                        localVideo.loop = true;
+                        localVideo.style.opacity = "0.6";
+                        localVideo.volume = 0;
+                        localVideo.play().then(() => {
+                            fadeVideoVolume(0.5, 1000);
+                        }).catch(() => { });
+                    } else {
+                        localVideo.pause();
+                        localVideo.style.opacity = "0.6";
+                    }
+                }, 400);
             }
             if (isCommandActivated) {
                 showSongList();
-                // プレイ済みの曲があればそのジャケットを表示
-                const jacketToUse = currentSelectedSong ? currentSelectedSong.jacket : 'assets/images/takaramonos.jpg';
+                // プレイ済みの曲があればそのジャケットを表示。なければFavicon等のデフォルトを使用
+                const jacketToUse = currentSelectedSong ? currentSelectedSong.jacket : BASE_PATH + 'assets/images/favicon.png';
                 updateCommandUI(true, jacketToUse);
 
-                // 動画プレビューがある場合はBGMを流さない（動画の音声を優先）
-                if (currentSelectedSong && localVideo && !localVideo.paused) {
+                // 動画プレビューがある、または再生予定の曲がある場合はBGMを流さない（動画の音声を優先）
+                if (currentSelectedSong || (localVideo && !localVideo.paused)) {
                     stopTitleBGM();
                 } else {
                     playTitleBGM();
@@ -2491,61 +3222,280 @@
             document.getElementById('editor-controls').style.display = 'none';
             document.getElementById('btn-skip-result').classList.add('hidden');
         }
-        function handleInputStart(l) { 
+
+        function retryLive() {
+            document.getElementById('result-screen').style.display = 'none';
+            startLive(false, false);
+        }
+
+        function startReplay() {
+            document.getElementById('result-screen').style.display = 'none';
+            // オートプレイ（鑑賞）モードで開始
+            startLive(false, true, false);
+        }
+
+        function startGhostReplay() {
+            document.getElementById('result-screen').style.display = 'none';
+            // ユーザー記録リプレイモードで開始
+            startLive(false, false, true);
+        }
+
+        function handleInputStart(l, isSimulated = false) { 
             if (lanePressed[l]) return; 
             lanePressed[l] = true; 
-            if (isEditMode) gameCurrentTime = localVideo.currentTime; // エディター時は入力時点を同期
+            if (isEditMode) gameCurrentTime = localVideo.currentTime; 
             lanePressStartTime[l] = gameCurrentTime; 
-            // 記録モード中かつ（再生中 または 停止中のステップ入力）なら記録
+            
+            if (!isEditMode && !isAutoPlay && !isGhostReplay && !isSimulated) {
+                userPlayRecord.push({ type: 'start', lane: l, time: gameCurrentTime });
+            }
+
             if (isEditMode && isRecording) { 
-                playTapSound(); 
+                playTapSound(l); 
                 recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); 
                 syncEditorNotes(); 
             } else if (!isEditMode) {
                 judgeStart(l);
             } else { 
-                // 非記録モード時は、単に音を鳴らして視覚フィードバックを出すだけ
-                playTapSound(); 
+                playTapSound(l); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); 
             } 
             if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
         }
-        function handleInputEnd(l) { 
+        function handleInputEnd(l, isSimulated = false) { 
             if (!lanePressed[l]) return; 
             lanePressed[l] = false; 
             const ct = gameCurrentTime; 
+            
+            if (!isEditMode && !isAutoPlay && !isGhostReplay && !isSimulated) {
+                userPlayRecord.push({ type: 'end', lane: l, time: gameCurrentTime });
+            }
+
             if (isEditMode && isRecording) { 
-                const dur = ct - lanePressStartTime[l]; 
-                if (dur > 0.2) { 
-                    const last = recordedChart.filter(n => n.lane === l).pop(); 
-                    if (last) last.endTime = parseFloat(ct.toFixed(2)); 
-                } 
-                syncEditorNotes(); 
+                 const dur = ct - lanePressStartTime[l]; 
+                 if (dur > 0.2) { 
+                     const last = recordedChart.filter(n => n.lane === l).pop(); 
+                     if (last) last.endTime = parseFloat(ct.toFixed(2)); 
+                 } 
+                 syncEditorNotes(); 
             } else if (!isEditMode) judgeEnd(l);
             if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
         }
-        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound('PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } else { playTapSound(); } }
-        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const d = Math.abs(ct - n.endTime); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(d, buttons[l]); else { playTapSound('MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); } }
-        function processResult(d, tb) {
+
+        // --- キーコンフィグ関連 ---
+        let configActiveIndex = -1;
+        function openSeSettings() {
+            initAudio();
+            const seVal = Math.round(seVol * 100);
+            const bgmVal = Math.round(bgmVol * 100);
+            const seSlider = document.getElementById('se-vol-slider');
+            const bgmSlider = document.getElementById('bgm-vol-slider');
+            const seDisp = document.getElementById('se-vol-value');
+            const bgmDisp = document.getElementById('bgm-vol-value');
+            
+            if (seSlider) seSlider.value = seVal;
+            if (bgmSlider) bgmSlider.value = bgmVal;
+            if (seDisp) seDisp.innerText = seVal + '%';
+            if (bgmDisp) bgmDisp.innerText = bgmVal + '%';
+
+            const list = document.getElementById('se-preset-list');
+            list.innerHTML = '';
+            const presets = [
+                { id: 'drums', name: 'Drum Set', desc: 'レーンごとに異なるドラム音' },
+                { id: 'tambourine', name: 'Tambourine', desc: 'スクフェス風のシャンシャン音' },
+                { id: 'click', name: 'Digital Click', desc: 'タイトで聞き取りやすい電子音' },
+                { id: 'piano', name: 'Piano', desc: '美しいピアノの旋律' },
+                { id: 'elec-guitar', name: 'Electric Guitar', desc: '歪みの効いたリードギター' },
+                { id: 'acou-guitar', name: 'Acoustic Guitar', desc: '明るいアコースティックの響き' },
+                { id: 'bass', name: 'Bass Guitar', desc: '深く響く低音ベース' }
+            ];
+
+            presets.forEach(p => {
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${currentSeSet === p.id ? 'border-blue-500 bg-blue-500/10' : 'border-white/5 bg-white/5 hover:bg-white/10'}`;
+                
+                item.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-black text-white italic uppercase">${p.name}</span>
+                        <span class="text-[8px] text-gray-500 font-bold">${p.desc}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="event.stopPropagation(); initAudio(); playTapSound(Math.floor(Math.random()*9), 'PERFECT', '${p.id}');" class="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-full text-[10px]">▶</button>
+                        <button onclick="saveSeSet('${p.id}'); openSeSettings();" class="px-4 py-1 rounded-full text-[9px] font-black tracking-widest uppercase ${currentSeSet === p.id ? 'bg-blue-500 text-white' : 'bg-white/10 text-gray-400'}">
+                            ${currentSeSet === p.id ? 'SET' : 'SELECT'}
+                        </button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            document.getElementById('se-settings-screen').style.display = 'flex';
+        }
+
+        function openKeyConfig() {
+            const list = document.getElementById('key-config-list');
+            list.innerHTML = '';
+            KEY_MAP.forEach((k, i) => {
+                const item = document.createElement('div');
+                item.className = 'key-config-item cursor-pointer';
+                item.id = `key-config-${i}`;
+                item.onclick = () => activateKeyBinding(i);
+                
+                const laneName = ['LEFT 1', 'LEFT 2', 'LEFT 3', 'LEFT 4', 'CENTER', 'RIGHT 4', 'RIGHT 3', 'RIGHT 2', 'RIGHT 1'][i];
+                item.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-gray-500 font-black uppercase tracking-tighter">${laneName}</span>
+                        <span class="text-[10px] font-bold text-white uppercase">${KEY_LABELS[i]}</span>
+                    </div>
+                    <div class="key-config-label">${KEY_LABELS[i] === ' ' ? 'SPC' : KEY_LABELS[i]}</div>
+                `;
+                list.appendChild(item);
+            });
+            document.getElementById('key-config-screen').style.display = 'flex';
+        }
+
+        function activateKeyBinding(index) {
+            if (configActiveIndex !== -1) {
+                document.getElementById(`key-config-${configActiveIndex}`).classList.remove('active');
+            }
+            configActiveIndex = index;
+            document.getElementById(`key-config-${index}`).classList.add('active');
+            
+            // 入力待ちリスナーを一度だけ追加
+            const waitKey = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (e.key === 'Escape') {
+                    deactivateKeyBinding();
+                    window.removeEventListener('keydown', waitKey, true);
+                    return;
+                }
+
+                const newKey = e.key.toLowerCase();
+                const newLabel = e.key.toUpperCase();
+                
+                KEY_MAP[configActiveIndex] = newKey === ' ' ? ' ' : newKey;
+                KEY_LABELS[configActiveIndex] = newKey === ' ' ? 'SPACE' : newLabel;
+                
+                localStorage.setItem('arcangel_key_map', JSON.stringify(KEY_MAP));
+                localStorage.setItem('arcangel_key_labels', JSON.stringify(KEY_LABELS));
+                
+                deactivateKeyBinding();
+                openKeyConfig(); // UI更新のために再描画
+                window.removeEventListener('keydown', waitKey, true);
+            };
+            window.addEventListener('keydown', waitKey, true);
+        }
+
+        function deactivateKeyBinding() {
+            if (configActiveIndex !== -1) {
+                const el = document.getElementById(`key-config-${configActiveIndex}`);
+                if (el) el.classList.remove('active');
+            }
+            configActiveIndex = -1;
+        }
+
+        function resetKeyConfig() {
+            if (!confirm('キー設定を初期状態に戻しますか？')) return;
+            KEY_MAP = ['a', 's', 'd', 'f', ' ', 'j', 'k', 'l', ';'];
+            KEY_LABELS = ['A', 'S', 'D', 'F', 'SPACE', 'J', 'K', 'L', ';'];
+            localStorage.removeItem('arcangel_key_map');
+            localStorage.removeItem('arcangel_key_labels');
+            openKeyConfig();
+        }
+
+        function closeKeyConfig() {
+            document.getElementById('key-config-screen').style.display = 'none';
+            deactivateKeyBinding();
+        }
+
+        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35, diff = 0; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; diff = ct - n.time; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound(l, 'PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(diff, buttons[l], l); } } else { playTapSound(l); } }
+        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l], l); else { playTapSound(l, 'MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
+        function processResult(diff, tb, lane) {
+            const d = Math.abs(diff);
             let judgment = "MISS";
-            if (d < 0.05) { judgment = "PERFECT"; score += 1000; counts.perfect++; combo++; stamina += 1.0; showJ("PERFECT", "text-yellow-400"); createHitEffect(tb.x, tb.y, '#facc15'); }
-            else if (d < 0.10) { judgment = "GREAT"; score += 800; counts.great++; combo++; stamina += 0.5; showJ("GREAT", "text-pink-400"); createHitEffect(tb.x, tb.y, '#f472b6'); }
-            else if (d < 0.15) { judgment = "GOOD"; score += 400; counts.good++; combo = 0; stamina -= 2; showJ("GOOD", "text-green-400"); createHitEffect(tb.x, tb.y, '#4ade80'); }
-            else if (d < 0.22) { judgment = "BAD"; score += 200; counts.bad++; combo = 0; stamina -= 5; showJ("BAD", "text-blue-400"); createHitEffect(tb.x, tb.y, '#60a5fa'); }
-            else { judgment = "MISS"; counts.miss++; combo = 0; stamina -= 10; showJ("MISS", "text-red-500"); }
+            let desc = "";
+            let colorCls = "";
+            
+            if (d > 0.05) {
+                if (diff < 0) { desc = "FAST"; counts.fast++; }
+                else { desc = "SLOW"; counts.slow++; }
+            }
 
-            playTapSound(judgment);
+            if (d < 0.05) { judgment = "PERFECT"; score += 1000; counts.perfect++; combo++; stamina += 1.0; colorCls = "text-yellow-400"; createHitEffect(tb.x, tb.y, '#facc15'); }
+            else if (d < 0.10) { judgment = "GREAT"; score += 800; counts.great++; combo++; stamina += 0.5; colorCls = "text-pink-400"; createHitEffect(tb.x, tb.y, '#f472b6'); }
+            else if (d < 0.15) { judgment = "GOOD"; score += 400; counts.good++; combo = 0; stamina -= 2; colorCls = "text-green-400"; createHitEffect(tb.x, tb.y, '#4ade80'); }
+            else if (d < 0.22) { judgment = "BAD"; score += 200; counts.bad++; combo = 0; stamina -= 5; colorCls = "text-blue-400"; createHitEffect(tb.x, tb.y, '#60a5fa'); }
+            else { judgment = "MISS"; counts.miss++; combo = 0; stamina -= 10; colorCls = "text-red-500"; }
 
-            // スタミナの範囲補正
+            playTapSound(lane, judgment);
+
             if (stamina < 0) stamina = 0;
             if (stamina > maxStamina) stamina = maxStamina;
-
             if (combo > maxCombo) maxCombo = combo;
+
+            // 50コンボごとのマイルストーン演出
+            if (judgment !== "MISS" && judgment !== "BAD" && combo > 0 && combo % 50 === 0) {
+                triggerComboMilestone(combo);
+            }
+
+            let detail = "";
+            if (judgment !== "MISS" && judgment !== "PERFECT") {
+                detail = `${desc} ${diff > 0 ? '+' : ''}${Math.round(diff * 1000)}ms`;
+            } else if (judgment === "PERFECT") {
+                detail = `±${Math.round(d * 1000)}ms`;
+            } else {
+                detail = "±---ms";
+            }
+            
+            showJ(judgment, colorCls, detail, diff);
             updateUI();
         }
         function createHitEffect(x, y, color) { hitEffects.push({ type: 'ring', x, y, size: buttonRadius, opacity: 1, color, speed: 6 }); for (let i = 0; i < 8; i++) { const a = Math.random() * Math.PI * 2, d = Math.random() * 4 + 2; hitEffects.push({ type: 'spark', x, y, vx: Math.cos(a) * d, vy: Math.sin(a) * d, size: Math.random() * 3 + 1, opacity: 1, color }); } }
-        function showJ(t, c) { const el = document.getElementById('judge-display'); el.innerText = t; el.className = `text-2xl font-black ${c} animate-bounce flex items-center justify-center h-8 italic tracking-widest`; }
+        function showJ(t, c, detail = "", diff = 0) { 
+            const el = document.getElementById('judge-display'); 
+            el.innerText = t; 
+            el.className = `text-3xl font-black ${c} flex items-center justify-center italic tracking-widest`; 
+            
+            el.style.animation = 'none';
+            void el.offsetWidth;
+            el.style.animation = 'pulse 0.2s cubic-bezier(0.4, 0, 0.6, 1)';
+
+            const detEl = document.getElementById('judge-detail-display');
+            if (detEl) {
+                detEl.innerText = detail;
+                if (t === "PERFECT") {
+                    detEl.className = "text-[12px] font-bold text-center h-4 opacity-80 tracking-widest text-yellow-200 drop-shadow-[0_0_8px_rgba(253,224,71,0.6)]";
+                } else if (t === "MISS") {
+                    detEl.className = "text-[12px] font-bold text-center h-4 opacity-60 tracking-widest text-red-700";
+                } else {
+                    detEl.className = `text-[12px] font-bold text-center h-4 opacity-100 tracking-widest ${diff < 0 ? 'text-blue-400' : 'text-red-400'}`;
+                }
+            }
+        }
+        function triggerComboMilestone(c) {
+            const canvasEl = document.getElementById('game-canvas');
+            if (canvasEl) {
+                canvasEl.classList.remove('animate-shake-screen');
+                void canvasEl.offsetWidth;
+                canvasEl.classList.add('animate-shake-screen');
+            }
+            const mileEl = document.getElementById('combo-milestone-display');
+            if (mileEl) {
+                mileEl.innerText = `${c} COMBO!`;
+                mileEl.classList.remove('animate-combo-burst');
+                void mileEl.offsetWidth;
+                mileEl.classList.add('animate-combo-burst');
+            }
+            for (let i = 0; i < 40; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const d = Math.random() * 18 + 5;
+                const x = canvas ? canvas.width / 2 : window.innerWidth / 2;
+                const y = canvas ? canvas.height / 2 : window.innerHeight / 2;
+                hitEffects.push({ type: 'spark', x, y, vx: Math.cos(a) * d, vy: Math.sin(a) * d, size: Math.random() * 5 + 3, opacity: 1, color: '#fbbf24' });
+            }
+        }
         function updateUI() {
             document.getElementById('score-display').innerText = `SCORE: ${score.toString().padStart(6, '0')}`;
             document.getElementById('combo-display').innerText = `COMBO: ${combo}`;
@@ -2572,6 +3522,13 @@
             if (isAllPerfect) { resultTitle.innerText = "ALL PERFECT!!"; resultTitle.className = "text-5xl font-black mb-4 italic text-rainbow tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"; }
             else if (isFullCombo) { resultTitle.innerText = "FULL COMBO!!"; resultTitle.className = "text-4xl font-black mb-4 italic text-yellow-300 tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]"; }
             else { resultTitle.innerText = "LIVE SUCCESS!"; resultTitle.className = "text-3xl font-black mb-4 italic text-green-400 tracking-tighter text-center px-12 overflow-visible min-w-full"; }
+            
+            const ghostBtn = document.getElementById('btn-result-ghost');
+            if (ghostBtn) {
+                if (userPlayRecord.length > 0) ghostBtn.classList.remove('hidden');
+                else ghostBtn.classList.add('hidden');
+            }
+
             document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('result-screen').style.display = 'flex';
             
             // --- エディターからのテストプレイ時は、戻り先をエディターに変更 ---
@@ -2595,6 +3552,12 @@
             document.getElementById('res-good').innerText = counts.good;
             document.getElementById('res-bad').innerText = counts.bad;
             document.getElementById('res-miss').innerText = counts.miss;
+            
+            const fastEl = document.getElementById('res-fast');
+            if (fastEl) fastEl.innerText = counts.fast || 0;
+            const slowEl = document.getElementById('res-slow');
+            if (slowEl) slowEl.innerText = counts.slow || 0;
+
             document.getElementById('res-combo').innerText = maxCombo;
         }
 
@@ -2647,6 +3610,45 @@
             location.reload();
         }
     </script>
+
+    <div id="se-settings-screen" class="overlay-screen" style="display: none;">
+        <div class="overlay-screen-content w-full max-w-[420px]">
+            <div class="bg-gray-900/90 border border-white/10 rounded-3xl p-8 backdrop-blur-xl relative">
+                <h2 class="text-2xl font-black text-white italic tracking-tighter mb-4 text-center">SE SETTINGS</h2>
+                
+                <!-- Volume Control -->
+                <div class="mb-6 flex flex-col gap-3">
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase">BGM Volume</span>
+                            <span id="bgm-vol-value" class="text-[10px] font-black text-blue-400">100%</span>
+                        </div>
+                        <input type="range" id="bgm-vol-slider" min="0" max="100" value="100" 
+                            class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                            oninput="updateBgmVolume(this.value)">
+                    </div>
+
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase">SE Volume</span>
+                            <span id="se-vol-value" class="text-[10px] font-black text-blue-400">100%</span>
+                        </div>
+                        <input type="range" id="se-vol-slider" min="0" max="200" value="100" 
+                            class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                            oninput="updateSeVolume(this.value)">
+                    </div>
+                </div>
+
+                <div id="se-preset-list" class="flex flex-col gap-2 w-full max-h-[50vh] overflow-y-auto pr-1 no-scrollbar">
+                    <!-- JavaScriptで生成 -->
+                </div>
+                
+                <button onclick="document.getElementById('se-settings-screen').style.display='none'" class="mt-8 btn-secondary w-full py-4 rounded-2xl font-bold text-[11px] tracking-widest uppercase">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
