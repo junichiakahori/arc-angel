@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:05 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:10 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2910,6 +2910,12 @@
             isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; isEditMode = false;
             updateRecordingUI();
 
+            // 重要：サビプレビューのリピートを解除
+            if (localVideo && localVideo._previewLoopListener) {
+                localVideo.removeEventListener('timeupdate', localVideo._previewLoopListener);
+                localVideo._previewLoopListener = null;
+            }
+
             // ライブ中UIの「戻る」ボタンを元に戻す
             const liveBackBtn = document.getElementById('btn-live-back');
             if (liveBackBtn) {
@@ -2939,8 +2945,8 @@
             }
             if (isCommandActivated) {
                 showSongList();
-                // プレイ済みの曲があればそのジャケットを表示
-                const jacketToUse = currentSelectedSong ? currentSelectedSong.jacket : 'assets/images/takaramonos.jpg';
+                // プレイ済みの曲があればそのジャケットを表示。なければFavicon等のデフォルトを使用
+                const jacketToUse = currentSelectedSong ? currentSelectedSong.jacket : BASE_PATH + 'assets/images/favicon.png';
                 updateCommandUI(true, jacketToUse);
 
                 // 動画プレビューがある場合はBGMを流さない（動画の音声を優先）
