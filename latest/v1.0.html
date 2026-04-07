@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:58 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:05 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1758,6 +1758,27 @@
                 renderList(BACKUP_SONG_LIST);
             }
         }
+        function updateStartButtons(enabled) {
+            const startBtn = document.getElementById('btn-start-game');
+            const editBtn = document.getElementById('btn-start-edit');
+            if (startBtn) {
+                if (enabled) {
+                    startBtn.classList.remove('opacity-30', 'pointer-events-none');
+                    startBtn.innerText = "プレイ開始";
+                } else {
+                    startBtn.classList.add('opacity-30', 'pointer-events-none');
+                    startBtn.innerText = "難易度を選択してください";
+                }
+            }
+            if (editBtn) {
+                if (enabled) {
+                    editBtn.classList.remove('opacity-30', 'pointer-events-none');
+                } else {
+                    editBtn.classList.add('opacity-30', 'pointer-events-none');
+                }
+            }
+        }
+
         async function selectSong(s) {
             currentSelectedSong = s;
             isVideoReady = true;
@@ -1823,6 +1844,7 @@
                 localVideo.addEventListener('timeupdate', localVideo._previewLoopListener);
             };
             localVideo.load();
+            updateStartButtons(false);
 
             // 難易度パネルの更新と表示
             const diffBox = document.getElementById('difficulty-box');
@@ -1881,6 +1903,7 @@
                 chartStatus.innerText = `[${diff}] 新規作成 (譜面データなし)`;
                 chartStatus.className = "text-[9px] text-yellow-400 mt-1";
                 syncEditorNotes();
+                updateStartButtons(true);
                 return;
             }
             showLoading("譜面を取得中...");
@@ -1910,6 +1933,7 @@
                 }
                 showToast(`${diff} 譜面を読み込みました！`);
                 syncEditorNotes();
+                updateStartButtons(true);
             } catch (e) { showToast("譜面の取得に失敗しました"); }
             hideLoading();
         }
