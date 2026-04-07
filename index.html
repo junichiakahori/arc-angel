@@ -1280,7 +1280,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 08:18 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 08:37 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1422,7 +1422,7 @@
 
         // --- 音響処理 ---
         let currentSeSet = localStorage.getItem('arcangel_se_set') || 'drums';
-        let seMasterGain;
+        let seMasterGain, bgmMasterGain, videoFadeGain, bgmSourceNode, videoSourceNode;
         let seVol = parseFloat(localStorage.getItem('arcangel_se_vol') || '1.0');
         let bgmVol = parseFloat(localStorage.getItem('arcangel_bgm_vol') || '0.5');
 
@@ -1431,9 +1431,28 @@
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // SE用
                 seMasterGain = audioCtx.createGain();
                 seMasterGain.gain.setValueAtTime(seVol, audioCtx.currentTime);
                 seMasterGain.connect(audioCtx.destination);
+
+                // BGM用 (マスターボリューム)
+                bgmMasterGain = audioCtx.createGain();
+                bgmMasterGain.gain.setValueAtTime(bgmVol, audioCtx.currentTime);
+                bgmMasterGain.connect(audioCtx.destination);
+
+                // 動画・BGM個別のフェード用ゲイン
+                videoFadeGain = audioCtx.createGain();
+                videoFadeGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                videoFadeGain.connect(bgmMasterGain);
+                
+                if (localVideo) {
+                    try {
+                        videoSourceNode = audioCtx.createMediaElementSource(localVideo);
+                        videoSourceNode.connect(videoFadeGain);
+                    } catch(e) { console.error("Video audio routing failed:", e); }
+                }
 
                 const bufferSize = audioCtx.sampleRate * 0.1; noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const d = noiseBuffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) d[i] = Math.random() * 2 - 1;
@@ -1456,10 +1475,14 @@
             localStorage.setItem('arcangel_bgm_vol', bgmVol);
             const valDisp = document.getElementById('bgm-vol-value');
             if (valDisp) valDisp.innerText = val + '%';
+            
+            // iOS対応: GainNodeを更新
+            if (bgmMasterGain) {
+                bgmMasterGain.gain.setTargetAtTime(bgmVol, audioCtx.currentTime, 0.05);
+            }
+            
+            // 下記の旧来の直接指定はiOSでは無効だが、PCブラウザの互換性のため残す
             if (bgmAudio) bgmAudio.volume = bgmVol;
-            // プレイ中の動画音量は、現在のフェード目標を反映させるのが難しいため、
-            // 次回のフェードイベントまたは直接設定時に反映される。
-            // 鑑賞モード等で一定音量の場合は、即座に反映させる。
             if (localVideo && !isPlaying && !localVideo.paused) {
                 localVideo.volume = bgmVol;
             }
@@ -1848,11 +1871,22 @@
                 bgmAudio = null;
             }
             // 動画再生中（プレビュー中）であれば、タイトルBGMは再生しない（強制フラグが立っていない場合のみ）
-            if (!force && localVideo && !localVideo.paused && localVideo.volume > 0.1) return;
+            if (!force && localVideo && !localVideo.paused && (videoFadeGain ? videoFadeGain.gain.value > 0.1 : localVideo.volume > 0.1)) return;
             
-            bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); 
+            bgmAudio = new Audio();
+            bgmAudio.crossOrigin = "anonymous"; // WebAudioルーティング用
+            bgmAudio.src = BASE_PATH + 'assets/bgm/title.mp3';
             bgmAudio.loop = true; 
-            bgmAudio.volume = bgmVol; 
+            bgmAudio.volume = bgmVol; // iOS以外用
+            
+            // iOS対応: GainNodeにルーティング
+            if (audioCtx) {
+                try {
+                    const s = audioCtx.createMediaElementSource(bgmAudio);
+                    s.connect(bgmMasterGain);
+                } catch(e) { console.warn("BGM routing failed:", e); }
+            }
+
             bgmAudio.play().catch(e => {
                 console.log('BGM Playback failed:', e);
                 // 失敗した場合はトーストで通知
@@ -1863,6 +1897,12 @@
         
         function fadeVideoVolume(target, duration = 500) {
             if (!localVideo) return;
+            // iOS対応: WebAudio APIのGainNodeフェードを優先
+            if (audioCtx && videoFadeGain) {
+                videoFadeGain.gain.setTargetAtTime(target, audioCtx.currentTime, duration / 1000 / 3);
+            }
+            
+            // 旧来のインターバルによるフェード（PC/Android用として維持）
             if (localVideo._fadeInterval) clearInterval(localVideo._fadeInterval);
             const start = localVideo.volume;
             const effectiveTarget = target * bgmVol;
@@ -1948,26 +1988,21 @@
                     // 曲名コンテナ
                     const info = document.createElement('div');
                     info.className = "w-full p-1.5 bg-gradient-to-t from-black/95 to-transparent flex items-center justify-center flex-1";
-                    info.style.pointerEvents = 'none'; // テキストがスクロールを邪魔しないように
+                    info.style.pointerEvents = 'none';
                     info.innerHTML = `
                         <div class="flex flex-col items-center justify-center">
                             <span class="text-[9px] font-black italic text-white leading-[1.1] drop-shadow-lg text-center px-1 mb-0.5">${s.name}</span>
                             <span class="text-[7px] text-blue-300/80 font-bold opacity-80 tracking-wider">${s.release_date || ''}</span>
                         </div>`;
-
                     b.appendChild(img);
                     b.appendChild(info);
                     b.onclick = () => selectSong(s);
                     list.appendChild(b);
                 });
             };
-
-            // API fetch replaced by JSON fetch
             try {
                 const response = await fetch(`${BASE_PATH}assets/songs.json?v=${Date.now()}`);
                 songsStore = await response.json();
-
-                // songs.json内の全パスを、現在の階層に合わせて調整
                 songsStore = songsStore.map(song => {
                     const fix = (p) => (p && p.startsWith('assets/')) ? BASE_PATH + p : p;
                     const newCharts = {};
@@ -2013,44 +2048,33 @@
         async function selectSong(s) {
             currentSelectedSong = s;
             isVideoReady = true;
-            
             const prevContainer = document.getElementById('preview-status-container');
             const prevStatus = document.getElementById('preview-status');
             if(prevContainer) prevContainer.classList.remove('hidden');
-            
             prevStatus.innerText = `「${s.name}」のプレビューをロード中...`; 
             prevStatus.className = "text-[10px] text-blue-400 font-bold animate-pulse";
-            
-            // ファイルステータスにも一応記載（裏側）
             const status = document.getElementById('file-status');
             if(status) { status.innerText = `「${s.name}」を準備中...`; status.className = "text-[9px] text-blue-400 font-bold mt-2"; }
-
             stopTitleBGM();
-            // 背景画像をクリア
             updateCommandUI(isCommandActivated, 'none');
-            // 動画プレビューを見せるため、動画表示をON
             localVideo.style.display = 'block';
             localVideo.style.opacity = "0.6";
-            localVideo.loop = true; // プレビュー時はループ再生
+            localVideo.loop = true;
+            localVideo.crossOrigin = "anonymous";
             localVideo.src = s.video;
-            
-            // サビ再生用イベントの設定
             const previewStart = s.preview_start || 0;
-            const previewEnd = previewStart + 30; // 30秒間プレビュー
-            
-            // 既存のプレビューループリスナーを削除
+            const previewEnd = previewStart + 30;
             if (localVideo._previewLoopListener) {
                 localVideo.removeEventListener('timeupdate', localVideo._previewLoopListener);
                 localVideo._previewLoopListener = null;
             }
-
             localVideo.onloadedmetadata = () => {
                 prevStatus.innerText = `🎵 「${s.name}」 サビプレビュー準備中...`; 
                 prevStatus.className = "text-[10px] text-blue-400 font-bold";
                 if(status) { status.innerText = `楽曲情報読込済: ${s.name}`; status.className = "text-[9px] text-blue-400 font-bold mt-2"; }
-                
                 const doPreview = () => {
                     localVideo.volume = 0;
+                    if (videoFadeGain) videoFadeGain.gain.setValueAtTime(0, audioCtx.currentTime);
                     localVideo.play().then(() => {
                         prevStatus.innerText = `🎵 「${s.name}」 サビプレビュー再生中...`; 
                         prevStatus.className = "text-[10px] text-green-400 font-bold";
@@ -2059,18 +2083,13 @@
                     localVideo.onloadedmetadata = null;
                     localVideo.onseeked = null;
                 };
-
-                // サビ位置にシーク
                 if (previewStart > 0 && Math.abs(localVideo.currentTime - previewStart) > 0.5) {
                     localVideo.onseeked = doPreview;
                     localVideo.currentTime = previewStart;
-                    // シークが遅い場合でも3秒後には強制再生
                     setTimeout(() => { if(localVideo.onseeked) doPreview(); }, 3000);
                 } else {
                     doPreview();
                 }
-
-                // サビ終了位置でループさせるリスナー
                 localVideo._previewLoopListener = () => {
                     if (localVideo.currentTime >= previewEnd) {
                         localVideo.currentTime = previewStart;
@@ -2080,19 +2099,13 @@
             };
             localVideo.load();
             updateStartButtons(false);
-
-            // 難易度パネルの更新と表示
             const diffBox = document.getElementById('difficulty-box');
             diffBox.classList.remove('hidden');
             const btns = diffBox.querySelectorAll('.btn-diff');
             btns.forEach(b => {
                 const diff = b.innerText;
                 b.classList.remove('selected', 'inactive');
-                // 譜面データが全く定義されていない（undefined）場合のみ inactive にする。
-                // 空文字 "" の場合は「新規作成」扱いで選択できるように維持。
                 if (!s.charts || s.charts[diff] === undefined) b.classList.add('inactive');
-
-                // BACKUP_SONG_LIST 等で値が入っているものは強調
                 if (s.charts && s.charts[diff] && s.charts[diff] !== "") {
                     b.style.fontWeight = "900";
                     b.style.opacity = "1";
@@ -2101,7 +2114,6 @@
                     b.style.opacity = "0.7";
                 }
             });
-
             showToast(`「${s.name}」プレビュー中！難易度を選んでね♪`);
         }
 
@@ -2111,7 +2123,6 @@
                 btn.classList.remove('selected');
                 if (btn.innerText.trim() === diff) btn.classList.add('selected');
             });
-
             if (!currentSelectedSong) {
                 showError("先に曲を選択してください。");
                 return;
@@ -2119,8 +2130,6 @@
             const song = currentSelectedSong;
             const chartUrl = song.charts[diff];
             const chartStatus = document.getElementById('chart-file-status');
-
-            // ローカル保存譜面の復旧確認 (同一セッション内では1回のみ)
             const restoreKey = `${song.name}_${diff}`;
             if (!askedRestoreKeys.has(restoreKey)) {
                 const savedData = loadChartFromLocal();
@@ -2137,7 +2146,6 @@
                     }
                 }
             }
-
             if (!chartUrl) {
                 CHART = []; recordedChart = [];
                 chartStatus.innerText = `[${diff}] 新規作成 (譜面データなし)`;
@@ -2148,22 +2156,16 @@
             }
             showLoading("譜面を取得中...");
             try {
-                // `chartUrl` はすでに showSongList で BASE_PATH が付与されているため、そのまま使用する
                 const response = await fetch(`${chartUrl}?v=${Date.now()}`);
                 const txt = await response.text();
                 document.getElementById('chart-input').value = txt;
-
-                // 読み込みをより堅牢に修正（前後トリム、セミコロン削除の強化）
                 let jsonText = txt.trim()
                     .replace(/^const CHART\s*=\s*/, '')
                     .replace(/;+\s*$/, '');
-
                 try {
                     recordedChart = JSON.parse(jsonText);
                     CHART = [...recordedChart].sort((a, b) => a.time - b.time);
                     showToast(`譜面読込成功: ${CHART.length}個のノーツ`);
-                    console.log("Chart Loaded Successfully:", CHART);
-
                     chartStatus.innerText = `譜面読込済: ${currentSelectedSong.name} [${diff}] (${CHART.length}notes)`;
                     chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
                 } catch (e) {
@@ -2230,12 +2232,10 @@
                 return true;
             }
 
-            // 通常タップ: 重なっている場合は、選択されていないものを優先的に選ぶ
             let target = candidates[0];
             if (editorSelectedNote) {
                 const alreadySelected = candidates.find(c => Math.abs(c.time - editorSelectedNote.time) < 0.005 && c.lane === editorSelectedNote.lane);
                 if (alreadySelected) {
-                    // すでに選択されているものを再度タップした場合は削除
                     deleteNote(alreadySelected.time, alreadySelected.lane);
                     return true;
                 }
@@ -2259,22 +2259,17 @@
         function openNoteSelector(notes) {
             const list = document.getElementById('note-selector-list');
             list.innerHTML = '';
-            
-            // 時間順にソート
             notes.sort((a, b) => a.time - b.time);
-
             notes.forEach(n => {
                 const btn = document.createElement('div');
                 btn.className = 'note-item-btn cursor-pointer';
                 if (editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane) {
                     btn.classList.add('selected');
                 }
-                
                 const timeStr = n.time.toFixed(3);
                 const laneNames = ['LEFT 1', 'LEFT 2', 'LEFT 3', 'LEFT 4', 'CENTER', 'RIGHT 4', 'RIGHT 3', 'RIGHT 2', 'RIGHT 1'];
                 const laneName = laneNames[n.lane];
                 const typeName = n.endTime ? "HOLD" : "TAP";
-                
                 btn.innerHTML = `
                     <div class="flex flex-col">
                         <div class="flex items-center gap-2">
@@ -2288,8 +2283,6 @@
                         <button class="px-3 py-1 bg-red-600/40 hover:bg-red-500/60 rounded-lg text-[8px] font-bold uppercase tracking-widest">削除</button>
                     </div>
                 `;
-
-                // 選択ボタン
                 btn.querySelectorAll('button')[0].onclick = (e) => {
                     e.stopPropagation();
                     editorSelectedNote = { time: n.time, lane: n.lane };
@@ -2297,17 +2290,13 @@
                     draw(localVideo.currentTime);
                     showToast("ノートを選択しました");
                 };
-
-                // 削除ボタン
                 btn.querySelectorAll('button')[1].onclick = (e) => {
                     e.stopPropagation();
                     deleteNote(n.time, n.lane);
                     closeNoteSelector();
                 };
-
                 list.appendChild(btn);
             });
-            
             document.getElementById('note-selector-screen').style.display = 'flex';
         }
 
@@ -2318,7 +2307,6 @@
         function setupInput() {
             const sH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputStart(l); };
             const eH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
-
             window.addEventListener('keydown', (e) => { 
                 if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return; 
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
@@ -2331,8 +2319,6 @@
                     sH(l); 
                 }
                 if (e.key === 'Escape') togglePause(); 
-                
-                // エディター / テストプレイ用ショートカット
                 if (isEditMode || isEditorTestPlay) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
@@ -2376,7 +2362,6 @@
                     eH(l); 
                 }
             }, {capture: true});
-
             canvas.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
@@ -2396,7 +2381,6 @@
                     }
                 }
             }, { passive: false });
-
             canvas.addEventListener('mousedown', (e) => {
                 e.preventDefault(); 
                 if (isEditMode) {
@@ -2410,7 +2394,6 @@
                 const l = getNearestLane(e.clientX, e.clientY);
                 if (l !== -1) sH(l);
             });
-
             const handleMove = (e) => {
                 if (longPressTimer) {
                     const pos = e.touches ? e.touches[0] : e;
@@ -2420,22 +2403,16 @@
             };
             canvas.addEventListener('mousemove', handleMove);
             canvas.addEventListener('touchmove', handleMove);
-
             const handleEnd = (e) => {
                 if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
                 if (isLongPressing) { isLongPressing = false; return; }
-                
                 if (isEditMode && e.clientX !== undefined) {
-                    // マウスアップ時に通常選択判定を実行 (マウスのみ)
                     if (tryInteractNoteAt(e.clientX, e.clientY)) return;
                 }
-
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
-                    // タッチエンド時に通常選択判定
                     if (isEditMode && tryInteractNoteAt(t.clientX, t.clientY)) continue;
-
                     const l = activeTouches.get(t.identifier);
                     if (l !== undefined) {
                         eH(l);
@@ -2443,18 +2420,15 @@
                     }
                 }
             };
-
             canvas.addEventListener('touchend', handleEnd, { passive: false });
             canvas.addEventListener('touchcancel', handleEnd, { passive: false });
             canvas.addEventListener('mouseup', handleEnd);
         }
 
         async function startLive(editMode = false, autoPlay = false, ghostReplay = false) {
-            // 前回のプレイ状態を完全に断ち切る
             isPlaying = false;
             isEditMode = false; 
             isEditorTestPlay = false;
-
             initAudio(); playStartSound(); stopTitleBGM();
             isAutoPlay = autoPlay;
             isGhostReplay = ghostReplay;
