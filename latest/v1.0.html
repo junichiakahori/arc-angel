@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 19:05 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 21:06 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1629,8 +1629,12 @@
         function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
         function playStartSound() { if (!audioCtx) initAudio(); const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.3); g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.connect(g); g.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.3); }
         function openChartModal() {
-            document.getElementById('chart-input').value = ''; // スタート画面からはクリア
+            // エディター内(recordedChart)にデータがあればそれを初期値に、なければ現在の入力を維持
+            if (recordedChart && recordedChart.length > 0) {
+                document.getElementById('chart-input').value = JSON.stringify(recordedChart, null, 2);
+            }
             document.getElementById('chart-input-modal').style.display = 'flex';
+            if (localVideo) localVideo.pause();
         }
         function clearChartInput() { if (confirm("入力内容をすべて消去しますか？")) { document.getElementById('chart-input').value = ''; } }
         function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
@@ -2196,6 +2200,15 @@
             localVideo.style.display = 'block';
             localVideo.style.opacity = isEditMode ? "0.7" : "0.4";
             localVideo.loop = false;
+            
+            // 再生速度の初期化
+            if (isEditMode) {
+                const speedSel = document.getElementById('editor-speed-select');
+                if (speedSel) localVideo.playbackRate = parseFloat(speedSel.value) || 1.0;
+            } else {
+                localVideo.playbackRate = 1.0;
+            }
+
             // プレビューのサビループリスナーを解除
             if (localVideo._previewLoopListener) {
                 localVideo.removeEventListener('timeupdate', localVideo._previewLoopListener);
@@ -2672,6 +2685,9 @@
                 jEl.innerText = "TEST PLAY"; 
                 jEl.className = "text-2xl font-black text-blue-400 h-8 flex items-center justify-center italic tracking-widest";
 
+                // テストプレイ時は必ず 1倍速
+                localVideo.playbackRate = 1.0;
+
                 // ライブ開始
                 score = 0; combo = 0; maxCombo = 0; stamina = 100; gameCurrentTime = 0;
                 counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
@@ -2743,6 +2759,12 @@
             showHelpOnPC(); // PCならヘルプを出す
             document.getElementById('btn-back-to-editor').classList.add('hidden');
 
+            // 再生速度をエディターの設定に戻す
+            const speedSel = document.getElementById('editor-speed-select');
+            if (speedSel && localVideo) {
+                localVideo.playbackRate = parseFloat(speedSel.value) || 1.0;
+            }
+
             // 描画ループ再開
             requestAnimationFrame(update);
             showToast("エディターに復帰しました");
@@ -2771,12 +2793,18 @@
         }
         function applyTextChart() {
             const rawTxt = document.getElementById('chart-input').value.trim();
-            // 変数宣言や末尾セミコロンがあれば除去
-            const cleanTxt = rawTxt.replace(/^(const|let|var)\s+CHART\s*=\s*/, '').replace(/;\s*$/, '');
+            // 先頭や末尾にある変数定義、コメント、セミコロン等をより強力に削除
+            const cleanTxt = rawTxt
+                .replace(/^(\/\/.*|\/\*[\s\S]*?\*\/)/gm, '') // コメント削除
+                .replace(/^(const|let|var)\s+CHART\s*=\s*/, '')
+                .replace(/;\s*$/, '')
+                .trim();
             try {
                 let data = cleanTxt ? JSON.parse(cleanTxt) : [];
                 if (!Array.isArray(data)) throw new Error("配列形式である必要があります");
                 recordedChart = data;
+                // CHARTにも反映
+                CHART = [...recordedChart].sort((a, b) => a.time - b.time);
                 syncEditorNotes();
                 saveChartToLocal();
                 closeTextChart();

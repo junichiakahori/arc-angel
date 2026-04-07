@@ -1,1 +1,2732 @@
-const CHART = [];
+[
+  {
+    "time": 10.98,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 11.52,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 12.12,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 12.72,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 13.26,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 13.78,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 14.38,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 14.38,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 14.88,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 14.88,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 15.46,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 16,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 16.58,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 17.14,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 17.72,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 18.26,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 18.84,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 19.42,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 19.94,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 20.59,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 20.59,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 21.13,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 21.13,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 21.73,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 22.32,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 22.96,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 23.54,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 24.06,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 24.39,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 24.78,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 25.13,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 26.56,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 27.65,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 27.65,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 27.95,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 27.95,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 28.18,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 28.33,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 28.57,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 29.23,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 29.75,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 30.31,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 30.92,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 31.47,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 32.08,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 32.69,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 32.69,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 33.32,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 33.32,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 33.89,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 34.49,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 34.99,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 35.47,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 35.98,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 36.58,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 37.13,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 37.69,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 38.29,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 38.9,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 38.9,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 39.47,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 39.47,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 40.08,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 40.67,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 41.16,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 41.67,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 41.99,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 42.29,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 43.13,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 43.78,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 44.16,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 45.19,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 45.19,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 45.92,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 45.92,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 46.32,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 46.64,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 47.25,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 47.86,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 48.48,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 49.07,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 49.73,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 50.37,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 50.93,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 51.49,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 51.49,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 52.07,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 52.07,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 52.63,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 53.24,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 53.8,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 54.36,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 54.91,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 55.46,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 56.03,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 56.59,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 57.16,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 57.72,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 57.72,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 58.32,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 58.32,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 58.94,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 59.31,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 59.6,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 60.56,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 61.45,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 62.21,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 62.64,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 63,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 63.6,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 63.94,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 63.94,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 64.27,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 64.27,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 64.43,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 64.59,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 64.91,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 65.48,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 66.06,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 66.8,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 67.12,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 68.29,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 69.11,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 69.4,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 69.4,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 70.52,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 70.52,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 71.44,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 72.02,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 72.65,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 73.2,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 73.73,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 74.27,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 74.57,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 74.97,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 75.33,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 75.63,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 75.63,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 75.89,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 75.89,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 76.06,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 76.24,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 76.39,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 76.54,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 76.7,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 76.85,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 76.85,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 77.26,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 77.77,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 78.31,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 78.88,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 78.88,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 79.43,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 79.43,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 80.02,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 80.02,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 80.58,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 81.16,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 81.77,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 82.35,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 82.35,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 82.35,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 82.35,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 82.87,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 83.44,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 84.04,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 84.04,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 84.62,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 85.18,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 85.18,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 85.75,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 85.75,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 86.31,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 86.88,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 87.46,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 88.04,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 88.04,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 88.63,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 89.16,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 89.7,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 90.32,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 90.91,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 91.47,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 91.47,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 92.05,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 92.05,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 92.61,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 92.91,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 93.34,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 93.73,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 94.02,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 94.29,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 94.44,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 94.44,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 94.6,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 94.76,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 94.91,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 94.91,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 95.06,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 95.06,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 95.53,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 96.07,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 96.64,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 97.25,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 97.78,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 98.34,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 98.9,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 99.49,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 100.11,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 100.69,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 100.69,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 101.24,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 101.24,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 101.79,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 102.35,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 102.35,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 102.9,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 103.52,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 103.83,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 104.09,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 104.65,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 105.22,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 105.77,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 106.31,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 106.31,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 106.87,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 106.87,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 107.38,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 107.92,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 108.23,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 108.5,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 109.13,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 109.69,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 110.26,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 110.83,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 111.12,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 111.52,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 111.52,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 111.94,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 111.94,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 112.29,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 112.44,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 113.38,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 113.94,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 114.66,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 114.99,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 116.2,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 116.96,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 117.27,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 118.49,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 118.49,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 119.3,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 119.3,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 119.67,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 120.75,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 121.41,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 121.83,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 122.15,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 122.74,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 123.33,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 123.9,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 124.57,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 125.24,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 125.24,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 125.82,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 125.82,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 126.39,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 126.93,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 127.48,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 128,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 128.64,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 129.2,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 129.77,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 130.3,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 130.81,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 131.08,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 131.08,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 131.4,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 131.4,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 132,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 132.59,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 133.13,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 133.7,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 134.3,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 134.89,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 135.47,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 136.07,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 136.65,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 137.24,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 137.24,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 137.83,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 137.83,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 138.39,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 138.98,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 139.54,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 140.13,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 140.63,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 141.24,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 141.74,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 142.31,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 142.85,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 143.43,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 143.43,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 143.99,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 143.99,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 144.6,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 144.88,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 146.06,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 146.95,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 147.21,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 148.34,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 149.08,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 149.42,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 149.71,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 150.33,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 150.33,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 150.91,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 150.91,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 151.48,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 152,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 152.57,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 153.18,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 153.76,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 154.32,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 154.94,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 155.54,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 156.09,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 156.59,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 156.59,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 157.18,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 157.18,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 157.73,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 158.29,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 158.91,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 159.5,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 160.05,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 160.67,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 161.25,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 161.77,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 162.2,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 162.86,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 162.86,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 163.47,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 163.47,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 164.38,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 165.22,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 165.61,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 165.92,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 166.47,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 166.85,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 167.4,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 168.31,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 168.91,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 169.65,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 169.65,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 169.99,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 169.99,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 171.1,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 171.84,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 172.17,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 173.28,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 174.19,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 174.51,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 174.83,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 175.47,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 176.06,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 176.6,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 176.6,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 177.06,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 177.06,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 177.43,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 177.89,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 178.26,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 178.55,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 178.86,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 179.14,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 179.43,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 179.7,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 180.26,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 180.5,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 180.5,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 180.67,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 180.67,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 181.1,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 181.4,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 181.68,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 182.33,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 182.9,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 183.46,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 184.06,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 184.63,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 185.22,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 185.78,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 185.78,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 186.36,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 186.36,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 186.96,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 187.52,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 188.04,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 188.04,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 188.61,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 189.2,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 189.75,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 190.27,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 190.57,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 190.88,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 191.52,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 191.52,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 192.05,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 192.05,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 192.58,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 193.16,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 193.75,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 194.05,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 194.54,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 194.95,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 195.25,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 195.25,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 195.56,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 196.14,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 196.67,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 196.67,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 197.18,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 197.18,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 197.66,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 198.23,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 198.77,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 199.09,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 199.51,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 199.75,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 200.03,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 200.03,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 200.59,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 201.17,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 201.72,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 201.72,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 202.3,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 202.3,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 202.83,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 203.42,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 203.99,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 203.99,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 204.57,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 205.16,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 205.7,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 206.24,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 206.85,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 207.43,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 207.98,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 207.98,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 207.98,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 207.98,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 208.56,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 208.56,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 208.85,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 208.85,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 209.14,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 209.78,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 210.3,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 210.85,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 211.44,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 212.03,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 212.57,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 213.13,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 213.42,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 213.42,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 213.71,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 213.71,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 214.31,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 214.79,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 215.43,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 216,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 216.59,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 217.14,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 217.45,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 217.74,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 218.32,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 218.8,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 218.8,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 219.32,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 219.32,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 219.97,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 220.61,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 221.21,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 221.76,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 222.43,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 223.02,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 223.66,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 224.27,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 224.87,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 225.69,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 225.69,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 226.24,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 226.24,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 226.79,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 227.1,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 227.38,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 227.98,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 227.98,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 228.54,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 229.16,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 229.77,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 230.36,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 230.36,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 230.91,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 231.5,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 231.5,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 232.09,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 232.09,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 232.64,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 233.18,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 233.8,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 234.39,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 234.39,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 234.9,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 235.45,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 235.99,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 235.99,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 236.3,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 236.57,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 237.16,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 237.16,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 237.73,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 237.73,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 238.34,
+    "lane": 4,
+    "isSim": false
+  },
+  {
+    "time": 238.92,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 239.46,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 240,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 240,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 240.53,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 241.08,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 241.45,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 241.83,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 242.21,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 243.3,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 243.3,
+    "lane": 3,
+    "isSim": true
+  },
+  {
+    "time": 243.91,
+    "lane": 5,
+    "isSim": true
+  },
+  {
+    "time": 243.91,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 244.78,
+    "lane": 2,
+    "isSim": true
+  },
+  {
+    "time": 244.78,
+    "lane": 6,
+    "isSim": true
+  },
+  {
+    "time": 245.06,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 245.34,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 245.66,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 245.8,
+    "lane": 6,
+    "isSim": false
+  },
+  {
+    "time": 246.98,
+    "lane": 2,
+    "isSim": false
+  },
+  {
+    "time": 247.13,
+    "lane": 6,
+    "isSim": false
+  }
+]
