@@ -1280,7 +1280,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:35 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:55 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1424,6 +1424,7 @@
         let currentSeSet = localStorage.getItem('arcangel_se_set') || 'drums';
         let seMasterGain;
         let seVol = parseFloat(localStorage.getItem('arcangel_se_vol') || '1.0');
+        let bgmVol = parseFloat(localStorage.getItem('arcangel_bgm_vol') || '0.5');
 
         function saveSeSet(set) { currentSeSet = set; localStorage.setItem('arcangel_se_set', set); showToast(`SEを ${set.toUpperCase()} に変更しました`); }
 
@@ -1450,14 +1451,33 @@
             }
         }
 
+        function updateBgmVolume(val) {
+            bgmVol = val / 100;
+            localStorage.setItem('arcangel_bgm_vol', bgmVol);
+            const valDisp = document.getElementById('bgm-vol-value');
+            if (valDisp) valDisp.innerText = val + '%';
+            if (bgmAudio) bgmAudio.volume = bgmVol;
+            // プレイ中の動画音量は、現在のフェード目標を反映させるのが難しいため、
+            // 次回のフェードイベントまたは直接設定時に反映される。
+            // 鑑賞モード等で一定音量の場合は、即座に反映させる。
+            if (localVideo && !isPlaying && !localVideo.paused) {
+                localVideo.volume = bgmVol;
+            }
+        }
+
         function playTapSound(lane = 0, judgment = 'NONE', overrideSet = null) {
             if (!audioCtx || !noiseBuffer) return;
             const now = audioCtx.currentTime;
 
-            // 優先順位: overrideSet > 隠しコマンド状態 > currentSeSet
+            // 優先順位: overrideSet > 状況に応じたデフォルト
             let effectiveSet = overrideSet;
             if (!effectiveSet) {
-                effectiveSet = isCommandActivated ? 'tambourine' : currentSeSet;
+                // 隠しコマンド有効かつ設定がデフォルト（未保存）の場合は tambourine を優先
+                if (isCommandActivated && !localStorage.getItem('arcangel_se_set')) {
+                    effectiveSet = 'tambourine';
+                } else {
+                    effectiveSet = currentSeSet;
+                }
             }
 
             if (effectiveSet === 'tambourine') {
@@ -1832,7 +1852,7 @@
             
             bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); 
             bgmAudio.loop = true; 
-            bgmAudio.volume = 0.5; 
+            bgmAudio.volume = bgmVol; 
             bgmAudio.play().catch(e => {
                 console.log('BGM Playback failed:', e);
                 // 失敗した場合はトーストで通知
@@ -1845,13 +1865,14 @@
             if (!localVideo) return;
             if (localVideo._fadeInterval) clearInterval(localVideo._fadeInterval);
             const start = localVideo.volume;
-            const diff = target - start;
+            const effectiveTarget = target * bgmVol;
+            const diff = effectiveTarget - start;
             const steps = 20;
             const stepTime = duration / steps;
             let i = 0;
             localVideo._fadeInterval = setInterval(() => {
                 i++;
-                localVideo.volume = Math.max(0, Math.min(1, start + (diff * (i / steps))));
+                localVideo.volume = Math.max(0, Math.min(bgmVol, start + (diff * (i / steps))));
                 if (i >= steps) {
                     clearInterval(localVideo._fadeInterval);
                     localVideo._fadeInterval = null;
@@ -2624,7 +2645,7 @@
                             const n = activeNotes[i];
                             if (n.status === 'waiting' && ct >= n.time) {
                                 activeNotes.splice(i, 1);
-                                processResult(0, buttons[n.lane]);
+                                processResult(0, buttons[n.lane], n.lane);
                             }
                         }
                     }
@@ -3266,11 +3287,17 @@
         let configActiveIndex = -1;
         function openSeSettings() {
             initAudio();
-            const vol = Math.round(seVol * 100);
-            const slider = document.getElementById('se-vol-slider');
-            const valDisp = document.getElementById('se-vol-value');
-            if (slider) slider.value = vol;
-            if (valDisp) valDisp.innerText = vol + '%';
+            const seVal = Math.round(seVol * 100);
+            const bgmVal = Math.round(bgmVol * 100);
+            const seSlider = document.getElementById('se-vol-slider');
+            const bgmSlider = document.getElementById('bgm-vol-slider');
+            const seDisp = document.getElementById('se-vol-value');
+            const bgmDisp = document.getElementById('bgm-vol-value');
+            
+            if (seSlider) seSlider.value = seVal;
+            if (bgmSlider) bgmSlider.value = bgmVal;
+            if (seDisp) seDisp.innerText = seVal + '%';
+            if (bgmDisp) bgmDisp.innerText = bgmVal + '%';
 
             const list = document.getElementById('se-preset-list');
             list.innerHTML = '';
@@ -3590,14 +3617,26 @@
                 <h2 class="text-2xl font-black text-white italic tracking-tighter mb-4 text-center">SE SETTINGS</h2>
                 
                 <!-- Volume Control -->
-                <div class="mb-6 p-4 bg-white/5 rounded-2xl border border-white/5">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase">Master Volume</span>
-                        <span id="se-vol-value" class="text-[10px] font-black text-blue-400">100%</span>
+                <div class="mb-6 flex flex-col gap-3">
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase">BGM Volume</span>
+                            <span id="bgm-vol-value" class="text-[10px] font-black text-blue-400">100%</span>
+                        </div>
+                        <input type="range" id="bgm-vol-slider" min="0" max="100" value="100" 
+                            class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                            oninput="updateBgmVolume(this.value)">
                     </div>
-                    <input type="range" id="se-vol-slider" min="0" max="200" value="100" 
-                        class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" 
-                        oninput="updateSeVolume(this.value)">
+
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase">SE Volume</span>
+                            <span id="se-vol-value" class="text-[10px] font-black text-blue-400">100%</span>
+                        </div>
+                        <input type="range" id="se-vol-slider" min="0" max="200" value="100" 
+                            class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                            oninput="updateSeVolume(this.value)">
+                    </div>
                 </div>
 
                 <div id="se-preset-list" class="flex flex-col gap-2 w-full max-h-[50vh] overflow-y-auto pr-1 no-scrollbar">
