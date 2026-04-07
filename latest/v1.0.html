@@ -1267,7 +1267,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:18 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:20 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1473,20 +1473,33 @@
             }
 
             if (effectiveSet === 'elec-guitar') {
-                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-                const d = audioCtx.createWaveShaper(); function makeDist(a){let k=typeof a==='number'?a:50,n=44100,c=new Float32Array(n),i=0,x;for(;i<n;++i){x=i*2/n-1;c[i]=(3+k)*x*20*deg/Math.PI/(3+k*Math.abs(x))}return c;};
-                const deg = Math.PI / 180; o.type = 'sawtooth'; o.frequency.setValueAtTime(freq, now);
-                g.gain.setValueAtTime(0.1, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now + 0.2);
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); const dist = audioCtx.createWaveShaper();
+                function makeDist(a){let k=a,n=44100,c=new Float32Array(n),i=0,x;for(;i<n;i++){x=i*2/n-1;c[i]=(3+k)*x*20*deg/(Math.PI+(k*Math.abs(x)))}return c;};
+                const deg = Math.PI / 180; dist.curve = makeDist(100);
+                o.type = 'sawtooth'; o.frequency.setValueAtTime(freq, now);
+                g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                o.connect(dist); dist.connect(g); g.connect(audioCtx.destination);
+                o.start(now); o.stop(now + 0.25);
                 return;
             }
 
             if (effectiveSet === 'acou-guitar') {
-                const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); const n = audioCtx.createBufferSource(); const f = audioCtx.createBiquadFilter();
-                o.type = 'triangle'; o.frequency.setValueAtTime(freq, now); n.buffer = noiseBuffer; f.type = 'highpass'; f.frequency.setValueAtTime(5000, now);
-                g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                o.connect(g); n.connect(f); f.connect(g); g.connect(audioCtx.destination);
-                o.start(now); o.stop(now + 0.15); n.start(now);
+                const o1 = audioCtx.createOscillator(); const o2 = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                const noise = audioCtx.createBufferSource(); const nf = audioCtx.createBiquadFilter(); const ng = audioCtx.createGain();
+                const lp = audioCtx.createBiquadFilter();
+
+                o1.type = 'triangle'; o1.frequency.setValueAtTime(freq, now);
+                o2.type = 'sine'; o2.frequency.setValueAtTime(freq * 2, now);
+                noise.buffer = noiseBuffer; nf.type = 'highpass'; nf.frequency.setValueAtTime(8000, now);
+                
+                ng.gain.setValueAtTime(0.1, now); ng.gain.exponentialRampToValueAtTime(0.01, now + 0.03); 
+                g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                lp.type = 'lowpass'; lp.frequency.setValueAtTime(10000, now); lp.frequency.exponentialRampToValueAtTime(1000, now + 0.4);
+
+                o1.connect(lp); o2.connect(lp); noise.connect(nf); nf.connect(ng); 
+                ng.connect(audioCtx.destination); lp.connect(g); g.connect(audioCtx.destination);
+                
+                o1.start(now); o1.stop(now + 0.4); o2.start(now); o2.stop(now + 0.4); noise.start(now); noise.stop(now + 0.03);
                 return;
             }
 
