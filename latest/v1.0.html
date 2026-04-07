@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:06 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:29 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2152,6 +2152,11 @@
         }
 
         async function startLive(editMode = false, autoPlay = false, ghostReplay = false) {
+            // 前回のプレイ状態を完全に断ち切る
+            isPlaying = false;
+            isEditMode = false; 
+            isEditorTestPlay = false;
+
             initAudio(); playStartSound(); stopTitleBGM();
             isAutoPlay = autoPlay;
             isGhostReplay = ghostReplay;
@@ -2192,7 +2197,10 @@
             jEl.innerText = "READY?"; 
             jEl.className = "text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest";
             
-            // プレイ開始前の初期化を doPlay へ移動（準備中の誤判定防止）
+            // 重要な変数を先行してリセット（非同期のdoPlay待ちの間、古い判定が走らないようにする）
+            stamina = 100; score = 0; combo = 0; maxCombo = 0;
+            activeNotes = []; notesQueue = []; hitEffects = [];
+            updateUI();
 
             // 動画の設定
             localVideo.style.display = 'block';
