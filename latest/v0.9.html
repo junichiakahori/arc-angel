@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 10:17 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 10:20 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -892,17 +892,27 @@
                     onmousedown="seekVideoStart()" onmouseup="seekVideoEnd()" ontouchstart="seekVideoStart()"
                     ontouchend="seekVideoEnd()">
             </div>
-            <div id="editor-status-row" class="flex items-center justify-between px-1">
+            <div id="editor-status-row" class="flex items-center justify-between mt-1 px-1">
                 <div class="flex items-center gap-2">
                     <div id="rec-lamp" class="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
                     <span id="edit-status"
-                        class="text-[8px] font-black italic text-gray-400 uppercase tracking-tighter">Ready</span>
+                        class="text-[8px] font-black italic text-gray-400 uppercase tracking-tighter w-14">Ready</span>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex items-center gap-1">
+                    <button onclick="seekVideoBy(-5)" class="bg-gray-800 text-gray-200 px-1.5 py-0.5 rounded-sm text-[8px] border border-gray-600 active:bg-gray-700">-5s</button>
                     <button id="btn-editor-pause" onclick="toggleEditorPause()"
-                        class="bg-white/10 px-2 py-0.5 rounded text-[8px]">⏸️/▶️</button>
+                        class="bg-blue-600/50 border border-blue-500/50 px-2 py-0.5 rounded text-[8px]">⏸️/▶️</button>
+                    <button onclick="seekVideoBy(5)" class="bg-gray-800 text-gray-200 px-1.5 py-0.5 rounded-sm text-[8px] border border-gray-600 active:bg-gray-700">+5s</button>
+                    
+                    <select id="editor-speed-select" onchange="setVideoSpeed(this.value)" class="bg-gray-800 text-gray-200 text-[8px] border border-gray-600 rounded-sm px-1 py-0.5 outline-none">
+                        <option value="0.25">0.25x</option>
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1.0" selected>1.0x</option>
+                    </select>
+
                     <button onclick="promptDeleteNote()"
-                        class="bg-red-900/40 text-red-200 border border-red-500/20 px-2 py-0.5 rounded text-[8px] font-bold">付近削除</button>
+                        class="bg-red-900/40 text-red-200 border border-red-500/40 px-2 py-0.5 rounded text-[8px] font-bold">付近削除</button>
                 </div>
             </div>
         </div>
@@ -978,7 +988,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:17 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:20 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1874,6 +1884,25 @@
             if (!isEditMode) return;
             isSeeking = false;
             if (localVideo && !isEditorPaused) localVideo.play();
+        }
+
+        function seekVideoBy(sec) {
+            if (!isEditMode || !localVideo) return;
+            let nt = localVideo.currentTime + sec;
+            if (nt < 0) nt = 0;
+            if (nt > localVideo.duration) nt = localVideo.duration;
+            localVideo.currentTime = nt;
+            document.getElementById('editor-time-display').innerText = nt.toFixed(2) + "s";
+            document.getElementById('editor-seek-bar').value = nt;
+            syncEditorNotes();
+            draw(nt);
+            showToast(`シーク: ${sec > 0 ? '+' : ''}${sec}s`, 1000);
+        }
+
+        function setVideoSpeed(speed) {
+            if (!localVideo) return;
+            localVideo.playbackRate = parseFloat(speed);
+            showToast(`再生速度: ${speed}x`, 1000);
         }
 
         function syncEditorNotes() {
