@@ -1280,7 +1280,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:27 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:31 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1422,15 +1422,32 @@
 
         // --- 音響処理 ---
         let currentSeSet = localStorage.getItem('arcangel_se_set') || 'drums';
+        let seMasterGain;
+        let seVol = parseFloat(localStorage.getItem('arcangel_se_vol') || '1.0');
+
         function saveSeSet(set) { currentSeSet = set; localStorage.setItem('arcangel_se_set', set); showToast(`SEを ${set.toUpperCase()} に変更しました`); }
 
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                seMasterGain = audioCtx.createGain();
+                seMasterGain.gain.setValueAtTime(seVol, audioCtx.currentTime);
+                seMasterGain.connect(audioCtx.destination);
+
                 const bufferSize = audioCtx.sampleRate * 0.1; noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const d = noiseBuffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) d[i] = Math.random() * 2 - 1;
             }
             if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function updateSeVolume(val) {
+            seVol = val / 100;
+            localStorage.setItem('arcangel_se_vol', seVol);
+            const valDisp = document.getElementById('se-vol-value');
+            if (valDisp) valDisp.innerText = val + '%';
+            if (seMasterGain) {
+                seMasterGain.gain.setTargetAtTime(seVol, audioCtx.currentTime, 0.05);
+            }
         }
 
         function playTapSound(lane = 0, judgment = 'NONE', overrideSet = null) {
@@ -1450,7 +1467,7 @@
                     const ng = audioCtx.createGain();
                     ng.gain.setValueAtTime(0.15, now);
                     ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-                    ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                    ns.connect(nf); nf.connect(ng); ng.connect(seMasterGain);
                     ns.start(now);
                     const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(8000, now); osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
                     const og = audioCtx.createGain(); og.gain.setValueAtTime(0.1, now); og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
@@ -1471,7 +1488,7 @@
                 const ng = audioCtx.createGain();
                 ng.gain.setValueAtTime(judgment === 'PERFECT' ? 0.2 : 0.1, now);
                 ng.gain.exponentialRampToValueAtTime(0.01, now + (judgment === 'PERFECT' ? 0.05 : 0.03));
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                ns.connect(nf); nf.connect(ng); ng.connect(seMasterGain);
                 ns.start(now);
                 return;
             }
@@ -1483,7 +1500,7 @@
                 const o1 = audioCtx.createOscillator(); const o2 = audioCtx.createOscillator();
                 const g = audioCtx.createGain(); o1.type = 'triangle'; o2.type = 'sine'; o1.frequency.setValueAtTime(freq, now); o2.frequency.setValueAtTime(freq * 2, now);
                 g.gain.setValueAtTime(0.3, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                o1.connect(g); o2.connect(g); g.connect(audioCtx.destination);
+                o1.connect(g); o2.connect(g); g.connect(seMasterGain);
                 o1.start(now); o1.stop(now + 0.3); o2.start(now); o2.stop(now + 0.3);
                 return;
             }
@@ -1494,7 +1511,7 @@
                 const deg = Math.PI / 180; dist.curve = makeDist(100);
                 o.type = 'sawtooth'; o.frequency.setValueAtTime(freq, now);
                 g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                o.connect(dist); dist.connect(g); g.connect(audioCtx.destination);
+                o.connect(dist); dist.connect(g); g.connect(seMasterGain);
                 o.start(now); o.stop(now + 0.25);
                 return;
             }
@@ -1513,7 +1530,7 @@
                 lp.type = 'lowpass'; lp.frequency.setValueAtTime(10000, now); lp.frequency.exponentialRampToValueAtTime(1000, now + 0.4);
 
                 o1.connect(lp); o2.connect(lp); noise.connect(nf); nf.connect(ng); 
-                ng.connect(audioCtx.destination); lp.connect(g); g.connect(audioCtx.destination);
+                ng.connect(audioCtx.destination); lp.connect(g); g.connect(seMasterGain);
                 
                 o1.start(now); o1.stop(now + 0.4); o2.start(now); o2.stop(now + 0.4); noise.start(now); noise.stop(now + 0.03);
                 return;
@@ -3248,6 +3265,13 @@
         // --- キーコンフィグ関連 ---
         let configActiveIndex = -1;
         function openSeSettings() {
+            initAudio();
+            const vol = Math.round(seVol * 100);
+            const slider = document.getElementById('se-vol-slider');
+            const valDisp = document.getElementById('se-vol-value');
+            if (slider) slider.value = vol;
+            if (valDisp) valDisp.innerText = vol + '%';
+
             const list = document.getElementById('se-preset-list');
             list.innerHTML = '';
             const presets = [
@@ -3560,16 +3584,30 @@
         }
     </script>
 
-    <!-- 9. SE設定画面 -->
     <div id="se-settings-screen" class="overlay-screen" style="display: none;">
         <div class="overlay-screen-content w-full max-w-[420px]">
-            <h2 class="text-3xl font-black italic text-blue-500 mb-6 uppercase tracking-widest text-center">SE Settings</h2>
-            <div id="se-preset-list" class="flex flex-col gap-2 w-full max-h-[60vh] overflow-y-auto pr-1 no-scrollbar">
-                <!-- JavaScriptで生成 -->
+            <div class="bg-gray-900/90 border border-white/10 rounded-3xl p-8 backdrop-blur-xl relative">
+                <h2 class="text-2xl font-black text-white italic tracking-tighter mb-4 text-center">SE SETTINGS</h2>
+                
+                <!-- Volume Control -->
+                <div class="mb-6 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[9px] font-black text-gray-400 tracking-widest uppercase">Master Volume</span>
+                        <span id="se-vol-value" class="text-[10px] font-black text-blue-400">100%</span>
+                    </div>
+                    <input type="range" id="se-vol-slider" min="0" max="200" value="100" 
+                        class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                        oninput="updateSeVolume(this.value)">
+                </div>
+
+                <div id="se-preset-list" class="flex flex-col gap-2 w-full max-h-[50vh] overflow-y-auto pr-1 no-scrollbar">
+                    <!-- JavaScriptで生成 -->
+                </div>
+                
+                <button onclick="document.getElementById('se-settings-screen').style.display='none'" class="mt-8 btn-secondary w-full py-4 rounded-2xl font-bold text-[11px] tracking-widest uppercase">
+                    閉じる
+                </button>
             </div>
-            <button onclick="document.getElementById('se-settings-screen').style.display='none'" class="mt-8 btn-secondary w-full py-4 rounded-2xl font-bold text-[11px] tracking-widest uppercase">
-                閉じる
-            </button>
         </div>
     </div>
 </body>
