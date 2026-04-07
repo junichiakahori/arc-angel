@@ -1031,9 +1031,10 @@
                     <span>Max Combo</span><span id="res-combo">0</span>
                 </div>
             </div>
-            <div class="flex gap-3 mt-2">
-                <button id="btn-result-retry" onclick="retryLive()" class="btn-action shadow-lg px-6 bg-blue-600 hover:bg-blue-500 text-xs">もう一度プレイ</button>
-                <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-6 btn-secondary text-xs">選曲画面に戻る</button>
+            <div class="flex flex-wrap justify-center gap-3 mt-2">
+                <button id="btn-result-replay" onclick="startReplay()" class="btn-action shadow-lg px-6 bg-purple-600 hover:bg-purple-500 text-xs">鑑賞リプレイ</button>
+                <button id="btn-result-retry" onclick="retryLive()" class="btn-action shadow-lg px-6 bg-blue-600 hover:bg-blue-500 text-xs">再挑戦 (Retry)</button>
+                <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-6 btn-secondary text-xs">選曲画面へ</button>
             </div>
         </div>
     </div>
@@ -1119,7 +1120,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 16:31 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 16:30 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1195,7 +1196,7 @@
         let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
         let stamina = 100, maxStamina = 100;
         let isEditorPaused = false, isSeeking = false;
-        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false;
+        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false, isAutoPlay = false;
         // --- 9レーンカラー定義 (虹色グラデーション) ---
         const LANE_COLORS = [
             '255, 215, 0',   // 0: Yellow (A)
@@ -1849,8 +1850,9 @@
             canvas.addEventListener('touchcancel', handleEnd, { passive: false });
         }
 
-        async function startLive(editMode = false) {
+        async function startLive(editMode = false, autoPlay = false) {
             initAudio(); playStartSound(); stopTitleBGM();
+            isAutoPlay = autoPlay;
             
             const song = currentSelectedSong;
             if (isCommandActivated && song && !localVideo.src) {
@@ -1981,6 +1983,17 @@
                     // ノーツの生成（ActiveNotesへ）
                     while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) {
                         activeNotes.push({ ...notesQueue.shift(), status: 'waiting' });
+                    }
+
+                    // オートプレイ（鑑賞リプレイ）ロジック
+                    if (isAutoPlay && !isEditMode) {
+                        for (let i = activeNotes.length - 1; i >= 0; i--) {
+                            const n = activeNotes[i];
+                            if (n.status === 'waiting' && ct >= n.time) {
+                                activeNotes.splice(i, 1);
+                                processResult(0, buttons[n.lane]);
+                            }
+                        }
                     }
                     
                     if (!isEditMode) {
@@ -2497,8 +2510,13 @@
 
         function retryLive() {
             document.getElementById('result-screen').style.display = 'none';
-            // 現在の難易度や速度などの設定を維持して再開
-            startLive(false);
+            startLive(false, false);
+        }
+
+        function startReplay() {
+            document.getElementById('result-screen').style.display = 'none';
+            // オートプレイ（鑑賞）モードで開始
+            startLive(false, true);
         }
 
         function handleInputStart(l) { 
