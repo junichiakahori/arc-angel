@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 14:35 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 14:48 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -711,13 +711,8 @@
                     </p>
                 </div>
 
-                <!-- バージョン切り替えリンク -->
-                <div class="mt-6 pt-4 border-t border-white/5 w-full max-w-xs text-center">
-                    <p class="text-[9px] text-gray-500 font-bold tracking-widest mb-2 uppercase opacity-50">バージョン切り替え</p>
-                    <a href="../index.html"
-                        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 text-green-400 text-[10px] font-black tracking-wider hover:bg-green-500/20 transition-all">
-                        ✅ v0.8（安定版）へ
-                    </a>
+                <!-- バージョン切り替えリンク (JS側で動的に生成) -->
+                <div id="version-switch-container" class="mt-6 pt-4 border-t border-white/5 w-full max-w-xs text-center">
                 </div>
 
                 <!-- 著作権・免責事項 -->
@@ -1091,10 +1086,39 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:35 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:48 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
+
+                // --- 動的バージョン誘導ロジック ---
+                const switchContainer = document.getElementById('version-switch-container');
+                if (switchContainer && data.stable) {
+                    if (MY_VERSION === data.stable) {
+                        // 自身が安定版(index.html相当)の場合
+                        if (data.latest && data.latest !== data.stable) {
+                            // より新しい最新版が存在する場合のみリンクを表示
+                            switchContainer.innerHTML = `
+                                <p class="text-[9px] text-gray-500 font-bold tracking-widest mb-2 uppercase opacity-50">最新開発版を試す</p>
+                                <a href="${BASE_PATH}latest/${data.latest}.html" 
+                                    class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-wider hover:bg-blue-500/20 transition-all">
+                                    🔥 ${data.latest} (BETA) へ
+                                </a>
+                            `;
+                        } else {
+                            switchContainer.style.display = 'none';
+                        }
+                    } else {
+                        // 自身が開発版（安定版より進んでいる）の場合
+                        switchContainer.innerHTML = `
+                            <p class="text-[9px] text-gray-500 font-bold tracking-widest mb-2 uppercase opacity-50">安定版に戻る</p>
+                            <a href="${BASE_PATH}index.html" 
+                                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 text-green-400 text-[10px] font-black tracking-wider hover:bg-green-500/20 transition-all">
+                                ✅ ${data.stable} (安定版) へ
+                            </a>
+                        `;
+                    }
+                }
             } catch (e) {
                 console.log("Version Info could not be loaded", e);
             }
