@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 12:40 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 12:44 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1008,9 +1008,9 @@
             <span class="text-[8px] font-black text-blue-500 uppercase tracking-tighter">Guides</span>
         </div>
 
-        <div class="flex-1 grid grid-cols-3 gap-2">
+        <div class="flex-1 flex gap-4">
             <!-- Gameplay -->
-            <div class="space-y-2 col-span-1 border-r border-white/5 pr-2">
+            <div class="space-y-2 shrink-0 border-r border-white/5 pr-3">
                 <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Gameplay</p>
                 <div class="grid grid-cols-3 gap-1.5 w-max">
                     <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(255,215,0);">A</div>
@@ -1026,21 +1026,21 @@
             </div>
 
             <!-- Editor -->
-            <div class="space-y-2 border-r border-white/5 pr-2">
+            <div class="space-y-2 shrink-0 border-r border-white/5 pr-3">
                 <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Editor</p>
                 <div class="grid grid-cols-1 gap-1.5">
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center gap-3">
                         <span class="opacity-60 italic">Play/Rec</span>
                         <div class="flex gap-1">
                             <kbd class="bg-white/10 border border-white/20 px-1 rounded font-bold text-white">⏎</kbd>
                             <kbd class="bg-blue-500/20 border border-blue-500/30 px-1 rounded font-bold text-blue-300">R</kbd>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center gap-3">
                         <span class="opacity-60 italic">Test</span>
                         <kbd class="bg-green-500/20 border border-green-500/30 px-1 rounded font-bold text-green-300">P</kbd>
                     </div>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center gap-3">
                         <span class="opacity-60 italic">Seek/Spd</span>
                         <div class="flex gap-1 text-[7px] font-bold">
                             <span class="bg-white/5 border border-white/10 px-1 rounded">←→</span>
@@ -1051,13 +1051,13 @@
             </div>
 
             <!-- System -->
-            <div class="space-y-2">
+            <div class="space-y-2 flex-1">
                 <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">System</p>
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center gap-2">
                     <span class="opacity-60 italic">Title/Menu</span>
                     <kbd class="bg-white/10 border border-white/20 px-1 rounded font-bold text-white">Esc</kbd>
                 </div>
-                <p class="mt-2 text-[7px] text-gray-600 italic text-right">PC Only</p>
+                <p class="mt-2 text-[7px] text-gray-600 italic text-right opacity-60">PC Only</p>
             </div>
         </div>
     </div>
@@ -1077,7 +1077,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:40 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:44 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
