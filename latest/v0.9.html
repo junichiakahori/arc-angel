@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 10:44 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 10:51 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -969,7 +969,7 @@
                     <span>Max Combo</span><span id="res-combo">0</span>
                 </div>
             </div>
-            <button onclick="backToTitle()" class="btn-action shadow-lg px-12">選曲画面に戻る</button>
+            <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-12">選曲画面に戻る</button>
         </div>
     </div>
 
@@ -988,7 +988,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:44 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:51 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1784,6 +1784,20 @@
 
             document.getElementById('ui-overlay').style.opacity = '0';
             document.getElementById('result-screen').style.display = 'flex';
+
+            // --- エディターからのテストプレイ時は、戻り先をエディターに変更 ---
+            const backBtn = document.getElementById('btn-result-back');
+            if (isEditorTestPlay) {
+                backBtn.innerText = "エディターに戻る";
+                backBtn.onclick = () => {
+                    document.getElementById('result-screen').style.display = 'none';
+                    backToEditorFromPlay();
+                };
+            } else {
+                backBtn.innerText = "選曲画面に戻る";
+                backBtn.onclick = backToTitle;
+            }
+
             document.getElementById('final-score').innerText = score.toString().padStart(6, '0');
             document.getElementById('res-perfect').innerText = counts.perfect;
             document.getElementById('res-great').innerText = counts.great;
@@ -2224,6 +2238,22 @@
             else if (isFullCombo) { resultTitle.innerText = "FULL COMBO!!"; resultTitle.className = "text-4xl font-black mb-4 italic text-yellow-300 tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]"; }
             else { resultTitle.innerText = "LIVE SUCCESS!"; resultTitle.className = "text-3xl font-black mb-4 italic text-green-400 tracking-tighter text-center px-12 overflow-visible min-w-full"; }
             document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('result-screen').style.display = 'flex';
+            
+            // --- エディターからのテストプレイ時は、戻り先をエディターに変更 ---
+            const backBtn = document.getElementById('btn-result-back');
+            if (isEditorTestPlay) {
+                backBtn.innerText = "エディターに戻る";
+                backBtn.onclick = () => {
+                    document.getElementById('result-screen').style.display = 'none';
+                    backToEditorFromPlay();
+                };
+                backBtn.classList.replace('bg-blue-600', 'bg-blue-700'); 
+            } else {
+                backBtn.innerText = "選曲画面に戻る";
+                backBtn.onclick = backToTitle;
+                backBtn.classList.remove('bg-blue-700');
+            }
+            
             document.getElementById('final-score').innerText = score.toString().padStart(6, '0');
             document.getElementById('res-perfect').innerText = counts.perfect;
             document.getElementById('res-great').innerText = counts.great;
