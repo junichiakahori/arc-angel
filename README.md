@@ -31,7 +31,7 @@
 
 ![ArcAngel Favicon](assets/images/favicon.png)
 
-**ArcAngel** は、ブラウザで動作するプレミアムな動画同期型リズムアクションゲームです。
+**ArcAngel** は、ブラウザで動作するプレミアムな動画同期型リズムゲームです。
 
 - **🎮 プレイ (Official URL)**: [https://junichiakahori.github.io/arc-angel/](https://junichiakahori.github.io/arc-angel/)
 - **操作**: `A S D F SPACE J K L ;` キー
