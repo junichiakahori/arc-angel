@@ -9,6 +9,16 @@
     <link id="favicon" rel="icon" type="image/png" href="assets/images/favicon.png">
     <link id="apple-touch-icon" rel="apple-touch-icon" href="assets/images/favicon.png">
 
+    <!-- Google tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M1677MTMKN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-M1677MTMKN');
+    </script>
+
     <script>
         // JS実行前にhrefを調整 (サブフォルダ対応)
         (function () {
@@ -20,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.8 - 2026/04/06 13:20 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 13:23 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -115,7 +125,7 @@
         }
 
         #launcher-screen {
-            z-index: 500;
+            z-index: 10000;
         }
 
         #start-screen {
@@ -132,27 +142,34 @@
             background-color: #000;
         }
 
-        :fullscreen .overlay-screen, :-webkit-full-screen .overlay-screen {
+        :fullscreen .overlay-screen,
+        :-webkit-full-screen .overlay-screen {
             position: absolute !important;
-            top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
             z-index: 2147483647 !important;
             background: rgba(0, 0, 0, 0.4) !important;
             backdrop-filter: blur(8px) !important;
             pointer-events: auto !important;
         }
 
-        :fullscreen #game-canvas, :-webkit-full-screen #game-canvas {
+        :fullscreen #game-canvas,
+        :-webkit-full-screen #game-canvas {
             z-index: 10000 !important;
         }
 
-        :fullscreen #ui-overlay, :-webkit-full-screen #ui-overlay {
+        :fullscreen #ui-overlay,
+        :-webkit-full-screen #ui-overlay {
             z-index: 2147483647 !important;
             background: rgba(0, 0, 0, 0.7) !important;
             backdrop-filter: none !important;
         }
 
         /* エディターUIも全画面時は最前面へ */
-        :fullscreen #editor-controls, :-webkit-full-screen #editor-controls {
+        :fullscreen #editor-controls,
+        :-webkit-full-screen #editor-controls {
             z-index: 2147483647 !important;
         }
 
@@ -171,7 +188,8 @@
             transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }
 
-        .launcher-btn:focus, .launcher-btn:hover {
+        .launcher-btn:focus,
+        .launcher-btn:hover {
             transform: scale(1.05);
             border-color: #60a5fa;
             box-shadow: 0 0 50px rgba(37, 99, 235, 0.9);
@@ -223,7 +241,8 @@
             transition: all 0.2s;
         }
 
-        .btn-action:focus, .btn-action:hover {
+        .btn-action:focus,
+        .btn-action:hover {
             transform: translateY(-2px);
             filter: brightness(1.1);
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
@@ -374,7 +393,7 @@
             position: fixed;
             bottom: max(10px, env(safe-area-inset-bottom) + 10px);
             left: 10px;
-            width: 260px;
+            width: 320px;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(15px);
             padding: 8px 12px;
@@ -441,7 +460,7 @@
 
         @media (max-width: 650px) {
             #editor-timeline-panel {
-                width: 180px;
+                width: 240px;
                 bottom: 5px;
                 left: 5px;
                 padding: 6px;
@@ -589,38 +608,78 @@
         .animate-slide-up {
             animation: slide-up 0.3s ease-out forwards;
         }
+
+        /* 記録中インジケーター用の点滅アニメーション */
+        @keyframes blink-red {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.8)); }
+            50% { opacity: 0.4; filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.2)); }
+        }
+        .recording-blink {
+            animation: blink-red 1s infinite;
+        }
+
+        /* 記録中の画面全体の枠線強調 */
+        #game-wrapper.recording-active::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border: 6px solid rgba(239, 68, 68, 0.6);
+            box-shadow: inset 0 0 100px rgba(239, 68, 68, 0.3);
+            pointer-events: none;
+            z-index: 1000;
+            animation: blink-red 2s infinite;
+        }
     </style>
 </head>
 
 <body>
     <!-- 全画面切り替えボタン (最上位階層に配置) -->
-    <button onclick="toggleFullScreen()" 
+    <button onclick="toggleFullScreen()"
         class="fixed top-4 right-4 bg-white/5 hover:bg-white/20 p-2.5 rounded-full border border-white/10 z-[2147483647] backdrop-blur-md transition-all opacity-40 hover:opacity-100 pointer-events-auto">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
         </svg>
     </button>
 
     <div id="game-wrapper" class="relative group">
-        <!-- ローディング表示 -->
-        <div id="loading-overlay">
-            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div id="loading-text" class="text-xl font-black italic tracking-widest text-blue-400">動画を準備中...</div>
+        <!-- ローディング表示 (プリロード対応) -->
+        <div id="loading-overlay" class="absolute inset-0 z-[1100] bg-black/80 backdrop-blur-md hidden flex-col justify-center items-center">
+            <div class="overlay-screen-content text-center">
+                <div class="mb-4">
+                    <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                    <p class="text-xl font-black italic tracking-tighter text-white mb-2">PRE-LOADING ASSETS...</p>
+                    <div class="w-64 h-3 bg-gray-800 rounded-full overflow-hidden mx-auto shadow-inner border border-white/5">
+                        <div id="loading-progress" class="w-0 h-full bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-200"></div>
+                    </div>
+                    <p id="loading-status" class="text-[10px] text-blue-400 mt-4 font-bold tracking-[0.2em] uppercase opacity-80">Initializing Download...</p>
+                </div>
+            </div>
         </div>
 
         <video id="local-video" style="display:none;" playsinline webkit-playsinline crossorigin="anonymous"></video>
+
+        <!-- バッファリング(ロード待ち)表示 -->
+        <div id="buffering-overlay" class="absolute inset-0 z-[600] bg-black/40 backdrop-blur-sm hidden flex-col justify-center items-center pointer-events-none">
+            <div class="w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div class="text-white font-black italic tracking-widest text-sm drop-shadow-lg">BUFFERING...</div>
+        </div>
 
         <!-- 1. 起動画面 -->
         <div id="launcher-screen" class="overlay-screen">
             <div class="overlay-screen-content">
                 <div class="mb-12">
-                    <h1 class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl mb-4 text-rainbow">ArcAngel
-                    </h1>
+                    <div class="flex flex-col items-center justify-center gap-2 mb-4">
+                        <img src="../assets/images/favicon.png" alt="Logo" class="w-20 h-20 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] animate-pulse">
+                        <h1 class="text-6xl font-black italic text-white tracking-tighter drop-shadow-2xl text-rainbow">
+                            ArcAngel
+                        </h1>
+                    </div>
                     <p
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        最終更新: 2026/04/06 13:20 (JST)
+                        <span id="version-display">ArcAngel v0.9</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
                     </p>
                 </div>
 
@@ -641,9 +700,9 @@
                 <!-- バージョン切り替えリンク -->
                 <div class="mt-6 pt-4 border-t border-white/5 w-full max-w-xs text-center">
                     <p class="text-[9px] text-gray-500 font-bold tracking-widest mb-2 uppercase opacity-50">バージョン切り替え</p>
-                    <a href="latest/v0.9.html"
-                        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-orange-500/40 bg-orange-500/10 text-orange-400 text-[10px] font-black tracking-wider hover:bg-orange-500/20 transition-all">
-                        ⚡ v0.9（開発版）へ
+                    <a href="../index.html"
+                        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 text-green-400 text-[10px] font-black tracking-wider hover:bg-green-500/20 transition-all">
+                        ✅ v0.8（安定版）へ
                     </a>
                 </div>
 
@@ -665,7 +724,10 @@
     <!-- 2. スタジオ設定画面 -->
     <div id="start-screen" class="overlay-screen" style="display: none;">
         <div class="overlay-screen-content">
-            <h1 class="text-3xl font-black mb-1 italic text-blue-500 tracking-tighter">ArcAngel</h1>
+            <div class="flex items-center justify-center gap-3 mb-1">
+                <img src="../assets/images/favicon.png" alt="Logo" class="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]">
+                <h1 class="text-3xl font-black italic text-blue-500 tracking-tighter">ArcAngel</h1>
+            </div>
             <p class="mb-6 text-gray-400 text-[10px] font-bold tracking-widest text-center px-4">動画ファイルを選択して開始してください</p>
 
             <div class="input-box text-left space-y-4">
@@ -676,12 +738,11 @@
                     <p id="file-status" class="text-[9px] text-gray-500 mt-2">※ファイルを選択すると準備が完了します。</p>
                 </div>
 
-                <!-- 隠し選曲リスト (コナミコマンド後に出現) -->
+                <!-- 選曲リスト (隠しコマンド後に出現) -->
                 <div id="song-list-container"
                     class="hidden mt-4 w-full p-3 bg-blue-900/40 border-2 border-blue-500/50 rounded-3xl shadow-[0_0_20px_rgba(37,99,235,0.3)] animate-pulse overflow-visible">
                     <div class="flex items-center justify-between mb-3">
-                        <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">Secret Song
-                            List</p>
+                        <p class="text-[10px] font-black italic text-blue-300 tracking-[0.3em] uppercase">SONG LIST</p>
                         <button onclick="toggleBGM(this)"
                             class="bg-blue-500/20 hover:bg-blue-500/40 border border-blue-500/30 px-3 py-1 rounded-full text-[8px] font-bold text-blue-200 transition-all">BGM
                             STOP</button>
@@ -689,6 +750,11 @@
                     <div id="song-list"
                         class="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 px-2 snap-proximity snap-x scroll-smooth no-scrollbar"
                         style="-webkit-overflow-scrolling: touch; touch-action: auto; user-select: none;"></div>
+
+                    <!-- プレビュー読み込みステータス -->
+                    <div id="preview-status-container" class="hidden flex-col items-center justify-center mt-2 h-6">
+                        <p id="preview-status" class="text-[10px] font-bold text-center tracking-widest"></p>
+                    </div>
 
                     <!-- 難易度選択パネル (合言葉入力後、曲選択で出現) -->
                     <div id="difficulty-box" class="hidden mt-6 animate-slide-up border-t border-blue-500/20 pt-4">
@@ -706,6 +772,11 @@
                                 class="btn-diff btn-diff-master">MASTER</button>
                         </div>
                     </div>
+
+                    <button onclick="backToLauncher()"
+                        class="w-full mt-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-bold text-gray-500 transition-all uppercase tracking-widest">
+                        タイトル画面(ランチャー)に戻る
+                    </button>
                 </div>
 
                 <div id="chart-selector"
@@ -815,8 +886,8 @@
             <button id="btn-skip-result"
                 class="bg-blue-600 px-4 py-1 rounded text-[9px] font-black hidden border border-white/40 animate-pulse shadow-[0_0_15px_rgba(37,99,235,0.8)]"
                 onclick="showResults()">リザルトへ進む</button>
-            <button class="bg-white/10 px-3 py-1 rounded text-[9px] font-bold active:bg-red-500/30"
-                onclick="backToTitle()">タイトルへ</button>
+            <button id="btn-live-back" class="bg-white/10 px-3 py-1 rounded text-[9px] font-bold active:bg-red-500/30"
+                onclick="backToTitle()">選曲画面へ</button>
         </div>
     </div>
 
@@ -826,7 +897,8 @@
             <button onclick="togglePause()" class="btn-action w-64">再開</button>
             <button id="btn-back-to-editor" onclick="backToEditorFromPlay()"
                 class="btn-action bg-blue-700 hidden w-64">エディターに戻る</button>
-            <button onclick="backToTitle()" class="btn-action btn-secondary w-64">タイトルに戻る</button>
+            <button onclick="backToTitle()" class="btn-action btn-secondary w-64">選曲画面に戻る</button>
+            <button onclick="backToLauncher()" class="btn-action bg-gray-800 w-64 text-[10px]">タイトル画面に戻る</button>
         </div>
     </div>
 
@@ -841,17 +913,29 @@
                     onmousedown="seekVideoStart()" onmouseup="seekVideoEnd()" ontouchstart="seekVideoStart()"
                     ontouchend="seekVideoEnd()">
             </div>
-            <div id="editor-status-row" class="flex items-center justify-between px-1">
+            <div id="editor-status-row" class="flex items-center justify-between mt-1 px-1">
                 <div class="flex items-center gap-2">
                     <div id="rec-lamp" class="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
                     <span id="edit-status"
-                        class="text-[8px] font-black italic text-gray-400 uppercase tracking-tighter">Ready</span>
+                        class="text-[8px] font-black italic text-gray-400 uppercase tracking-tighter w-14">Ready</span>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="toggleEditorPause()"
-                        class="bg-white/10 px-2 py-0.5 rounded text-[8px]">⏸️/▶️</button>
-                    <button onclick="promptDeleteNote()"
-                        class="bg-red-900/40 text-red-200 border border-red-500/20 px-2 py-0.5 rounded text-[8px] font-bold">付近削除</button>
+                <div class="flex items-center gap-1 flex-wrap justify-end">
+                    <button onclick="seekVideoBy(-5)" class="bg-gray-800 text-gray-200 px-1.5 py-0.5 rounded-sm text-[8px] border border-gray-600 active:bg-gray-700">-5s</button>
+                    <button id="btn-editor-pause" onclick="toggleEditorPause()"
+                        class="bg-blue-600/50 border border-blue-500/50 px-2 py-0.5 rounded text-[8px]">⏸️/▶️</button>
+                    <button onclick="seekVideoBy(5)" class="bg-gray-800 text-gray-200 px-1.5 py-0.5 rounded-sm text-[8px] border border-gray-600 active:bg-gray-700">+5s</button>
+                    
+                    <select id="editor-speed-select" onchange="setVideoSpeed(this.value)" class="bg-gray-800 text-gray-200 text-[8px] border border-gray-600 rounded-sm px-1 py-0.5 outline-none">
+                        <option value="0.25">0.25x</option>
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1">1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2.0x</option>
+                    </select>
+
+
                 </div>
             </div>
         </div>
@@ -859,6 +943,7 @@
         <!-- 右側パネル: メイン・アクション -->
         <div id="editor-actions">
             <button id="btn-rec-toggle" onclick="toggleRecording()" class="bg-red-700 text-white">記録開始</button>
+            <button onclick="resetChart()" class="bg-red-900/60 text-red-100 border border-red-500/30">全消去</button>
             <button onclick="startPlayFromEditor()"
                 class="bg-blue-700 text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] font-black">プレイ開始</button>
             <button onclick="openTextEditor()"
@@ -907,7 +992,73 @@
                     <span>Max Combo</span><span id="res-combo">0</span>
                 </div>
             </div>
-            <button onclick="backToTitle()" class="btn-action shadow-lg px-12">メニューに戻る</button>
+            <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-12">選曲画面に戻る</button>
+        </div>
+    </div>
+
+    <!-- PC専用ショートカットガイド -->
+    <div id="keyboard-help"
+        class="hidden lg:flex fixed left-1/2 -translate-x-1/2 top-4 bg-black/40 backdrop-blur-2xl p-4 rounded-3xl border border-white/10 text-[9px] text-gray-300 pointer-events-none z-[100] w-[400px] shadow-2xl transition-all animate-fade-in items-start gap-3">
+        
+        <!-- アイコンセクション -->
+        <div class="flex flex-col items-center gap-1 border-r border-white/10 pr-2">
+            <svg class="w-4 h-4 text-blue-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-[8px] font-black text-blue-500 uppercase tracking-tighter">Guides</span>
+        </div>
+
+        <div class="flex-1 flex gap-4">
+            <!-- Gameplay -->
+            <div class="space-y-2 shrink-0 border-r border-white/5 pr-3">
+                <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Gameplay</p>
+                <div class="grid grid-cols-3 gap-1.5 w-max">
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(255,215,0);">A</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(50,205,50);">S</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(255,68,68);">D</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(30,144,255);">F</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(255,140,0);">␣</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(255,255,255);">J</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(0,255,255);">K</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(147,112,219);">L</div>
+                    <div class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-black border border-white/20" style="background-color: rgb(255,105,180);">;</div>
+                </div>
+            </div>
+
+            <!-- Editor -->
+            <div class="space-y-2 shrink-0 border-r border-white/5 pr-3">
+                <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Editor</p>
+                <div class="grid grid-cols-1 gap-1.5">
+                    <div class="flex justify-between items-center gap-3">
+                        <span class="opacity-60 italic">Play/Rec</span>
+                        <div class="flex gap-1">
+                            <kbd class="bg-white/10 border border-white/20 px-1 rounded font-bold text-white">⏎</kbd>
+                            <kbd class="bg-blue-500/20 border border-blue-500/30 px-1 rounded font-bold text-blue-300">R</kbd>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center gap-3">
+                        <span class="opacity-60 italic">Test</span>
+                        <kbd class="bg-green-500/20 border border-green-500/30 px-1 rounded font-bold text-green-300">P</kbd>
+                    </div>
+                    <div class="flex justify-between items-center gap-3">
+                        <span class="opacity-60 italic">Seek/Spd</span>
+                        <div class="flex gap-1 text-[7px] font-bold">
+                            <span class="bg-white/5 border border-white/10 px-1 rounded">←→</span>
+                            <span class="bg-white/5 border border-white/10 px-1 rounded">↑↓</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System -->
+            <div class="space-y-2 flex-1">
+                <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">System</p>
+                <div class="flex justify-between items-center gap-2">
+                    <span class="opacity-60 italic">Title/Menu</span>
+                    <kbd class="bg-white/10 border border-white/20 px-1 rounded font-bold text-white">Esc</kbd>
+                </div>
+                <p class="mt-2 text-[7px] text-gray-600 italic text-right opacity-60">PC Only</p>
+            </div>
         </div>
     </div>
 
@@ -916,12 +1067,32 @@
         // サブフォルダ (latest/ 等) にいてもルートにいても assets を見つけられるようにする
         const BASE_PATH = window.location.pathname.includes('/latest/') ? '../' : '';
 
+        // --- バージョン情報の動的読み込み (履歴台帳方式) ---
+        async function loadVersionInfo() {
+            try {
+                const response = await fetch(BASE_PATH + 'assets/version_history.json');
+                const data = await response.json();
+                const verDisp = document.getElementById('version-display');
+                const timeDisp = document.getElementById('last-updated-display');
+                
+                // 特定バージョン版ファイル
+                const MY_VERSION = "v0.9"; 
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 13:23 (JST)";
+                
+                if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
+                if (timeDisp) timeDisp.innerText = updateDate;
+            } catch (e) {
+                console.log("Version Info could not be loaded", e);
+            }
+        }
+        window.addEventListener('DOMContentLoaded', loadVersionInfo);
+
         // --- 設定・定数 ---
         const ADMIN_EMAIL = "drone.akahori@gmail.com";
 
         // --- 変数管理 ---
         let canvas, ctx, audioCtx, noiseBuffer = null, bgmAudio = null, buttons = [], buttonRadius = 35;
-        let isKonamiActivated = false;
+        let isCommandActivated = false; // 隠しコマンド
         let currentSelectedSong = null;
         let currentSongIndex = -1;
         let songsStore = [];
@@ -933,12 +1104,27 @@
         ];
         let AUTO_SONG_LIST = []; // キャッシュ用
         let localVideo, isVideoReady = false;
+        let gameStartTime = 0; // ゲーム開始時刻 (performance.now())
         let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
         let stamina = 100, maxStamina = 100;
         let isEditorPaused = false, isSeeking = false;
         let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false;
+        // --- 9レーンカラー定義 (虹色グラデーション) ---
+        const LANE_COLORS = [
+            '255, 215, 0',   // 0: Yellow (A)
+            '50, 205, 50',   // 1: Green (S)
+            '255, 68, 68',   // 2: Red (D)
+            '30, 144, 255',  // 3: Blue (F)
+            '255, 140, 0',   // 4: Orange (Space)
+            '255, 255, 255', // 5: White (J)
+            '0, 255, 255',   // 6: Aqua (K)
+            '147, 112, 219', // 7: Purple (L)
+            '255, 105, 180'  // 8: Pink (;)
+        ];
         let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
+        let editorSelectedNote = null;
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
+        let gameCurrentTime = 0; // 一貫性のあるゲーム内時刻
         let NOTE_TRAVEL_TIME = 2.0;
         const KEY_LABELS = ['A', 'S', 'D', 'F', 'SPACE', 'J', 'K', 'L', ';'], KEY_MAP = ['a', 's', 'd', 'f', ' ', 'j', 'k', 'l', ';'];
 
@@ -963,21 +1149,21 @@
                 // 1. ノイズ成分 (シャッ)
                 const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
                 const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
-                const ng = audioCtx.createGain(); 
-                ng.gain.setValueAtTime(0.15, now); 
+                const ng = audioCtx.createGain();
+                ng.gain.setValueAtTime(0.15, now);
                 ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination); 
+                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
                 ns.start(now);
 
                 // 2. サイン波成分 (シャン) 8000Hz -> 6000Hz へのスウィープ
-                const osc = audioCtx.createOscillator(); 
-                osc.type = 'sine'; 
-                osc.frequency.setValueAtTime(8000, now); 
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(8000, now);
                 osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
-                const og = audioCtx.createGain(); 
-                og.gain.setValueAtTime(0.1, now); 
+                const og = audioCtx.createGain();
+                og.gain.setValueAtTime(0.1, now);
                 og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.connect(og); og.connect(audioCtx.destination); 
+                osc.connect(og); og.connect(audioCtx.destination);
                 osc.start(now); osc.stop(now + 0.1);
             } else {
                 // それ以外は控えめな「チッ」
@@ -985,7 +1171,7 @@
                 const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(8000, now);
                 const ngClick = audioCtx.createGain();
                 ngClick.gain.setValueAtTime(0.08, now);
-                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04); 
+                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
                 nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
                 nsClick.start(now);
             }
@@ -1005,7 +1191,7 @@
             });
         }
 
-        function updateKonamiUI(isActivated, jacketUrl) {
+        function updateCommandUI(isActivated, jacketUrl) {
             const wrapper = document.getElementById('game-wrapper');
             if (isActivated) {
                 document.body.classList.add('konami-mode');
@@ -1062,14 +1248,34 @@
             localVideo = document.getElementById('local-video');
             localVideo.onended = () => { if (!isEditMode && isPlaying) showResults(); };
 
-            localVideo.oncanplaythrough = () => { isVideoReady = true; hideLoading(); document.getElementById('file-status').innerText = "準備完了"; document.getElementById('file-status').className = "text-[9px] text-green-400 mt-2 font-bold"; };
+            localVideo.oncanplaythrough = () => { isVideoReady = true; };
+            
+            // --- バッファリング対策 ---
+            localVideo.onwaiting = () => {
+                if (isPlaying && !isPaused && localVideo.currentTime > 0.1) {
+                    document.getElementById('buffering-overlay').style.display = 'flex';
+                }
+            };
+            localVideo.onplaying = () => {
+                document.getElementById('buffering-overlay').style.display = 'none';
+            };
+            localVideo.onstalled = () => {
+                console.log("Video stalled due to network conditions");
+            };
+
             localVideo.onerror = () => { hideLoading(); document.getElementById('error-msg').classList.remove('hidden'); document.getElementById('error-msg').innerText = "この動画ファイルは読み込めませんでした。"; isVideoReady = false; };
             document.getElementById('local-file-input').onchange = (e) => {
                 const file = e.target.files[0];
-                if (file) { showLoading("動画を解析中..."); localVideo.src = URL.createObjectURL(file); localVideo.load(); }
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    localVideo.src = url;
+                    localVideo.load();
+                    isVideoReady = true;
+                }
             };
+
             window.addEventListener('resize', resize);
-            document.addEventListener('fullscreenchange', () => { resize(); showToast("画面表示を調整しました"); });
+            document.addEventListener('fullscreenchange', () => { resize(); if(typeof showToast === 'function') showToast("画面表示を調整しました"); });
             document.addEventListener('webkitfullscreenchange', () => { resize(); });
             setupInput(); resize();
 
@@ -1078,11 +1284,82 @@
             }
         }
 
+        // --- 動画の完全プリロード処理 (Blob方式) ---
+        async function preloadVideo(url) {
+            const overlay = document.getElementById('loading-overlay');
+            const progressEl = document.getElementById('loading-progress');
+            const statusEl = document.getElementById('loading-status');
+            
+            overlay.style.display = 'flex';
+            progressEl.style.width = '0%';
+            statusEl.innerText = 'Connecting...';
+            
+            try {
+                const response = await fetch(BASE_PATH + url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const contentLength = response.headers.get('content-length');
+                if (!contentLength) {
+                    localVideo.src = BASE_PATH + url;
+                    localVideo.load();
+                    return new Promise((resolve) => {
+                        const check = setInterval(() => {
+                            if (localVideo.readyState >= 3) {
+                                clearInterval(check); localVideo.oncanplay = null; localVideo.oncanplaythrough = null;
+                                isVideoReady = true; overlay.style.display = 'none'; resolve();
+                            }
+                        }, 200);
+                        localVideo.oncanplay = () => { clearInterval(check); isVideoReady = true; overlay.style.display = 'none'; resolve(); };
+                    });
+                }
+
+                const total = parseInt(contentLength, 10);
+                let loaded = 0;
+                const reader = response.body.getReader();
+                const chunks = [];
+                
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    loaded += value.length;
+                    const percent = Math.round((loaded / total) * 100);
+                    progressEl.style.width = `${percent}%`;
+                    statusEl.innerText = `Downloading... ${percent}% (${Math.round(loaded/1024/1024*10)/10}MB / ${Math.round(total/1024/1024*10)/10}MB)`;
+                }
+
+                const blob = new Blob(chunks, { type: 'video/mp4' });
+                const blobUrl = URL.createObjectURL(blob);
+                localVideo.src = blobUrl;
+                localVideo.load();
+                
+                return new Promise((resolve) => {
+                    const check = setInterval(() => {
+                        if (localVideo.readyState >= 3) {
+                            clearInterval(check); localVideo.oncanplay = null; localVideo.oncanplaythrough = null;
+                            isVideoReady = true; overlay.style.display = 'none'; resolve();
+                        }
+                    }, 200);
+                    localVideo.oncanplay = () => { clearInterval(check); isVideoReady = true; overlay.style.display = 'none'; resolve(); };
+                });
+            } catch (err) {
+                console.error("Preload Error:", err);
+                localVideo.src = BASE_PATH + url;
+                localVideo.load();
+                overlay.style.display = 'none';
+            }
+        }
+
         // クラウドIDE等に勝手に onload を上書きされて動かなくなるのを防ぐため、addEventListener を使用する
         window.addEventListener('DOMContentLoaded', initGame);
         window.addEventListener('load', initGame);
 
-        function showLoading(txt = "準備中...") { document.getElementById('loading-text').innerText = txt; document.getElementById('loading-overlay').style.display = 'flex'; }
+        function showLoading(txt = "準備中...") { 
+            const el = document.getElementById('loading-status') || document.getElementById('loading-text');
+            if (el) el.innerText = txt; 
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.style.display = 'flex'; 
+        }
         function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
         function playStartSound() { if (!audioCtx) initAudio(); const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.3); g.gain.setValueAtTime(0.2, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.connect(g); g.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.3); }
         function openChartModal() {
@@ -1107,13 +1384,13 @@
             const el = document.getElementById('chart-input');
             const val = el.value.replace(/\s+/g, '').toLowerCase();
             if (val === "μ'sicforever") {
-                isKonamiActivated = true;
+                isCommandActivated = true;
                 // 動画要素のロック解除
                 if (localVideo) localVideo.play().then(() => localVideo.pause()).catch(() => { });
                 playSecretSound();
                 playTitleBGM();
                 showSongList();
-                updateKonamiUI(true);
+                updateCommandUI(true);
                 el.value = '';
                 document.getElementById('chart-input-modal').style.display = 'none';
                 return;
@@ -1147,7 +1424,11 @@
                     const info = document.createElement('div');
                     info.className = "w-full p-2 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center flex-1";
                     info.style.pointerEvents = 'none'; // テキストがスクロールを邪魔しないように
-                    info.innerHTML = `<span class="text-[10px] font-black italic text-white leading-tight drop-shadow-lg text-center px-1">${s.name}</span>`;
+                    info.innerHTML = `
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black italic text-white leading-tight drop-shadow-lg text-center px-1">${s.name}</span>
+                            <span class="text-[7px] text-blue-300/80 font-bold opacity-80 mt-1 tracking-wider">${s.release_date || ''}</span>
+                        </div>`;
 
                     b.appendChild(img);
                     b.appendChild(info);
@@ -1184,22 +1465,34 @@
         }
         async function selectSong(s) {
             currentSelectedSong = s;
-            showLoading(`「${s.name}」を準備中...`); isVideoReady = true;
+            isVideoReady = true;
+            
+            const prevContainer = document.getElementById('preview-status-container');
+            const prevStatus = document.getElementById('preview-status');
+            if(prevContainer) prevContainer.classList.remove('hidden');
+            
+            prevStatus.innerText = `「${s.name}」のプレビューをロード中...`; 
+            prevStatus.className = "text-[10px] text-blue-400 font-bold animate-pulse";
+            
+            // ファイルステータスにも一応記載（裏側）
             const status = document.getElementById('file-status');
+            if(status) { status.innerText = `「${s.name}」を準備中...`; status.className = "text-[9px] text-blue-400 font-bold mt-2"; }
+
             stopTitleBGM();
             // 背景画像をクリア
-            updateKonamiUI(isKonamiActivated, 'none');
+            updateCommandUI(isCommandActivated, 'none');
             // 動画プレビューを見せるため、動画表示をON
-            localVideo.style.display = 'block'; 
+            localVideo.style.display = 'block';
             localVideo.style.opacity = "0.6";
             localVideo.loop = true; // プレビュー時はループ再生
-            localVideo.play().then(() => localVideo.pause()).catch(() => { });
             localVideo.src = s.video;
-            localVideo.oncanplaythrough = () => {
-                hideLoading();
-                status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2";
+            localVideo.oncanplay = () => {
+                prevStatus.innerText = `🎵 プレビュー再生準備完了: ${s.name}`; 
+                prevStatus.className = "text-[10px] text-green-400 font-bold";
+                if(status) { status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2"; }
+                
                 localVideo.play().catch(() => console.log("Auto-preview blocked"));
-                localVideo.oncanplaythrough = null;
+                localVideo.oncanplay = null;
             };
             localVideo.load();
 
@@ -1213,7 +1506,7 @@
                 // 譜面データが全く定義されていない（undefined）場合のみ inactive にする。
                 // 空文字 "" の場合は「新規作成」扱いで選択できるように維持。
                 if (!s.charts || s.charts[diff] === undefined) b.classList.add('inactive');
-                
+
                 // BACKUP_SONG_LIST 等で値が入っているものは強調
                 if (s.charts && s.charts[diff] && s.charts[diff] !== "") {
                     b.style.fontWeight = "900";
@@ -1228,10 +1521,11 @@
         }
 
         window.selectDifficulty = async (diff) => {
-            const target = event.currentTarget || event.target;
             const buttons = document.querySelectorAll('.btn-diff');
-            buttons.forEach(btn => btn.classList.remove('selected'));
-            if (target && target.classList) target.classList.add('selected');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.innerText.trim() === diff) btn.classList.add('selected');
+            });
 
             if (!currentSelectedSong) {
                 showError("先に曲を選択してください。");
@@ -1304,8 +1598,8 @@
 
         function getNearestLane(x, y) {
             const rect = canvas.getBoundingClientRect();
-            const canvasX = x - rect.left;
-            const canvasY = y - rect.top;
+            const canvasX = (x - rect.left) * (canvas.width / rect.width);
+            const canvasY = (y - rect.top) * (canvas.height / rect.height);
             let idx = -1, min = buttonRadius * 3.5;
             buttons.forEach((btn, i) => {
                 const d = Math.hypot(btn.x - canvasX, btn.y - canvasY);
@@ -1314,17 +1608,108 @@
             return idx;
         }
 
+        function tryInteractNoteAt(mx, my) {
+            if (!isEditMode) return false;
+            const rect = canvas.getBoundingClientRect();
+            const x = (mx - rect.left) * (canvas.width / rect.width);
+            const y = (my - rect.top) * (canvas.height / rect.height);
+            const isP = canvas.height > canvas.width;
+            const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
+            const ct = localVideo.currentTime;
+            
+            for (let i = activeNotes.length - 1; i >= 0; i--) {
+                const n = activeNotes[i];
+                const tb = buttons[n.lane];
+                const sp = (ct - (n.time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
+                if (sp < 0 || sp > 1.2) continue; 
+                const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
+                const dist = Math.hypot(x - hx, y - hy);
+                if (dist < buttonRadius * 1.5) {
+                    if (editorSelectedNote && Math.abs(editorSelectedNote.time - n.time) < 0.005 && editorSelectedNote.lane === n.lane) {
+                        recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - n.time) < 0.005 && rn.lane === n.lane));
+                        activeNotes.splice(i, 1);
+                        editorSelectedNote = null;
+                        syncEditorNotes();
+                        draw(ct); 
+                        showToast("ノートを削除しました", 1500);
+                    } else {
+                        editorSelectedNote = { time: n.time, lane: n.lane };
+                        draw(ct);
+                        showToast("選択状態 (再度押すと削除)", 1500);
+                    }
+                    return true;
+                }
+            }
+            if (editorSelectedNote) {
+                editorSelectedNote = null;
+                draw(ct);
+            }
+            return false;
+        }
+
         function setupInput() {
             const sH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputStart(l); };
             const eH = (l) => { if (isPaused || (!isPlaying && !isEditMode)) return; handleInputEnd(l); };
 
-            window.addEventListener('keydown', (e) => { if (e.repeat) return; let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) sH(l); if (e.key === 'Escape') togglePause(); });
-            window.addEventListener('keyup', (e) => { let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); if (l === -1 && k === 'h') l = 4; if (l !== -1) eH(l); });
+            window.addEventListener('keydown', (e) => { 
+                if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return; 
+                let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
+                if (l !== -1) {
+                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sH(l); 
+                }
+                if (e.key === 'Escape') togglePause(); 
+                
+                // エディター / テストプレイ用ショートカット
+                if (isEditMode || isEditorTestPlay) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        toggleEditorPause();
+                    } else if (e.key.toLowerCase() === 'r') {
+                        e.preventDefault();
+                        toggleRecording();
+                    } else if (e.key.toLowerCase() === 'p') {
+                        e.preventDefault();
+                        startPlayFromEditor();
+                    } else if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        seekVideoBy(-5);
+                    } else if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        seekVideoBy(5);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+                        let cur = localVideo.playbackRate;
+                        let next = speeds.find(s => s > cur) || speeds[speeds.length - 1];
+                        setVideoSpeed(next);
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+                        let cur = localVideo.playbackRate;
+                        let next = [...speeds].reverse().find(s => s < cur) || speeds[0];
+                        setVideoSpeed(next);
+                    }
+                }
+            }, {capture: true});
+            window.addEventListener('keyup', (e) => { 
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
+                let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
+                if (l !== -1) {
+                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    eH(l); 
+                }
+            }, {capture: true});
 
             canvas.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
+                    if (isEditMode && tryInteractNoteAt(t.clientX, t.clientY)) continue;
                     const l = getNearestLane(t.clientX, t.clientY);
                     if (l !== -1) {
                         activeTouches.set(t.identifier, l);
@@ -1332,6 +1717,13 @@
                     }
                 }
             }, { passive: false });
+
+            canvas.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // ダブルクリック時のテキスト全選択を防止
+                if (isEditMode && tryInteractNoteAt(e.clientX, e.clientY)) return;
+                const l = getNearestLane(e.clientX, e.clientY);
+                if (l !== -1) sH(l);
+            });
 
             const handleEnd = (e) => {
                 e.preventDefault();
@@ -1350,52 +1742,119 @@
         }
 
         async function startLive(editMode = false) {
-            initAudio(); playStartSound(); stopTitleBGM(); if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
+            initAudio(); playStartSound(); stopTitleBGM();
+            
+            const song = currentSelectedSong;
+            if (isCommandActivated && song && !localVideo.src) {
+                localVideo.src = song.video;
+                localVideo.load();
+            }
+            
+            if (!isVideoReady) { showToast("先に動画ファイルを選択してください"); return; }
+            
+            // ロード中表示を開始
+            showLoading(editMode ? "エディット環境を構築中..." : "ライブ準備中...");
+            
             isEditMode = editMode;
-
+            isEditorPaused = false;
             const speedVal = parseFloat(document.getElementById('speed-input').value) || 5.0;
-            // 速度計算を2倍速ベースに変更 (5.0設定時に約1.0秒で到達)
             NOTE_TRAVEL_TIME = Math.max(0.2, 5.0 / speedVal);
 
-            const raw = document.getElementById('chart-input').value.trim();
-            CHART = raw ? JSON.parse(raw.replace(/^const CHART = /, '').replace(/;$/, '')).sort((a, b) => a.time - b.time) : [];
+            if (!CHART || CHART.length === 0) {
+                const raw = document.getElementById('chart-input').value.trim();
+                if (raw) {
+                    try {
+                        CHART = JSON.parse(raw.replace(/^const CHART\s*=\s*/, '').replace(/;+\s*$/, '')).sort((a, b) => a.time - b.time);
+                    } catch(e) {
+                        CHART = [];
+                    }
+                }
+            }
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
-            if (isEditMode && localVideo) document.getElementById('editor-seek-bar').max = localVideo.duration || 100;
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('launcher-screen').style.display = 'none';
-            document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
-            document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
-            document.getElementById('editor-controls').style.display = isEditMode ? 'flex' : 'none';
-            document.getElementById('btn-skip-result').classList.add('hidden');
-
             score = 0; combo = 0; maxCombo = 0; counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
-            stamina = 100;
-            // エディットモード時は、貼り付けられた既存譜面を読み込んで続きから編集可能にする
+            stamina = 100; gameCurrentTime = 0;
             recordedChart = isEditMode ? JSON.parse(JSON.stringify(CHART)) : [];
             notesQueue = isEditMode ? [] : [...CHART];
             activeNotes = []; hitEffects = [];
             lanePressed.fill(false); activeTouches.clear(); updateUI();
-            const jEl = document.getElementById('judge-display'); jEl.innerText = "READY?"; jEl.className = "text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest";
+            
+            const jEl = document.getElementById('judge-display'); 
+            jEl.innerText = "READY?"; 
+            jEl.className = "text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest";
             syncEditorNotes();
-            if (isKonamiActivated) updateKonamiUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
 
-            if (isEditMode) {
-                isRecording = true;
-                const btn = document.getElementById('btn-rec-toggle'), status = document.getElementById('edit-status'), lamp = document.getElementById('rec-lamp');
-                btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500');
-            } else { isRecording = false; }
+            // 動画の設定
+            localVideo.style.display = 'block';
+            localVideo.style.opacity = isEditMode ? "0.7" : "0.4";
+            localVideo.loop = false;
+            document.getElementById('buffering-overlay').style.display = 'none';
 
-            localVideo.currentTime = 0; localVideo.style.display = 'block';
-            localVideo.style.opacity = isEditMode ? "0.7" : "0.4"; // プレイ中は視認性を高めるため暗く(40%)する
-            localVideo.loop = false; // プレイ中はループ解除
-            localVideo.play();
-            isPlaying = true; requestAnimationFrame(update);
+            // ゲーム開始・UI遷移の実行
+            const doPlay = async () => {
+                // UIを一気にプレイモードへ切り替え
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('launcher-screen').style.display = 'none';
+                document.getElementById('ui-overlay').style.display = 'block';
+                document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
+                document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
+                document.getElementById('keyboard-help').style.display = 'none';
+                document.getElementById('editor-controls').style.display = isEditMode ? 'flex' : 'none';
+                if (isEditMode) document.getElementById('editor-seek-bar').max = localVideo.duration || 100;
+                if (isCommandActivated) updateCommandUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
+                
+                isPlaying = true;
+                gameCurrentTime = 0;
+                gameStartTime = performance.now();
+                requestAnimationFrame(update);
+                
+                try {
+                    await localVideo.play();
+                } catch(e) {
+                    console.warn("Video play failed:", e);
+                }
+                
+                // 再生が実際に始まった（または開始処理が終わった）らロードを消す
+                setTimeout(hideLoading, 300);
+            };
+
+            // シーク完了を待ってから開始する
+            if (Math.abs(localVideo.currentTime) > 0.1) {
+                localVideo.onseeked = () => {
+                    localVideo.onseeked = null;
+                    doPlay();
+                };
+                localVideo.currentTime = 0;
+            } else {
+                doPlay();
+            }
+            
+            // シークがいつまでも終わらない場合の保険
+            setTimeout(() => { if (!isPlaying) doPlay(); }, 2000);
         }
 
         function update() {
-            if (!isPlaying || isPaused) return;
-            const ct = localVideo.currentTime;
+            if (!isPlaying || isPaused || (isEditMode && isEditorPaused)) return;
+            
+            const videoTime = localVideo.currentTime;
+            const isVideoPlaying = !localVideo.paused && !localVideo.seeking && localVideo.readyState >= 3;
+
+            if (isVideoPlaying) {
+                // 動画が動いているなら、基本的には動画の時刻に合わせる
+                if (videoTime > 0) {
+                    gameCurrentTime = videoTime;
+                    // 内部時計も同期（動画が止まった時のために）
+                    gameStartTime = performance.now() - (videoTime * 1000);
+                } else {
+                    // 再生開始直後の currentTime=0 の間は内部時計で微調整
+                    gameCurrentTime = (performance.now() - gameStartTime) / 1000;
+                }
+            } else {
+                // 動画がロード中、またはバッファリングで止まっている場合は、ゲーム内時刻も止める
+                // 現在の gameCurrentTime を維持するように gameStartTime をスライドさせる
+                gameStartTime = performance.now() - (gameCurrentTime * 1000);
+            }
+            const ct = gameCurrentTime;
             if (!isEditMode && notesQueue.length === 0 && activeNotes.length === 0 && CHART.length > 0) {
                 document.getElementById('btn-skip-result').classList.remove('hidden');
             }
@@ -1404,23 +1863,38 @@
                     document.getElementById('editor-seek-bar').value = ct;
                     document.getElementById('editor-time-display').innerText = ct.toFixed(2) + "s";
                 }
-                if (isPreviewMode || (!isEditMode && isPlaying) || isEditMode) {
-                    while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) { activeNotes.push({ ...notesQueue.shift(), status: 'waiting' }); }
+                
+                // プレイ中またはプレビュー中、またはエディットモードなら処理継続
+                if (isPreviewMode || isPlaying || isEditMode) {
+                    // ノーツの生成（ActiveNotesへ）
+                    while (notesQueue.length > 0 && notesQueue[0].time <= ct + NOTE_TRAVEL_TIME) {
+                        activeNotes.push({ ...notesQueue.shift(), status: 'waiting' });
+                    }
+                    
                     if (!isEditMode) {
                         document.getElementById('time-display').innerText = `${ct.toFixed(2)}s`;
                         const progress = (ct / localVideo.duration) * 100;
                         document.getElementById('progress-bar').style.width = `${progress}%`;
                         document.getElementById('progress-text').innerText = `${Math.floor(progress)}%`;
 
-                        // スタミナチェック
                         if (stamina <= 0) {
                             showLiveFailed();
                             return;
                         }
                     }
-                    for (let i = hitEffects.length - 1; i >= 0; i--) { let e = hitEffects[i]; if (e.type === 'ring') { e.size += e.speed; e.opacity -= 0.05; } else { e.x += e.vx; e.y += e.vy; e.opacity -= 0.04; } if (e.opacity <= 0) hitEffects.splice(i, 1); }
+                    
+                    // エフェクト更新
+                    for (let i = hitEffects.length - 1; i >= 0; i--) {
+                        let e = hitEffects[i];
+                        if (e.type === 'ring') { e.size += e.speed; e.opacity -= 0.05; }
+                        else { e.x += e.vx; e.y += e.vy; e.opacity -= 0.04; }
+                        if (e.opacity <= 0) hitEffects.splice(i, 1);
+                    }
+                    
                     draw(ct);
                 }
+            }
+            if (isPlaying && !isPaused && !(isEditMode && isEditorPaused)) {
                 requestAnimationFrame(update);
             }
         }
@@ -1433,6 +1907,20 @@
 
             document.getElementById('ui-overlay').style.opacity = '0';
             document.getElementById('result-screen').style.display = 'flex';
+
+            // --- エディターからのテストプレイ時は、戻り先をエディターに変更 ---
+            const backBtn = document.getElementById('btn-result-back');
+            if (isEditorTestPlay) {
+                backBtn.innerText = "エディターに戻る";
+                backBtn.onclick = () => {
+                    document.getElementById('result-screen').style.display = 'none';
+                    backToEditorFromPlay();
+                };
+            } else {
+                backBtn.innerText = "選曲画面に戻る";
+                backBtn.onclick = backToTitle;
+            }
+
             document.getElementById('final-score').innerText = score.toString().padStart(6, '0');
             document.getElementById('res-perfect').innerText = counts.perfect;
             document.getElementById('res-great').innerText = counts.great;
@@ -1447,15 +1935,43 @@
 
             const isP = canvas.height > canvas.width;
             const cx = canvas.width / 2, cy = isP ? canvas.height * 0.35 : canvas.height * 0.15;
+            // --- 背景が明るい場合の視認性向上 (ディミンググラデーション) ---
+            const gradient = ctx.createLinearGradient(0, canvas.height, 0, cy - buttonRadius * 2);
+            gradient.addColorStop(0, 'rgba(0,0,0,0.6)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, cy - buttonRadius * 2, canvas.width, canvas.height - (cy - buttonRadius * 2));
+
             buttons.forEach((btn, idx) => {
-                ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2); ctx.strokeStyle = lanePressed[idx] ? '#fff' : '#00f0ff'; ctx.lineWidth = lanePressed[idx] ? 4 : 2; ctx.stroke();
-                ctx.fillStyle = 'rgba(0, 240, 255, 0.15)'; ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = `bold ${buttonRadius / 2.5}px Arial`; ctx.textAlign = 'center'; ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
+                const c = LANE_COLORS[idx] || '0, 240, 255';
+                
+                // ボタンの外枠・影
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                
+                ctx.beginPath(); ctx.arc(btn.x, btn.y, buttonRadius, 0, Math.PI * 2); 
+                ctx.strokeStyle = lanePressed[idx] ? '#fff' : `rgb(${c})`; 
+                ctx.lineWidth = lanePressed[idx] ? 5 : 3; // 枠線を少し太く
+                ctx.stroke();
+                
+                ctx.fillStyle = lanePressed[idx] ? `rgba(${c}, 0.6)` : `rgba(${c}, 0.25)`; 
+                ctx.fill();
+                ctx.restore();
+
+                // キーラベルの縁取り
+                ctx.font = `bold ${buttonRadius / 2.2}px Arial`; 
+                ctx.textAlign = 'center'; 
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 4;
+                ctx.strokeText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
+                ctx.fillStyle = 'rgba(255,255,255,1.0)'; 
+                ctx.fillText(KEY_LABELS[idx], btn.x, btn.y + buttonRadius / 6);
             });
             const timeG = {}; activeNotes.forEach(n => { if (n.status === 'waiting') { const k = n.time.toFixed(3); if (!timeG[k]) timeG[k] = []; timeG[k].push(n); } });
             Object.values(timeG).forEach(g => {
                 if (g.length > 1) {
-                    g.sort((a, b) => a.lane - b.lane); ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 4;
+                    g.sort((a, b) => a.lane - b.lane); ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'; ctx.lineWidth = 5;
                     for (let i = 0; i < g.length; i++) { const sp = (ct - (g[i].time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME; const hx = cx + (buttons[g[i].lane].x - cx) * sp, hy = cy + (buttons[g[i].lane].y - cy) * sp; if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy); }
                     ctx.stroke();
                 }
@@ -1472,8 +1988,26 @@
                         if (ep >= 0) { ctx.beginPath(); ctx.arc(tx, ty, noteSize * 0.7, 0, Math.PI * 2); ctx.fillStyle = '#facc15'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); }
                     }
                     if (n.status !== 'holding') {
-                        if (n.isSim) { ctx.beginPath(); ctx.arc(hx, hy, noteSize + 5, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke(); }
-                        ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2); ctx.fillStyle = n.endTime ? '#facc15' : '#ff00ff'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+                        const noteColor = n.endTime ? '250, 204, 21' : (LANE_COLORS[n.lane] || '59, 130, 246');
+                        
+                        // ノーツの影と縁取り
+                        ctx.save();
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = 'rgba(0,0,0,0.7)';
+
+                        if (n.isSim) { 
+                            ctx.beginPath(); ctx.arc(hx, hy, noteSize + 5, 0, Math.PI * 2); 
+                            ctx.strokeStyle = 'white'; ctx.lineWidth = 4; ctx.stroke(); 
+                        }
+                        if (isEditMode && editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane) {
+                            ctx.beginPath(); ctx.arc(hx, hy, noteSize + 10, 0, Math.PI * 2); 
+                            ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 4; ctx.stroke();
+                            ctx.fillStyle = 'rgba(192, 132, 252, 0.4)'; ctx.fill();
+                        }
+                        ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2); 
+                        ctx.fillStyle = `rgb(${noteColor})`; ctx.fill(); 
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
+                        ctx.restore();
                     }
                 }
                 if (ct > (n.endTime || n.time) + 0.4) {
@@ -1488,6 +2022,25 @@
                 }
             }
             hitEffects.forEach(e => { ctx.globalAlpha = e.opacity; ctx.beginPath(); if (e.type === 'ring') { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.strokeStyle = e.color; ctx.lineWidth = 3; ctx.stroke(); } else { ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2); ctx.fillStyle = e.color; ctx.fill(); } });
+            
+            // --- 記録数 (エディター用インジケーター) ---
+            if (isEditMode) {
+                ctx.globalAlpha = 1.0;
+                ctx.font = "bold 12px Arial";
+                ctx.textAlign = "left";
+                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                ctx.fillText(`NOTES: ${recordedChart.length}`, 20, 30);
+                
+                if (isRecording) {
+                    const isBlink = Math.floor(performance.now() / 500) % 2 === 0;
+                    ctx.fillStyle = isBlink ? "rgba(239, 68, 68, 1.0)" : "rgba(239, 68, 68, 0.3)";
+                    ctx.beginPath(); ctx.arc(20, 50, 6, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = "white";
+                    ctx.font = "black 14px Arial";
+                    ctx.fillText("● REC (RECORDING NOW)", 32, 55);
+                }
+            }
+
             ctx.globalAlpha = 1.0;
         }
 
@@ -1496,7 +2049,12 @@
             if (!isEditMode || !localVideo) return;
             isEditorPaused = !isEditorPaused;
             if (isEditorPaused) { localVideo.pause(); document.getElementById('btn-editor-pause').innerText = "▶️"; }
-            else { localVideo.play(); document.getElementById('btn-editor-pause').innerText = "⏸️"; }
+            else { 
+                localVideo.play(); 
+                document.getElementById('btn-editor-pause').innerText = "⏸️";
+                // update内での if チェックにより多重起動を防ぎつつ再開
+                requestAnimationFrame(update);
+            }
         }
 
         function seekVideoStart() { if (!isEditMode) return; isSeeking = true; if (localVideo) localVideo.pause(); }
@@ -1512,15 +2070,56 @@
             if (localVideo && !isEditorPaused) localVideo.play();
         }
 
+        function seekVideoBy(sec) {
+            if (!isEditMode || !localVideo) return;
+            let nt = localVideo.currentTime + sec;
+            if (nt < 0) nt = 0;
+            if (nt > localVideo.duration) nt = localVideo.duration;
+            localVideo.currentTime = nt;
+            document.getElementById('editor-time-display').innerText = nt.toFixed(2) + "s";
+            document.getElementById('editor-seek-bar').value = nt;
+            syncEditorNotes();
+            draw(nt);
+            showToast(`シーク: ${sec > 0 ? '+' : ''}${sec}s`, 1000);
+        }
+
+        function setVideoSpeed(speed) {
+            if (!localVideo) return;
+            const s = parseFloat(speed);
+            localVideo.playbackRate = s;
+            const sel = document.getElementById('editor-speed-select');
+            if (sel) sel.value = s.toString();
+            showToast(`再生速度: ${s}x`, 1000);
+        }
+
         function syncEditorNotes() {
-            if (!isEditMode) return;
+            if (!isEditMode || !localVideo) return;
+            const ct = localVideo.currentTime;
+            
+            // データをソート
+            const sortedChart = [...recordedChart].sort((a, b) => a.time - b.time);
+            
             activeNotes = [];
-            notesQueue = [...recordedChart].sort((a, b) => a.time - b.time);
-            for (let i = 0; i < notesQueue.length; i++) {
-                const c = notesQueue[i];
-                c.isSim = notesQueue.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015);
+            notesQueue = [];
+            
+            for (let i = 0; i < sortedChart.length; i++) {
+                const n = sortedChart[i];
+                // 同時押しフラグの再計算
+                n.isSim = sortedChart.some((other, idx) => idx !== i && Math.abs(other.time - n.time) < 0.015);
+                
+                const startTime = n.time - NOTE_TRAVEL_TIME;
+                const endTime = (n.endTime || n.time) + 0.4;
+                
+                if (ct >= startTime && ct <= endTime) {
+                    // 現在の再生時間で画面上に存在するべきノーツ
+                    activeNotes.push({ ...n, status: 'waiting' });
+                } else if (n.time > ct + NOTE_TRAVEL_TIME) {
+                    // まだ未来にある（これから流れてくる）ノーツ
+                    notesQueue.push(n);
+                }
             }
-            if (localVideo) draw(localVideo.currentTime);
+            
+            draw(ct);
         }
 
         function promptDeleteNote() {
@@ -1541,14 +2140,38 @@
             }
         }
 
+        function updateRecordingUI() {
+            const btn = document.getElementById('btn-rec-toggle');
+            const status = document.getElementById('edit-status');
+            const lamp = document.getElementById('rec-lamp');
+            const wrapper = document.getElementById('game-wrapper');
+            if (!btn || !status || !lamp || !wrapper) return;
+
+            if (isRecording) {
+                btn.innerText = "記録停止";
+                btn.classList.add('bg-red-600', 'recording-blink');
+                status.innerText = "RECORDING NOW";
+                status.className = "text-[10px] font-bold text-red-500 tracking-widest recording-blink";
+                lamp.classList.replace('bg-gray-600', 'bg-red-500');
+                lamp.classList.add('recording-blink');
+                wrapper.classList.add('recording-active');
+            } else {
+                btn.innerText = "記録開始";
+                btn.classList.remove('bg-red-600', 'recording-blink');
+                status.innerText = "RECORDING READY";
+                status.className = "text-[10px] font-bold text-gray-400 tracking-widest";
+                lamp.classList.replace('bg-red-500', 'bg-gray-600');
+                lamp.classList.remove('recording-blink');
+                wrapper.classList.remove('recording-active');
+            }
+        }
+
         function toggleRecording() {
             if (!isEditMode) return; if (isPreviewMode) togglePreview();
             isRecording = !isRecording;
-            const btn = document.getElementById('btn-rec-toggle'), status = document.getElementById('edit-status'), lamp = document.getElementById('rec-lamp');
-            if (isRecording) { btn.innerText = "記録停止"; btn.classList.add('bg-red-600'); status.innerText = "RECORDING NOW"; status.className = "text-[10px] font-bold text-red-500 tracking-widest"; lamp.classList.replace('bg-gray-600', 'bg-red-500'); if (recordedChart.length > 0 && confirm("RESET?")) recordedChart = []; localVideo.currentTime = 0; localVideo.play(); }
-            else {
-                btn.innerText = "記録開始"; btn.classList.remove('bg-red-600'); status.innerText = "RECORDING READY"; status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; lamp.classList.replace('bg-red-500', 'bg-gray-600'); localVideo.pause();
-                // 記録停止時にオートセーブ
+            updateRecordingUI();
+            if (!isRecording) {
+                localVideo.pause();
                 saveChartToLocal();
             }
         }
@@ -1568,30 +2191,62 @@
             CHART = [...recordedChart].sort((a, b) => a.time - b.time);
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
-            // モード切り替え
-            isEditMode = false;
-            isPlaying = true;
-            isPaused = false;
-            isRecording = false;
-            isPreviewMode = false;
-            isEditorTestPlay = true; // フラグをオン
+            const doPlay = () => {
+                // モード切り替え
+                isEditMode = false;
+                isPlaying = true;
+                isPaused = false;
+                isRecording = false;
+                isPreviewMode = false;
+                isEditorTestPlay = true;
 
-            // UI
-            document.getElementById('editor-controls').style.display = 'none';
-            document.getElementById('ui-overlay').style.opacity = '1';
-            document.getElementById('ui-overlay').style.pointerEvents = 'auto';
-            document.getElementById('btn-back-to-editor').classList.remove('hidden'); // ボタン表示
+                // 記録中表示のリセット
+                updateRecordingUI();
 
-            // ライブ開始
-            score = 0; combo = 0; maxCombo = 0;
-            counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
-            notesQueue = [...CHART];
-            activeNotes = [];
+                // UI
+                document.getElementById('editor-controls').style.display = 'none';
+                document.getElementById('ui-overlay').style.opacity = '1';
+                document.getElementById('ui-overlay').style.pointerEvents = 'auto';
+                document.getElementById('btn-back-to-editor').classList.remove('hidden');
+                document.getElementById('keyboard-help').style.display = 'none';
 
-            localVideo.currentTime = 0;
-            localVideo.style.opacity = "1"; // プレイ中は不透明度を 100% に
-            localVideo.play();
-            saveChartToLocal(); // プレイ開始時にも保存
+                // ライブ中UIの「戻る」ボタンをエディター用に変更
+                const liveBackBtn = document.getElementById('btn-live-back');
+                if (liveBackBtn) {
+                    liveBackBtn.innerText = "エディターに戻る";
+                    liveBackBtn.onclick = backToEditorFromPlay;
+                }
+
+                const jEl = document.getElementById('judge-display'); 
+                jEl.innerText = "TEST PLAY"; 
+                jEl.className = "text-2xl font-black text-blue-400 h-8 flex items-center justify-center italic tracking-widest";
+
+                // ライブ開始
+                score = 0; combo = 0; maxCombo = 0; stamina = 100; gameCurrentTime = 0;
+                counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
+                notesQueue = [...CHART];
+                activeNotes = []; hitEffects = [];
+                lanePressed.fill(false); activeTouches.clear();
+                updateUI();
+
+                gameStartTime = performance.now();
+                requestAnimationFrame(update);
+                
+                localVideo.play().catch(e => console.warn(e));
+                saveChartToLocal(); 
+            };
+
+            localVideo.style.opacity = "1";
+            if (localVideo && Math.abs(localVideo.currentTime) > 0.1) {
+                localVideo.onseeked = () => {
+                    localVideo.onseeked = null;
+                    doPlay();
+                };
+                localVideo.currentTime = 0;
+                setTimeout(() => { if (!isPlaying) doPlay(); }, 2000); // タイムアウト保険
+            } else {
+                doPlay();
+            }
         }
 
         // --- 譜面保存関連 ---
@@ -1617,16 +2272,25 @@
 
         function backToEditorFromPlay() {
             isPaused = false;
-            isPlaying = true; // 描画ループのために true にする
+            isPlaying = true; // 描画ループ維持
             isEditMode = true;
             isEditorTestPlay = false;
+            isEditorPaused = true;
+
             document.getElementById('pause-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
             localVideo.pause();
+
+            // エディター側の一時停止ボタン表示の同期
+            const pBtn = document.getElementById('btn-editor-pause');
+            if (pBtn) pBtn.innerText = "▶️";
 
             // UI復帰
             document.getElementById('editor-controls').style.display = 'flex';
             document.getElementById('ui-overlay').style.opacity = '0';
             document.getElementById('ui-overlay').style.pointerEvents = 'none';
+            document.getElementById('keyboard-help').style.display = 'flex';
+            document.getElementById('keyboard-help').style.opacity = "1.0";
             document.getElementById('btn-back-to-editor').classList.add('hidden');
 
             // 描画ループ再開
@@ -1635,6 +2299,15 @@
         }
 
         function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
+        function resetChart() {
+            if (confirm("現在記録されているすべてのノーツを消去しますか？")) {
+                recordedChart = [];
+                CHART = [];
+                syncEditorNotes();
+                saveChartToLocal();
+                showToast("譜面を全消去しました");
+            }
+        }
         function openTextEditor() {
             if (isRecording) toggleRecording();
             const jsonStr = JSON.stringify(recordedChart, null, 2);
@@ -1664,11 +2337,25 @@
         }
 
         function backToTitle() {
-            isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false;
+            isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; isEditMode = false;
+            updateRecordingUI();
+
+            // ライブ中UIの「戻る」ボタンを元に戻す
+            const liveBackBtn = document.getElementById('btn-live-back');
+            if (liveBackBtn) {
+                liveBackBtn.innerText = "選曲画面へ";
+                liveBackBtn.onclick = backToTitle;
+            }
+            // ヘルプパネルの項目も適宜隠す等の処理があればここだが、まずはフラグのリセットを優先
+            const kh = document.getElementById('keyboard-help');
+            if (kh) {
+                kh.style.display = 'flex';
+                kh.style.opacity = "0.4";
+            }
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
             activeNotes = []; hitEffects = []; // 残留物を一掃
             if (localVideo) {
-                if (currentSelectedSong && isKonamiActivated) {
+                if (currentSelectedSong && isCommandActivated) {
                     localVideo.currentTime = 0;
                     localVideo.loop = true;
                     localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
@@ -1678,11 +2365,11 @@
                     localVideo.style.opacity = "0.6";
                 }
             }
-            if (isKonamiActivated) {
+            if (isCommandActivated) {
                 showSongList();
                 // プレイ済みの曲があればそのジャケットを表示
                 const jacketToUse = currentSelectedSong ? currentSelectedSong.jacket : 'assets/images/takaramonos.jpg';
-                updateKonamiUI(true, jacketToUse);
+                updateCommandUI(true, jacketToUse);
 
                 // 動画プレビューがある場合はBGMを流さない（動画の音声を優先）
                 if (currentSelectedSong && localVideo && !localVideo.paused) {
@@ -1691,7 +2378,7 @@
                     playTitleBGM();
                 }
             }
-            else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateKonamiUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); }
+            else if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; updateCommandUI(false); const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector'); if (vSec) vSec.classList.remove('hidden'); if (cSec) cSec.classList.remove('hidden'); }
             document.getElementById('result-screen').style.display = 'none';
             document.getElementById('launcher-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
@@ -1701,10 +2388,42 @@
             document.getElementById('editor-controls').style.display = 'none';
             document.getElementById('btn-skip-result').classList.add('hidden');
         }
-        function handleInputStart(l) { if (lanePressed[l]) return; lanePressed[l] = true; lanePressStartTime[l] = localVideo.currentTime; if (isEditMode && isRecording) { playTapSound(); recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); syncEditorNotes(); } else if (!isEditMode) judgeStart(l); else { playTapSound(); createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); } }
-        function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = localVideo.currentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
-        function judgeStart(l) { const ct = localVideo.currentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound('PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } else { playTapSound(); } }
-        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = localVideo.currentTime; const d = Math.abs(ct - n.endTime); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(d, buttons[l]); else { playTapSound('MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); } }
+        function handleInputStart(l) { 
+            if (lanePressed[l]) return; 
+            lanePressed[l] = true; 
+            if (isEditMode) gameCurrentTime = localVideo.currentTime; // エディター時は入力時点を同期
+            lanePressStartTime[l] = gameCurrentTime; 
+            // 記録モード中かつ（再生中 または 停止中のステップ入力）なら記録
+            if (isEditMode && isRecording) { 
+                playTapSound(); 
+                recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
+                createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); 
+                syncEditorNotes(); 
+            } else if (!isEditMode) {
+                judgeStart(l);
+            } else { 
+                // 非記録モード時は、単に音を鳴らして視覚フィードバックを出すだけ
+                playTapSound(); 
+                createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); 
+            } 
+            if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
+        }
+        function handleInputEnd(l) { 
+            if (!lanePressed[l]) return; 
+            lanePressed[l] = false; 
+            const ct = gameCurrentTime; 
+            if (isEditMode && isRecording) { 
+                const dur = ct - lanePressStartTime[l]; 
+                if (dur > 0.2) { 
+                    const last = recordedChart.filter(n => n.lane === l).pop(); 
+                    if (last) last.endTime = parseFloat(ct.toFixed(2)); 
+                } 
+                syncEditorNotes(); 
+            } else if (!isEditMode) judgeEnd(l);
+            if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
+        }
+        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound('PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } else { playTapSound(); } }
+        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const d = Math.abs(ct - n.endTime); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(d, buttons[l]); else { playTapSound('MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); } }
         function processResult(d, tb) {
             let judgment = "MISS";
             if (d < 0.05) { judgment = "PERFECT"; score += 1000; counts.perfect++; combo++; stamina += 1.0; showJ("PERFECT", "text-yellow-400"); createHitEffect(tb.x, tb.y, '#facc15'); }
@@ -1712,7 +2431,7 @@
             else if (d < 0.15) { judgment = "GOOD"; score += 400; counts.good++; combo = 0; stamina -= 2; showJ("GOOD", "text-green-400"); createHitEffect(tb.x, tb.y, '#4ade80'); }
             else if (d < 0.22) { judgment = "BAD"; score += 200; counts.bad++; combo = 0; stamina -= 5; showJ("BAD", "text-blue-400"); createHitEffect(tb.x, tb.y, '#60a5fa'); }
             else { judgment = "MISS"; counts.miss++; combo = 0; stamina -= 10; showJ("MISS", "text-red-500"); }
-            
+
             playTapSound(judgment);
 
             // スタミナの範囲補正
@@ -1751,6 +2470,22 @@
             else if (isFullCombo) { resultTitle.innerText = "FULL COMBO!!"; resultTitle.className = "text-4xl font-black mb-4 italic text-yellow-300 tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]"; }
             else { resultTitle.innerText = "LIVE SUCCESS!"; resultTitle.className = "text-3xl font-black mb-4 italic text-green-400 tracking-tighter text-center px-12 overflow-visible min-w-full"; }
             document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('result-screen').style.display = 'flex';
+            
+            // --- エディターからのテストプレイ時は、戻り先をエディターに変更 ---
+            const backBtn = document.getElementById('btn-result-back');
+            if (isEditorTestPlay) {
+                backBtn.innerText = "エディターに戻る";
+                backBtn.onclick = () => {
+                    document.getElementById('result-screen').style.display = 'none';
+                    backToEditorFromPlay();
+                };
+                backBtn.classList.replace('bg-blue-600', 'bg-blue-700'); 
+            } else {
+                backBtn.innerText = "選曲画面に戻る";
+                backBtn.onclick = backToTitle;
+                backBtn.classList.remove('bg-blue-700');
+            }
+            
             document.getElementById('final-score').innerText = score.toString().padStart(6, '0');
             document.getElementById('res-perfect').innerText = counts.perfect;
             document.getElementById('res-great').innerText = counts.great;
@@ -1794,7 +2529,7 @@
 
             window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
         }
-        function showToast(m) { const t = document.getElementById('toast-msg'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+        function showToast(m, dur = 2500) { const t = document.getElementById('toast-msg'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', dur); }
         function launchInPlace() {
             initAudio();
             // 動画要素のロック解除
@@ -1802,6 +2537,9 @@
             document.getElementById('launcher-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
             resize();
+        }
+        function backToLauncher() {
+            location.reload();
         }
     </script>
 </body>
