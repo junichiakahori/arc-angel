@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:40 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:42 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1640,6 +1640,24 @@
         function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
         function playTitleBGM() { if (bgmAudio) return; bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); bgmAudio.loop = true; bgmAudio.volume = 0.5; bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); }
         function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
+        
+        function fadeVideoVolume(target, duration = 500) {
+            if (!localVideo) return;
+            if (localVideo._fadeInterval) clearInterval(localVideo._fadeInterval);
+            const start = localVideo.volume;
+            const diff = target - start;
+            const steps = 20;
+            const stepTime = duration / steps;
+            let i = 0;
+            localVideo._fadeInterval = setInterval(() => {
+                i++;
+                localVideo.volume = Math.max(0, Math.min(1, start + (diff * (i / steps))));
+                if (i >= steps) {
+                    clearInterval(localVideo._fadeInterval);
+                    localVideo._fadeInterval = null;
+                }
+            }, stepTime);
+        }
         function toggleBGM(btn) {
             if (bgmAudio || (localVideo && !localVideo.paused && !isPlaying)) {
                 stopTitleBGM(); if (localVideo) localVideo.pause();
@@ -1773,11 +1791,11 @@
                 prevStatus.className = "text-[10px] text-green-400 font-bold";
                 if(status) { status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2"; }
                 
-                // サビ位置にシーク
-                if (previewStart > 0) {
-                    localVideo.currentTime = previewStart;
-                }
-                localVideo.play().catch(() => console.log("Auto-preview blocked"));
+                // フェードインして再生
+                localVideo.volume = 0;
+                localVideo.play().then(() => {
+                    fadeVideoVolume(1.0, 800);
+                }).catch(() => console.log("Auto-preview blocked"));
                 localVideo.oncanplay = null;
 
                 // サビ終了位置でループさせるリスナー
@@ -2265,7 +2283,9 @@
                 requestAnimationFrame(update);
                 
                 try {
+                    localVideo.volume = 0;
                     await localVideo.play();
+                    fadeVideoVolume(1.0, 800);
                 } catch(e) {
                     console.warn("Video play failed:", e);
                 }
@@ -2860,15 +2880,22 @@
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
             activeNotes = []; hitEffects = []; // 残留物を一掃
             if (localVideo) {
-                if (currentSelectedSong && isCommandActivated) {
-                    localVideo.currentTime = 0;
-                    localVideo.loop = true;
-                    localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
-                    localVideo.play().catch(() => { });
-                } else {
-                    localVideo.pause();
-                    localVideo.style.opacity = "0.6";
-                }
+                // フェードアウトしてから停止またはタイトル用に再設定
+                fadeVideoVolume(0, 400); 
+                setTimeout(() => {
+                    if (currentSelectedSong && isCommandActivated) {
+                        localVideo.currentTime = 0;
+                        localVideo.loop = true;
+                        localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
+                        localVideo.volume = 0;
+                        localVideo.play().then(() => {
+                            fadeVideoVolume(0.5, 1000); // タイトル背景音量は少し控えめ
+                        }).catch(() => { });
+                    } else {
+                        localVideo.pause();
+                        localVideo.style.opacity = "0.6";
+                    }
+                }, 400);
             }
             if (isCommandActivated) {
                 showSongList();
