@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 02:18 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 02:25 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1701,12 +1701,22 @@
             
             if (val === "μ'sicforever" || val === "musicforever") {
                 isCommandActivated = true;
-                // 動画要素のロック解除
-                if (localVideo) localVideo.play().then(() => localVideo.pause()).catch(() => { });
                 
                 stopTitleBGM(); // 確実にリセット
-                playSecretSound();
-                playTitleBGM();
+                playSecretSound(); // 合言葉成立音（SE）
+                
+                // 動画要素のロック解除を待ってからBGMを開始する
+                if (localVideo) {
+                    localVideo.play().then(() => {
+                        localVideo.pause();
+                        playTitleBGM(); // 動画が確実に止まってからBGM再生
+                    }).catch(() => {
+                        playTitleBGM(); // 失敗しても一応呼ぶ
+                    });
+                } else {
+                    playTitleBGM();
+                }
+
                 showSongList();
                 updateCommandUI(true);
                 el.value = '';
