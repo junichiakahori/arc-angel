@@ -978,7 +978,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 08:47 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 09:34 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2181,73 +2181,7 @@
             resize();
         }
         function backToLauncher() {
-            // 完全初期化
-            isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false;
-            isEditorPaused = false; isSeeking = false;
-            isEditMode = false; isEditorTestPlay = false;
-            currentSelectedSong = null; currentSongIndex = -1;
-            activeNotes = []; hitEffects = []; notesQueue = []; CHART = []; recordedChart = [];
-            
-            if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); 
-            if (localVideo) { 
-                try {
-                   localVideo.pause(); 
-                   localVideo.src = ""; 
-                   localVideo.load();
-                } catch(e) { }
-                localVideo.style.display = "none";
-                localVideo.style.pointerEvents = "none";
-                localVideo.style.zIndex = "1";
-            }
-            stopTitleBGM();
-            hideLoading();
-            const loadingOverlay = document.getElementById('loading-overlay');
-            if (loadingOverlay) {
-                loadingOverlay.style.display = 'none';
-                loadingOverlay.style.pointerEvents = 'none';
-                loadingOverlay.style.zIndex = '1';
-            }
-            
-            // 全画面・全モーダルを隠し、背面に追いやる
-            const screens = ['start-screen', 'pause-screen', 'result-screen', 'editor-controls', 'chart-input-modal'];
-            screens.forEach(s => { 
-                const el = document.getElementById(s); 
-                if(el) {
-                    el.style.display = 'none';
-                    el.style.pointerEvents = 'none';
-                    el.style.zIndex = '1';
-                }
-            });
-            
-            // ランチャー表示（最前面へ）
-            const launcher = document.getElementById('launcher-screen');
-            if(launcher) {
-                launcher.style.display = 'flex';
-                launcher.style.pointerEvents = 'auto';
-                launcher.style.zIndex = '9999'; // 圧倒的優先順位
-            }
-            
-            // UIオーバーレイのリセット
-            const ui = document.getElementById('ui-overlay');
-            if(ui) { 
-                ui.style.display = 'none'; 
-                ui.style.opacity = '0'; 
-                ui.style.pointerEvents = 'none'; 
-                ui.style.zIndex = '1';
-            }
-            
-            // ファイル入力のリセット
-            const fileInput = document.getElementById('local-file-input');
-            if(fileInput) fileInput.value = "";
-            const fileStatus = document.getElementById('file-status');
-            if(fileStatus) fileStatus.innerText = "※ファイルを選択すると準備が完了します。";
-            
-            // 指 gesture を確実に通すための強制リセット
-            document.body.style.pointerEvents = 'auto';
-            document.documentElement.style.pointerEvents = 'auto';
-            
-            console.log("Core: State Reset -> Returned to Launcher.");
-            showToast("アプリをリセットしました");
+            location.reload();
         }
     </script>
 </body>
