@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 00:51 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 01:44 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1648,13 +1648,22 @@
         function clearChartInput() { if (confirm("入力内容をすべて消去しますか？")) { document.getElementById('chart-input').value = ''; } }
         function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
         function playTitleBGM() { 
-            if (bgmAudio) return; 
+            // すでに再生中の場合は一度停止してリセット
+            if (bgmAudio) {
+                bgmAudio.pause();
+                bgmAudio = null;
+            }
             // 動画再生中（プレビュー中）であれば、タイトルBGMは再生しない
-            if (localVideo && !localVideo.paused && localVideo.volume > 0) return;
+            if (localVideo && !localVideo.paused && localVideo.volume > 0.1) return;
+            
             bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); 
             bgmAudio.loop = true; 
             bgmAudio.volume = 0.5; 
-            bgmAudio.play().catch(e => console.log('BGM Playback failed:', e)); 
+            bgmAudio.play().catch(e => {
+                console.log('BGM Playback failed:', e);
+                // 失敗した場合はトーストで通知
+                showToast("BGMの自動再生がブロックされました。画面をクリックしてください。");
+            }); 
         }
         function stopTitleBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio = null; } }
         
@@ -1687,17 +1696,20 @@
         }
         function closeChartModal() {
             const el = document.getElementById('chart-input');
-            const val = el.value.replace(/\s+/g, '').toLowerCase();
-            if (val === "μ'sicforever") {
+            const val = el.value.trim().toLowerCase(); // 前後の空白を除去
+            if (val === "μ'sicforever" || val === "musicforever") {
                 isCommandActivated = true;
                 // 動画要素のロック解除
                 if (localVideo) localVideo.play().then(() => localVideo.pause()).catch(() => { });
+                
+                stopTitleBGM(); // 確実にリセット
                 playSecretSound();
                 playTitleBGM();
                 showSongList();
                 updateCommandUI(true);
                 el.value = '';
                 document.getElementById('chart-input-modal').style.display = 'none';
+                showToast("μ'sic forever! 選曲リストを解放しました。");
                 return;
             }
             // 合言葉でなければ通常の譜面として反映
