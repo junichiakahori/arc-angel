@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 00:46 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 00:51 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1331,13 +1331,13 @@
         let songsStore = [];
         let askedRestoreKeys = new Set(); 
         let BACKUP_SONG_LIST = [
-            { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", preview_start: 76, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
-            { name: "Snow Halation", video: BASE_PATH + "assets/videos/snohala.mp4", preview_start: 52, charts: { EASY: "", NORMAL: "", HARD: "", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/snohala.jpg" },
-            { name: "僕らは今のなかで", video: BASE_PATH + "assets/videos/bokuima.mp4", preview_start: 61, charts: { EASY: BASE_PATH + "assets/charts/bokuima_easy.txt", NORMAL: "", HARD: "", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokuima.jpg" },
-            { name: "START:DASH!!", video: BASE_PATH + "assets/videos/startdash.mp4", preview_start: 64, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/startdash_hard.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/startdash.jpg" },
-            { name: "タカラモノズ", video: BASE_PATH + "assets/videos/takaramonos.mp4", preview_start: 60, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/takaramonos.jpg" },
-            { name: "それは僕たちの奇跡", video: BASE_PATH + "assets/videos/soreboku.mp4", preview_start: 58, charts: { EASY: "", NORMAL: "", HARD: "", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/soreboku.jpg" },
-            { name: "A song for You! You? You!!", video: BASE_PATH + "assets/videos/asongforyou.mp4", preview_start: 98, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/asongforyou.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/asongforyou.jpg" }
+            { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", preview_start: 76, charts: { EASY: BASE_PATH + "assets/charts/bokura_easy.txt", NORMAL: BASE_PATH + "assets/charts/bokura_normal.txt", HARD: BASE_PATH + "assets/charts/bokura_hard.txt", EXPERT: BASE_PATH + "assets/charts/bokura_expert.txt", MASTER: BASE_PATH + "assets/charts/bokura_master.txt" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
+            { name: "Snow Halation", video: BASE_PATH + "assets/videos/snohala.mp4", preview_start: 52, charts: { EASY: BASE_PATH + "assets/charts/snohala_easy.txt", NORMAL: BASE_PATH + "assets/charts/snohala_normal.txt", HARD: BASE_PATH + "assets/charts/snohala_hard.txt", EXPERT: BASE_PATH + "assets/charts/snohala_expert.txt", MASTER: BASE_PATH + "assets/charts/snohala_master.txt" }, jacket: BASE_PATH + "assets/images/snohala.jpg" },
+            { name: "僕らは今のなかで", video: BASE_PATH + "assets/videos/bokuima.mp4", preview_start: 61, charts: { EASY: BASE_PATH + "assets/charts/bokuima_easy.txt", NORMAL: BASE_PATH + "assets/charts/bokuima_normal.txt", HARD: BASE_PATH + "assets/charts/bokuima_hard.txt", EXPERT: BASE_PATH + "assets/charts/bokuima_expert.txt", MASTER: BASE_PATH + "assets/charts/bokuima_master.txt" }, jacket: BASE_PATH + "assets/images/bokuima.jpg" },
+            { name: "START:DASH!!", video: BASE_PATH + "assets/videos/startdash.mp4", preview_start: 64, charts: { EASY: BASE_PATH + "assets/charts/startdash_easy.txt", NORMAL: BASE_PATH + "assets/charts/startdash_normal.txt", HARD: BASE_PATH + "assets/charts/startdash_hard.txt", EXPERT: BASE_PATH + "assets/charts/startdash_expert.txt", MASTER: BASE_PATH + "assets/charts/startdash_master.txt" }, jacket: BASE_PATH + "assets/images/startdash.jpg" },
+            { name: "タカラモノズ", video: BASE_PATH + "assets/videos/takaramonos.mp4", preview_start: 60, charts: { EASY: BASE_PATH + "assets/charts/takaramonos_easy.txt", NORMAL: BASE_PATH + "assets/charts/takaramonos_normal.txt", HARD: BASE_PATH + "assets/charts/takaramonos_hard.txt", EXPERT: BASE_PATH + "assets/charts/takaramonos_expert.txt", MASTER: BASE_PATH + "assets/charts/takaramonos_master.txt" }, jacket: BASE_PATH + "assets/images/takaramonos.jpg" },
+            { name: "それは僕たちの奇跡", video: BASE_PATH + "assets/videos/soreboku.mp4", preview_start: 58, charts: { EASY: BASE_PATH + "assets/charts/soreboku_easy.txt", NORMAL: BASE_PATH + "assets/charts/soreboku_normal.txt", HARD: BASE_PATH + "assets/charts/soreboku_hard.txt", EXPERT: BASE_PATH + "assets/charts/soreboku_expert.txt", MASTER: BASE_PATH + "assets/charts/soreboku_master.txt" }, jacket: BASE_PATH + "assets/images/soreboku.jpg" },
+            { name: "A song for You! You? You!!", video: BASE_PATH + "assets/videos/asongforyou.mp4", preview_start: 98, charts: { EASY: BASE_PATH + "assets/charts/asongforyou_easy.txt", NORMAL: BASE_PATH + "assets/charts/asongforyou_normal.txt", HARD: BASE_PATH + "assets/charts/asongforyou_hard.txt", EXPERT: BASE_PATH + "assets/charts/asongforyou_expert.txt", MASTER: BASE_PATH + "assets/charts/asongforyou_master.txt" }, jacket: BASE_PATH + "assets/images/asongforyou.jpg" }
         ];
         let AUTO_SONG_LIST = []; // キャッシュ用
         let localVideo, isVideoReady = false;

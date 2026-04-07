@@ -19,11 +19,11 @@
         "release_date": "2010/12/22",
         "preview_start": 52,
         "charts": {
-            "EASY": "",
-            "NORMAL": "",
-            "HARD": "",
-            "EXPERT": "",
-            "MASTER": ""
+            "EASY": "assets/charts/snohala_easy.txt",
+            "NORMAL": "assets/charts/snohala_normal.txt",
+            "HARD": "assets/charts/snohala_hard.txt",
+            "EXPERT": "assets/charts/snohala_expert.txt",
+            "MASTER": "assets/charts/snohala_master.txt"
         },
         "jacket": "assets/images/snohala.jpg"
     },
@@ -75,11 +75,11 @@
         "release_date": "2014/04/23",
         "preview_start": 58,
         "charts": {
-            "EASY": "",
-            "NORMAL": "",
-            "HARD": "",
-            "EXPERT": "",
-            "MASTER": ""
+            "EASY": "assets/charts/soreboku_easy.txt",
+            "NORMAL": "assets/charts/soreboku_normal.txt",
+            "HARD": "assets/charts/soreboku_hard.txt",
+            "EXPERT": "assets/charts/soreboku_expert.txt",
+            "MASTER": "assets/charts/soreboku_master.txt"
         },
         "jacket": "assets/images/soreboku.jpg"
     },
