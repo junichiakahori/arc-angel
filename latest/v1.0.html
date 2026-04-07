@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:45 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:47 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2283,11 +2283,23 @@
                 localVideo.playbackRate = 1.0;
             }
 
-            // プレビューのサビループリスナーを解除
+            // 1. サビプレビューに関連するすべてのイベントとリスナーを強制解除
+            localVideo.onloadedmetadata = null;
+            localVideo.oncanplay = null;
+            localVideo.onseeked = null;
+            
             if (localVideo._previewLoopListener) {
                 localVideo.removeEventListener('timeupdate', localVideo._previewLoopListener);
                 localVideo._previewLoopListener = null;
             }
+            
+            // 2. 音声フェードの中断とミュート準備
+            if (window._fadeTimer) {
+                clearInterval(window._fadeTimer);
+                window._fadeTimer = null;
+            }
+            localVideo.volume = 0;
+
             document.getElementById('buffering-overlay').style.display = 'none';
 
             // ゲーム開始・UI遷移の実行
