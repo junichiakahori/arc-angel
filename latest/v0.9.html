@@ -1023,6 +1023,7 @@
             '255, 105, 180'  // 8: Pink (;)
         ];
         let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
+        let editorSelectedNote = null;
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
         let gameCurrentTime = 0; // 一貫性のあるゲーム内時刻
         let NOTE_TRAVEL_TIME = 2.0;
@@ -1508,7 +1509,7 @@
             return idx;
         }
 
-        function tryDeleteNoteAt(mx, my) {
+        function tryInteractNoteAt(mx, my) {
             if (!isEditMode) return false;
             const rect = canvas.getBoundingClientRect();
             const x = (mx - rect.left) * (canvas.width / rect.width);
@@ -1525,13 +1526,24 @@
                 const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
                 const dist = Math.hypot(x - hx, y - hy);
                 if (dist < buttonRadius * 1.5) {
-                    recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - n.time) < 0.005 && rn.lane === n.lane));
-                    activeNotes.splice(i, 1);
-                    syncEditorNotes();
-                    draw(ct); 
-                    showToast("ノートを削除しました");
+                    if (editorSelectedNote && Math.abs(editorSelectedNote.time - n.time) < 0.005 && editorSelectedNote.lane === n.lane) {
+                        recordedChart = recordedChart.filter(rn => !(Math.abs(rn.time - n.time) < 0.005 && rn.lane === n.lane));
+                        activeNotes.splice(i, 1);
+                        editorSelectedNote = null;
+                        syncEditorNotes();
+                        draw(ct); 
+                        showToast("ノートを削除しました", 1500);
+                    } else {
+                        editorSelectedNote = { time: n.time, lane: n.lane };
+                        draw(ct);
+                        showToast("選択状態 (再度押すと削除)", 1500);
+                    }
                     return true;
                 }
+            }
+            if (editorSelectedNote) {
+                editorSelectedNote = null;
+                draw(ct);
             }
             return false;
         }
@@ -1567,7 +1579,7 @@
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const t = e.changedTouches[i];
-                    if (isEditMode && tryDeleteNoteAt(t.clientX, t.clientY)) continue;
+                    if (isEditMode && tryInteractNoteAt(t.clientX, t.clientY)) continue;
                     const l = getNearestLane(t.clientX, t.clientY);
                     if (l !== -1) {
                         activeTouches.set(t.identifier, l);
@@ -1577,7 +1589,7 @@
             }, { passive: false });
 
             canvas.addEventListener('mousedown', (e) => {
-                if (isEditMode && tryDeleteNoteAt(e.clientX, e.clientY)) return;
+                if (isEditMode && tryInteractNoteAt(e.clientX, e.clientY)) return;
                 const l = getNearestLane(e.clientX, e.clientY);
                 if (l !== -1) sH(l);
             });
@@ -1811,6 +1823,11 @@
                         if (n.isSim) { 
                             ctx.beginPath(); ctx.arc(hx, hy, noteSize + 4, 0, Math.PI * 2); 
                             ctx.strokeStyle = 'white'; ctx.lineWidth = 3; ctx.stroke(); 
+                        }
+                        if (isEditMode && editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane) {
+                            ctx.beginPath(); ctx.arc(hx, hy, noteSize + 10, 0, Math.PI * 2); 
+                            ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 4; ctx.stroke();
+                            ctx.fillStyle = 'rgba(192, 132, 252, 0.4)'; ctx.fill();
                         }
                         ctx.beginPath(); ctx.arc(hx, hy, noteSize, 0, Math.PI * 2); 
                         ctx.fillStyle = `rgb(${noteColor})`; ctx.fill(); 
@@ -2171,7 +2188,7 @@
 
             window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`;
         }
-        function showToast(m) { const t = document.getElementById('toast-msg'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+        function showToast(m, dur = 2500) { const t = document.getElementById('toast-msg'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', dur); }
         function launchInPlace() {
             initAudio();
             // 動画要素のロック解除
