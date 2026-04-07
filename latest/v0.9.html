@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 12:44 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 12:53 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1077,7 +1077,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:44 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:53 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2139,29 +2139,37 @@
             }
         }
 
+        function updateRecordingUI() {
+            const btn = document.getElementById('btn-rec-toggle');
+            const status = document.getElementById('edit-status');
+            const lamp = document.getElementById('rec-lamp');
+            const wrapper = document.getElementById('game-wrapper');
+            if (!btn || !status || !lamp || !wrapper) return;
+
+            if (isRecording) {
+                btn.innerText = "記録停止";
+                btn.classList.add('bg-red-600', 'recording-blink');
+                status.innerText = "RECORDING NOW";
+                status.className = "text-[10px] font-bold text-red-500 tracking-widest recording-blink";
+                lamp.classList.replace('bg-gray-600', 'bg-red-500');
+                lamp.classList.add('recording-blink');
+                wrapper.classList.add('recording-active');
+            } else {
+                btn.innerText = "記録開始";
+                btn.classList.remove('bg-red-600', 'recording-blink');
+                status.innerText = "RECORDING READY";
+                status.className = "text-[10px] font-bold text-gray-400 tracking-widest";
+                lamp.classList.replace('bg-red-500', 'bg-gray-600');
+                lamp.classList.remove('recording-blink');
+                wrapper.classList.remove('recording-active');
+            }
+        }
+
         function toggleRecording() {
             if (!isEditMode) return; if (isPreviewMode) togglePreview();
             isRecording = !isRecording;
-            const btn = document.getElementById('btn-rec-toggle'), status = document.getElementById('edit-status'), lamp = document.getElementById('rec-lamp');
-            const wrapper = document.getElementById('game-wrapper');
-
-            if (isRecording) { 
-                btn.innerText = "記録停止"; 
-                btn.classList.add('bg-red-600', 'recording-blink'); 
-                status.innerText = "RECORDING NOW"; 
-                status.className = "text-[10px] font-bold text-red-500 tracking-widest recording-blink"; 
-                lamp.classList.replace('bg-gray-600', 'bg-red-500'); 
-                lamp.classList.add('recording-blink');
-                wrapper.classList.add('recording-active');
-            }
-            else {
-                btn.innerText = "記録開始"; 
-                btn.classList.remove('bg-red-600', 'recording-blink'); 
-                status.innerText = "RECORDING READY"; 
-                status.className = "text-[10px] font-bold text-gray-400 tracking-widest"; 
-                lamp.classList.replace('bg-red-500', 'bg-gray-600'); 
-                lamp.classList.remove('recording-blink');
-                wrapper.classList.remove('recording-active');
+            updateRecordingUI();
+            if (!isRecording) {
                 localVideo.pause();
                 saveChartToLocal();
             }
@@ -2192,20 +2200,7 @@
                 isEditorTestPlay = true;
 
                 // 記録中表示のリセット
-                const wrapper = document.getElementById('game-wrapper');
-                const btn = document.getElementById('btn-rec-toggle');
-                const status = document.getElementById('edit-status');
-                const lamp = document.getElementById('rec-lamp');
-                if (wrapper) wrapper.classList.remove('recording-active');
-                if (btn) btn.classList.remove('bg-red-600', 'recording-blink');
-                if (status) {
-                    status.innerText = "RECORDING READY";
-                    status.className = "text-[10px] font-bold text-gray-400 tracking-widest";
-                }
-                if (lamp) {
-                    lamp.classList.replace('bg-red-500', 'bg-gray-600');
-                    lamp.classList.remove('recording-blink');
-                }
+                updateRecordingUI();
 
                 // UI
                 document.getElementById('editor-controls').style.display = 'none';
@@ -2328,6 +2323,7 @@
 
         function backToTitle() {
             isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; isEditMode = false;
+            updateRecordingUI();
             // ヘルプパネルの項目も適宜隠す等の処理があればここだが、まずはフラグのリセットを優先
             const kh = document.getElementById('keyboard-help');
             if (kh) {
