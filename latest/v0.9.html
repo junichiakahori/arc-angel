@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 11:08 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 11:11 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1009,7 +1009,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 11:08 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 11:11 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1593,6 +1593,12 @@
                     sH(l); 
                 }
                 if (e.key === 'Escape') togglePause(); 
+                
+                // エディター用ショートカット: Enter または Shift+Space で再生/停止
+                if (isEditMode && (e.key === 'Enter' || (e.key === ' ' && e.shiftKey))) {
+                    e.preventDefault();
+                    toggleEditorPause();
+                }
             }, {capture: true});
             window.addEventListener('keyup', (e) => { 
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
