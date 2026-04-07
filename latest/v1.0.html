@@ -1032,6 +1032,7 @@
                 </div>
             </div>
             <div class="flex flex-wrap justify-center gap-3 mt-2">
+                <button id="btn-result-ghost" onclick="startGhostReplay()" class="btn-action shadow-lg px-6 bg-pink-600 hover:bg-pink-500 text-xs hidden">自分のプレイを再生</button>
                 <button id="btn-result-replay" onclick="startReplay()" class="btn-action shadow-lg px-6 bg-purple-600 hover:bg-purple-500 text-xs">鑑賞リプレイ</button>
                 <button id="btn-result-retry" onclick="retryLive()" class="btn-action shadow-lg px-6 bg-blue-600 hover:bg-blue-500 text-xs">再挑戦 (Retry)</button>
                 <button id="btn-result-back" onclick="backToTitle()" class="btn-action shadow-lg px-6 btn-secondary text-xs">選曲画面へ</button>
@@ -1120,7 +1121,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 17:01 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 17:11 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1196,7 +1197,7 @@
         let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
         let stamina = 100, maxStamina = 100;
         let isEditorPaused = false, isSeeking = false;
-        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false, isAutoPlay = false;
+        let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false, isAutoPlay = false, isGhostReplay = false;
         // --- 9レーンカラー定義 (虹色グラデーション) ---
         const LANE_COLORS = [
             '255, 215, 0',   // 0: Yellow (A)
@@ -1209,7 +1210,8 @@
             '147, 112, 219', // 7: Purple (L)
             '255, 105, 180'  // 8: Pink (;)
         ];
-        let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [];
+        let CHART = [], notesQueue = [], activeNotes = [], hitEffects = [], recordedChart = [], userPlayRecord = [];
+        let ghostRecordIndex = 0;
         let editorSelectedNote = null;
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
         let gameCurrentTime = 0; // 一貫性のあるゲーム内時刻
@@ -1850,9 +1852,14 @@
             canvas.addEventListener('touchcancel', handleEnd, { passive: false });
         }
 
-        async function startLive(editMode = false, autoPlay = false) {
+        async function startLive(editMode = false, autoPlay = false, ghostReplay = false) {
             initAudio(); playStartSound(); stopTitleBGM();
             isAutoPlay = autoPlay;
+            isGhostReplay = ghostReplay;
+            ghostRecordIndex = 0;
+            if (!isAutoPlay && !isGhostReplay && !editMode) {
+                userPlayRecord = []; // 新しい実際のプレイ開始時に記録をリセット
+            }
             
             const song = currentSelectedSong;
             if (isCommandActivated && song && !localVideo.src) {
@@ -1995,6 +2002,19 @@
                             }
                         }
                     }
+
+                    // ゴーストプレイ（ユーザー記録リプレイ）ロジック
+                    if (isGhostReplay && !isEditMode) {
+                        while (ghostRecordIndex < userPlayRecord.length && userPlayRecord[ghostRecordIndex].time <= ct) {
+                            const action = userPlayRecord[ghostRecordIndex];
+                            if (action.type === 'start') {
+                                handleInputStart(action.lane, true);
+                            } else if (action.type === 'end') {
+                                handleInputEnd(action.lane, true);
+                            }
+                            ghostRecordIndex++;
+                        }
+                    }
                     
                     if (!isEditMode) {
                         document.getElementById('time-display').innerText = `${ct.toFixed(2)}s`;
@@ -2029,6 +2049,12 @@
             const resultTitle = document.querySelector('#result-screen h2');
             resultTitle.innerText = "LIVE FAILED";
             resultTitle.className = "text-5xl font-black mb-4 italic text-red-600 animate-pulse tracking-tighter text-center px-12 overflow-visible min-w-full";
+
+            const ghostBtn = document.getElementById('btn-result-ghost');
+            if (ghostBtn) {
+                if (userPlayRecord.length > 0) ghostBtn.classList.remove('hidden');
+                else ghostBtn.classList.add('hidden');
+            }
 
             document.getElementById('ui-overlay').style.opacity = '0';
             document.getElementById('result-screen').style.display = 'flex';
@@ -2516,14 +2542,25 @@
         function startReplay() {
             document.getElementById('result-screen').style.display = 'none';
             // オートプレイ（鑑賞）モードで開始
-            startLive(false, true);
+            startLive(false, true, false);
         }
 
-        function handleInputStart(l) { 
+        function startGhostReplay() {
+            document.getElementById('result-screen').style.display = 'none';
+            // ユーザー記録リプレイモードで開始
+            startLive(false, false, true);
+        }
+
+        function handleInputStart(l, isSimulated = false) { 
             if (lanePressed[l]) return; 
             lanePressed[l] = true; 
             if (isEditMode) gameCurrentTime = localVideo.currentTime; // エディター時は入力時点を同期
             lanePressStartTime[l] = gameCurrentTime; 
+            
+            if (!isEditMode && !isAutoPlay && !isGhostReplay && !isSimulated) {
+                userPlayRecord.push({ type: 'start', lane: l, time: gameCurrentTime });
+            }
+
             // 記録モード中かつ（再生中 または 停止中のステップ入力）なら記録
             if (isEditMode && isRecording) { 
                 playTapSound(); 
@@ -2539,10 +2576,15 @@
             } 
             if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
         }
-        function handleInputEnd(l) { 
+        function handleInputEnd(l, isSimulated = false) { 
             if (!lanePressed[l]) return; 
             lanePressed[l] = false; 
             const ct = gameCurrentTime; 
+            
+            if (!isEditMode && !isAutoPlay && !isGhostReplay && !isSimulated) {
+                userPlayRecord.push({ type: 'end', lane: l, time: gameCurrentTime });
+            }
+
             if (isEditMode && isRecording) { 
                 const dur = ct - lanePressStartTime[l]; 
                 if (dur > 0.2) { 
@@ -2600,6 +2642,13 @@
             if (isAllPerfect) { resultTitle.innerText = "ALL PERFECT!!"; resultTitle.className = "text-5xl font-black mb-4 italic text-rainbow tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"; }
             else if (isFullCombo) { resultTitle.innerText = "FULL COMBO!!"; resultTitle.className = "text-4xl font-black mb-4 italic text-yellow-300 tracking-tighter text-center px-12 overflow-visible min-w-full animate-bounce drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]"; }
             else { resultTitle.innerText = "LIVE SUCCESS!"; resultTitle.className = "text-3xl font-black mb-4 italic text-green-400 tracking-tighter text-center px-12 overflow-visible min-w-full"; }
+            
+            const ghostBtn = document.getElementById('btn-result-ghost');
+            if (ghostBtn) {
+                if (userPlayRecord.length > 0) ghostBtn.classList.remove('hidden');
+                else ghostBtn.classList.add('hidden');
+            }
+
             document.getElementById('ui-overlay').style.opacity = '0'; document.getElementById('ui-overlay').style.pointerEvents = 'none'; document.getElementById('result-screen').style.display = 'flex';
             
             // --- エディターからのテストプレイ時は、戻り先をエディターに変更 ---
