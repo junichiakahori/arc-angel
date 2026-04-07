@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:47 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 00:09 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2952,12 +2952,16 @@
                 fadeVideoVolume(0, 400); 
                 setTimeout(() => {
                     if (currentSelectedSong && isCommandActivated) {
+                        // 選曲画面（コマンド有効）へ戻る場合は、最後に選んでいた曲のサビプレビューを再開させる
+                        selectSong(currentSelectedSong);
+                    } else if (currentSelectedSong) {
+                        // コマンド無効（通常のスタート画面）へ戻る場合は背景動画として再生
                         localVideo.currentTime = 0;
                         localVideo.loop = true;
-                        localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
+                        localVideo.style.opacity = "0.6";
                         localVideo.volume = 0;
                         localVideo.play().then(() => {
-                            fadeVideoVolume(0.5, 1000); // タイトル背景音量は少し控えめ
+                            fadeVideoVolume(0.5, 1000);
                         }).catch(() => { });
                     } else {
                         localVideo.pause();
