@@ -14,6 +14,20 @@
         "jacket": "assets/images/bokura.jpg"
     },
     {
+        "name": "Snow Halation",
+        "video": "assets/videos/snohala.mp4",
+        "release_date": "2010/12/22",
+        "preview_start": 78,
+        "charts": {
+            "EASY": "",
+            "NORMAL": "",
+            "HARD": "",
+            "EXPERT": "",
+            "MASTER": ""
+        },
+        "jacket": "assets/images/snohala.jpg"
+    },
+    {
         "name": "僕らは今のなかで",
         "video": "assets/videos/bokuima.mp4",
         "release_date": "2013/01/23",
@@ -56,20 +70,6 @@
         "jacket": "assets/images/takaramonos.jpg"
     },
     {
-        "name": "A song for You! You? You!!",
-        "video": "assets/videos/asongforyou.mp4",
-        "release_date": "2020/03/25",
-        "preview_start": 98,
-        "charts": {
-            "EASY": "assets/charts/asongforyou_easy.txt",
-            "NORMAL": "assets/charts/asongforyou_normal.txt",
-            "HARD": "assets/charts/asongforyou_hard.txt",
-            "EXPERT": "assets/charts/asongforyou_expert.txt",
-            "MASTER": "assets/charts/asongforyou_master.txt"
-        },
-        "jacket": "assets/images/asongforyou.jpg"
-    },
-    {
         "name": "それは僕たちの奇跡",
         "video": "assets/videos/soreboku.mp4",
         "release_date": "2014/04/23",
@@ -84,17 +84,17 @@
         "jacket": "assets/images/soreboku.jpg"
     },
     {
-        "name": "Snow Halation",
-        "video": "assets/videos/snohala.mp4",
-        "release_date": "2010/12/22",
-        "preview_start": 78,
+        "name": "A song for You! You? You!!",
+        "video": "assets/videos/asongforyou.mp4",
+        "release_date": "2020/03/25",
+        "preview_start": 98,
         "charts": {
-            "EASY": "",
-            "NORMAL": "",
-            "HARD": "",
-            "EXPERT": "",
-            "MASTER": ""
+            "EASY": "assets/charts/asongforyou_easy.txt",
+            "NORMAL": "assets/charts/asongforyou_normal.txt",
+            "HARD": "assets/charts/asongforyou_hard.txt",
+            "EXPERT": "assets/charts/asongforyou_expert.txt",
+            "MASTER": "assets/charts/asongforyou_master.txt"
         },
-        "jacket": "assets/images/snohala.jpg"
+        "jacket": "assets/images/asongforyou.jpg"
     }
 ]
