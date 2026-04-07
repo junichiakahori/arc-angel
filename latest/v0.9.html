@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 11:00 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 11:03 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1009,7 +1009,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 11:00 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 11:03 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2086,6 +2086,22 @@
                 isRecording = false;
                 isPreviewMode = false;
                 isEditorTestPlay = true;
+
+                // 記録中表示のリセット
+                const wrapper = document.getElementById('game-wrapper');
+                const btn = document.getElementById('btn-rec-toggle');
+                const status = document.getElementById('edit-status');
+                const lamp = document.getElementById('rec-lamp');
+                if (wrapper) wrapper.classList.remove('recording-active');
+                if (btn) btn.classList.remove('bg-red-600', 'recording-blink');
+                if (status) {
+                    status.innerText = "RECORDING READY";
+                    status.className = "text-[10px] font-bold text-gray-400 tracking-widest";
+                }
+                if (lamp) {
+                    lamp.classList.replace('bg-red-500', 'bg-gray-600');
+                    lamp.classList.remove('recording-blink');
+                }
 
                 // UI
                 document.getElementById('editor-controls').style.display = 'none';
