@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 21:54 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:00 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2184,17 +2184,11 @@
             }
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
-            score = 0; combo = 0; maxCombo = 0; counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0, fast: 0, slow: 0 };
-            stamina = 100; gameCurrentTime = 0;
-            recordedChart = isEditMode ? JSON.parse(JSON.stringify(CHART)) : [];
-            notesQueue = isEditMode ? [] : [...CHART];
-            activeNotes = []; hitEffects = [];
-            lanePressed.fill(false); activeTouches.clear(); updateUI();
-            
             const jEl = document.getElementById('judge-display'); 
             jEl.innerText = "READY?"; 
             jEl.className = "text-2xl font-black text-yellow-400 h-8 flex items-center justify-center italic tracking-widest";
-            syncEditorNotes();
+            
+            // プレイ開始前の初期化を doPlay へ移動（準備中の誤判定防止）
 
             // 動画の設定
             localVideo.style.display = 'block';
@@ -2224,6 +2218,17 @@
                 document.getElementById('ui-overlay').style.display = 'block';
                 document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
                 document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
+                // doPlay 直前ですべてのリセットを実行
+                score = 0; combo = 0; maxCombo = 0; stamina = 100;
+                counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0, fast: 0, slow: 0 };
+                recordedChart = isEditMode ? JSON.parse(JSON.stringify(CHART)) : [];
+                notesQueue = isEditMode ? [] : [...CHART];
+                activeNotes = []; hitEffects = [];
+                lanePressed.fill(false); activeTouches.clear();
+                gameCurrentTime = 0;
+                updateUI();
+                syncEditorNotes();
+
                 if (isEditMode) {
                     showHelpOnPC(); // エディター時のみ表示を検討
                 } else {
@@ -2688,13 +2693,16 @@
                 // テストプレイ時は必ず 1倍速
                 localVideo.playbackRate = 1.0;
 
-                // ライブ開始
+                // 準備完了直前にリセットを実行
                 score = 0; combo = 0; maxCombo = 0; stamina = 100; gameCurrentTime = 0;
                 counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
+                recordedChart = JSON.parse(JSON.stringify(CHART)); // CHARTの内容をコピーして recordedChart に戻す
                 notesQueue = [...CHART];
                 activeNotes = []; hitEffects = [];
                 lanePressed.fill(false); activeTouches.clear();
                 updateUI();
+
+                // ライブ開始
 
                 gameStartTime = performance.now();
                 requestAnimationFrame(update);
