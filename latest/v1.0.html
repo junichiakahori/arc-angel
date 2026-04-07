@@ -101,13 +101,12 @@
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             width: 100%;
-            height: 100.1%;
+            height: 100%;
             /* 微妙に大きくしてスクロール可能に */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
+            padding: 80px 20px 40px;
             text-align: center;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
@@ -1265,7 +1264,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 02:45 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 02:52 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
