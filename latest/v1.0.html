@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:23 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:38 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1703,7 +1703,7 @@
                 list.innerHTML = '';
                 songs.forEach(s => {
                     const b = document.createElement('button');
-                    b.className = "flex-shrink-0 w-[45%] max-w-[160px] h-48 bg-blue-900/40 hover:scale-95 active:scale-90 border-2 border-blue-500/20 rounded-[2rem] transition-all snap-center animate-fade-in relative overflow-hidden group flex flex-col shadow-lg";
+                    b.className = "flex-shrink-0 w-[45%] max-w-[160px] h-52 bg-blue-900/40 hover:scale-95 active:scale-90 border-2 border-blue-500/20 rounded-[2rem] transition-all snap-center animate-fade-in relative overflow-hidden group flex flex-col shadow-lg";
                     b.style.touchAction = 'pan-x'; // スワイプ優先設定
                     b.style.webkitUserDrag = 'none';
 
@@ -1717,12 +1717,12 @@
 
                     // 曲名コンテナ
                     const info = document.createElement('div');
-                    info.className = "w-full p-2 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center flex-1";
+                    info.className = "w-full p-1.5 bg-gradient-to-t from-black/95 to-transparent flex items-center justify-center flex-1";
                     info.style.pointerEvents = 'none'; // テキストがスクロールを邪魔しないように
                     info.innerHTML = `
-                        <div class="flex flex-col items-center">
-                            <span class="text-[10px] font-black italic text-white leading-tight drop-shadow-lg text-center px-1">${s.name}</span>
-                            <span class="text-[7px] text-blue-300/80 font-bold opacity-80 mt-1 tracking-wider">${s.release_date || ''}</span>
+                        <div class="flex flex-col items-center justify-center">
+                            <span class="text-[9px] font-black italic text-white leading-[1.1] drop-shadow-lg text-center px-1 mb-0.5">${s.name}</span>
+                            <span class="text-[7px] text-blue-300/80 font-bold opacity-80 tracking-wider">${s.release_date || ''}</span>
                         </div>`;
 
                     b.appendChild(img);
