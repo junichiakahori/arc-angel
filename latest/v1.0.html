@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:01 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:06 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2025,7 +2025,9 @@
                 if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return; 
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
                 if (l !== -1) {
-                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+                    const ae = document.activeElement;
+                    const isTextInput = ae && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && !['range', 'checkbox', 'radio', 'button', 'submit'].includes(ae.type)));
+                    if (isTextInput) return;
                     e.preventDefault();
                     e.stopPropagation();
                     sH(l); 
@@ -2068,7 +2070,9 @@
                 if (e.ctrlKey || e.metaKey || e.altKey) return;
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
                 if (l !== -1) {
-                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+                    const ae = document.activeElement;
+                    const isTextInput = ae && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && !['range', 'checkbox', 'radio', 'button', 'submit'].includes(ae.type)));
+                    if (isTextInput) return;
                     e.preventDefault();
                     e.stopPropagation();
                     eH(l); 
