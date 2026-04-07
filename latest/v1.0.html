@@ -780,7 +780,7 @@
 
     <div id="game-wrapper" class="relative group">
         <!-- ローディング表示 (プリロード対応) -->
-        <div id="loading-overlay" class="absolute inset-0 z-[1100] bg-black/80 backdrop-blur-md hidden flex-col justify-center items-center">
+        <div id="loading-overlay" class="absolute inset-0 z-[20000] bg-black/90 backdrop-blur-xl hidden flex-col justify-center items-center">
             <div class="overlay-screen-content text-center">
                 <div class="mb-4">
                     <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:41 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 23:45 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
