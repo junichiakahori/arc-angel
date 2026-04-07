@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 02:28 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 02:45 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1647,14 +1647,14 @@
         }
         function clearChartInput() { if (confirm("入力内容をすべて消去しますか？")) { document.getElementById('chart-input').value = ''; } }
         function playSecretSound() { initAudio(); const now = audioCtx.currentTime;[{ f: 523.25, t: 0 }, { f: 659.25, t: 0.15 }, { f: 783.99, t: 0.3 }, { f: 1046.50, t: 0.45 }].forEach(n => { const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'square'; osc.frequency.value = n.f; osc.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.15, now + n.t); g.gain.exponentialRampToValueAtTime(0.01, now + n.t + 0.15); osc.start(now + n.t); osc.stop(now + n.t + 0.15); }); }
-        function playTitleBGM() { 
+        function playTitleBGM(force = false) { 
             // すでに再生中の場合は一度停止してリセット
             if (bgmAudio) {
                 bgmAudio.pause();
                 bgmAudio = null;
             }
-            // 動画再生中（プレビュー中）であれば、タイトルBGMは再生しない
-            if (localVideo && !localVideo.paused && localVideo.volume > 0.1) return;
+            // 動画再生中（プレビュー中）であれば、タイトルBGMは再生しない（強制フラグが立っていない場合のみ）
+            if (!force && localVideo && !localVideo.paused && localVideo.volume > 0.1) return;
             
             bgmAudio = new Audio(BASE_PATH + 'assets/bgm/title.mp3'); 
             bgmAudio.loop = true; 
@@ -1703,18 +1703,12 @@
                 isCommandActivated = true;
                 
                 stopTitleBGM(); // 確実にリセット
-                playSecretSound(); // 合言葉成立音（SE）
+                playSecretSound(); // 合言葉成立音（SE: シャン！）
+                playTitleBGM(true); // ★即座にBGM開始（動画の状態を無視）
                 
-                // 動画要素のロック解除を待ってからBGMを開始する
+                // 動画要素のロック解除（BGMとは並行して実行）
                 if (localVideo) {
-                    localVideo.play().then(() => {
-                        localVideo.pause();
-                        playTitleBGM(); // 動画が確実に止まってからBGM再生
-                    }).catch(() => {
-                        playTitleBGM(); // 失敗しても一応呼ぶ
-                    });
-                } else {
-                    playTitleBGM();
+                    localVideo.play().then(() => localVideo.pause()).catch(() => { });
                 }
 
                 showSongList();
