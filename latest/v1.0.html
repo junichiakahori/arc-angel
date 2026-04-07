@@ -1103,7 +1103,7 @@
         </div>
     </div>
 
-    <div id="combo-milestone-display" class="fixed top-1/2 left-1/2 pointer-events-none z-[450] opacity-0 text-7xl font-black italic text-transparent bg-clip-text bg-gradient-to-tr from-yellow-300 via-white to-pink-400"></div>
+    <div id="combo-milestone-display" class="fixed top-[40%] left-1/2 pointer-events-none z-[450] opacity-0 text-[12vw] sm:text-7xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-tr from-yellow-300 via-white to-pink-400"></div>
 
     <div id="chart-output" onclick="this.style.display='none'"
         style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; height: 70%; background: #111; color: #0f0; font-family: monospace; padding: 20px; border-radius: 15px; border: 2px solid #555; display: none; z-index: 600; overflow-y: auto; font-size: 11px;">
@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 21:06 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 21:31 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
