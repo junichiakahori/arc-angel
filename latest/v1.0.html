@@ -1264,7 +1264,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 06:35 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 07:03 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -3251,9 +3251,9 @@
             deactivateKeyBinding();
         }
 
-        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35, diff = 0; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; diff = ct - n.time; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound(l, 'PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(diff, buttons[l]); } } else { playTapSound(l); } }
-        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l]); else { playTapSound(l, 'MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
-        function processResult(diff, tb) {
+        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35, diff = 0; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; diff = ct - n.time; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound(l, 'PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(diff, buttons[l], l); } } else { playTapSound(l); } }
+        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l], l); else { playTapSound(l, 'MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
+        function processResult(diff, tb, lane) {
             const d = Math.abs(diff);
             let judgment = "MISS";
             let desc = "";
@@ -3270,7 +3270,7 @@
             else if (d < 0.22) { judgment = "BAD"; score += 200; counts.bad++; combo = 0; stamina -= 5; colorCls = "text-blue-400"; createHitEffect(tb.x, tb.y, '#60a5fa'); }
             else { judgment = "MISS"; counts.miss++; combo = 0; stamina -= 10; colorCls = "text-red-500"; }
 
-            playTapSound(judgment);
+            playTapSound(lane, judgment);
 
             if (stamina < 0) stamina = 0;
             if (stamina > maxStamina) stamina = maxStamina;
