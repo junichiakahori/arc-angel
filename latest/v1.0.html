@@ -1264,7 +1264,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 03:23 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 06:35 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1414,40 +1414,124 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        function playTapSound(judgment = 'NONE') {
+        function playTapSound(lane = 0, judgment = 'NONE') {
             if (!audioCtx || !noiseBuffer) return;
             const now = audioCtx.currentTime;
 
-            if (judgment === 'PERFECT') {
-                // --- v0.5 の「シャン！」を完全復活 ---
-                // 1. ノイズ成分 (シャッ)
-                const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
-                const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
-                const ng = audioCtx.createGain();
-                ng.gain.setValueAtTime(0.15, now);
-                ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-                ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
-                ns.start(now);
+            // スクフェスモード（隠しコマンド有効時）は全レーン「シャンシャン」
+            if (isCommandActivated) {
+                if (judgment === 'PERFECT' || judgment === 'NONE') {
+                    // 1. ノイズ成分 (シャッ)
+                    const ns = audioCtx.createBufferSource(); ns.buffer = noiseBuffer;
+                    const nf = audioCtx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.setValueAtTime(5000, now);
+                    const ng = audioCtx.createGain();
+                    ng.gain.setValueAtTime(0.15, now);
+                    ng.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+                    ns.start(now);
 
-                // 2. サイン波成分 (シャン) 8000Hz -> 6000Hz へのスウィープ
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(8000, now);
-                osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
-                const og = audioCtx.createGain();
-                og.gain.setValueAtTime(0.1, now);
-                og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.connect(og); og.connect(audioCtx.destination);
-                osc.start(now); osc.stop(now + 0.1);
-            } else {
-                // それ以外は控えめな「チッ」
-                const nsClick = audioCtx.createBufferSource(); nsClick.buffer = noiseBuffer;
-                const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(8000, now);
-                const ngClick = audioCtx.createGain();
-                ngClick.gain.setValueAtTime(0.08, now);
-                ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-                nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
-                nsClick.start(now);
+                    // 2. サイン波成分 (シャン) 8000Hz -> 6000Hz へのスウィープ
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(8000, now);
+                    osc.frequency.exponentialRampToValueAtTime(6000, now + 0.1);
+                    const og = audioCtx.createGain();
+                    og.gain.setValueAtTime(0.1, now);
+                    og.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.connect(og); og.connect(audioCtx.destination);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else {
+                    const nsClick = audioCtx.createBufferSource(); nsClick.buffer = noiseBuffer;
+                    const nfClick = audioCtx.createBiquadFilter(); nfClick.type = 'highpass'; nfClick.frequency.setValueAtTime(8000, now);
+                    const ngClick = audioCtx.createGain();
+                    ngClick.gain.setValueAtTime(0.08, now);
+                    ngClick.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                    nsClick.connect(nfClick); nfClick.connect(ngClick); ngClick.connect(audioCtx.destination);
+                    nsClick.start(now);
+                }
+                return;
+            }
+
+            // 通常モード時のドラム音色合成 (レーン 0-8)
+            // 0:Kick, 1:Snare, 2:ClosedHH, 3:OpenHH, 4:LowTom, 5:MidTom, 6:HighTom, 7:Crash, 8:Ride
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const noise = audioCtx.createBufferSource();
+            const filter = audioCtx.createBiquadFilter();
+            
+            noise.buffer = noiseBuffer;
+            osc.connect(gain);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            switch (lane) {
+                case 0: // Kick
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                    break;
+                case 1: // Snare
+                    osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(1000, now);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1); noise.start(now);
+                    break;
+                case 2: // Closed HH
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(8000, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                    noise.start(now);
+                    break;
+                case 3: // Open HH
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(6000, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    noise.start(now);
+                    break;
+                case 4: // Low Tom
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                    break;
+                case 5: // Mid Tom
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                    break;
+                case 6: // High Tom
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(140, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now); osc.stop(now + 0.12);
+                    break;
+                case 7: // Crash
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(2000, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                    noise.start(now);
+                    break;
+                case 8: // Ride
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(3000, now);
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(5000, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now); osc.stop(now + 0.5); noise.start(now);
+                    break;
+                default: // Click (Fallback)
+                    filter.type = 'highpass'; filter.frequency.setValueAtTime(8000, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                    noise.start(now);
             }
         }
 
@@ -3055,14 +3139,14 @@
             }
 
             if (isEditMode && isRecording) { 
-                playTapSound(); 
+                playTapSound(l); 
                 recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); 
                 syncEditorNotes(); 
             } else if (!isEditMode) {
                 judgeStart(l);
             } else { 
-                playTapSound(); 
+                playTapSound(l); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); 
             } 
             if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
@@ -3167,8 +3251,8 @@
             deactivateKeyBinding();
         }
 
-        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35, diff = 0; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; diff = ct - n.time; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound('PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(diff, buttons[l]); } } else { playTapSound(); } }
-        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l]); else { playTapSound('MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
+        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35, diff = 0; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; diff = ct - n.time; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound(l, 'PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(diff, buttons[l]); } } else { playTapSound(l); } }
+        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l]); else { playTapSound(l, 'MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
         function processResult(diff, tb) {
             const d = Math.abs(diff);
             let judgment = "MISS";

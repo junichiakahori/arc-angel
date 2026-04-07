@@ -59,7 +59,7 @@
         "name": "タカラモノズ",
         "video": "assets/videos/takaramonos.mp4",
         "release_date": "2014/01/29",
-        "preview_start": 60,
+        "preview_start": 63,
         "charts": {
             "EASY": "assets/charts/takaramonos_easy.txt",
             "NORMAL": "assets/charts/takaramonos_normal.txt",
