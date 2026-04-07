@@ -1737,30 +1737,46 @@
             const prevStatus = document.getElementById('preview-status');
             if(prevContainer) prevContainer.classList.remove('hidden');
             
-            prevStatus.innerText = `「${s.name}」のプレビューをロード中...`; 
+            prevStatus.innerText = `「${s.name}」をシーク中...`; 
             prevStatus.className = "text-[10px] text-blue-400 font-bold animate-pulse";
             
-            // ファイルステータスにも一応記載（裏側）
             const status = document.getElementById('file-status');
-            if(status) { status.innerText = `「${s.name}」を準備中...`; status.className = "text-[9px] text-blue-400 font-bold mt-2"; }
+            if(status) { status.innerText = `「${s.name}」をプレビュー準備中...`; status.className = "text-[9px] text-blue-400 font-bold mt-2"; }
 
             stopTitleBGM();
-            // 背景画像をクリア
             updateCommandUI(isCommandActivated, 'none');
-            // 動画プレビューを見せるため、動画表示をON
+            
             localVideo.style.display = 'block';
-            localVideo.style.opacity = "0.6";
-            localVideo.loop = true; // プレビュー時はループ再生
-            localVideo.src = s.video;
-            localVideo.oncanplay = () => {
-                prevStatus.innerText = `🎵 プレビュー再生準備完了: ${s.name}`; 
-                prevStatus.className = "text-[10px] text-green-400 font-bold";
-                if(status) { status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2"; }
-                
-                localVideo.play().catch(() => console.log("Auto-preview blocked"));
+            localVideo.style.opacity = "0.7";
+            localVideo.loop = true; 
+            localVideo.muted = false;
+            localVideo.volume = 0.5; // プレビュー音量は少し控えめに
+
+            // プレビュー開始位置 (デフォルト45秒 or 各曲の設定)
+            const previewTime = s.preview_time !== undefined ? s.preview_time : 45;
+
+            const handlePreviewCanPlay = () => {
                 localVideo.oncanplay = null;
+                localVideo.currentTime = previewTime;
+                
+                localVideo.onseeked = () => {
+                    localVideo.onseeked = null;
+                    prevStatus.innerText = `🎵 プレビュー再生中: ${s.name}`; 
+                    prevStatus.className = "text-[10px] text-green-400 font-bold";
+                    localVideo.play().catch(() => {
+                        prevStatus.innerText = `⚠️ タップしてプレビュー再生`;
+                        prevStatus.className = "text-[10px] text-yellow-400 font-bold";
+                    });
+                };
             };
-            localVideo.load();
+
+            if (localVideo.src.includes(s.video)) {
+                handlePreviewCanPlay();
+            } else {
+                localVideo.src = s.video;
+                localVideo.oncanplay = handlePreviewCanPlay;
+                localVideo.load();
+            }
 
             // 難易度パネルの更新と表示
             const diffBox = document.getElementById('difficulty-box');
@@ -2772,9 +2788,10 @@
             activeNotes = []; hitEffects = []; // 残留物を一掃
             if (localVideo) {
                 if (currentSelectedSong && isCommandActivated) {
-                    localVideo.currentTime = 0;
+                    const previewTime = currentSelectedSong.preview_time !== undefined ? currentSelectedSong.preview_time : 45;
+                    localVideo.currentTime = previewTime;
                     localVideo.loop = true;
-                    localVideo.style.opacity = "0.6"; // タイトルでは再び透過させる
+                    localVideo.style.opacity = "0.6"; 
                     localVideo.play().catch(() => { });
                 } else {
                     localVideo.pause();
