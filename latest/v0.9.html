@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 10:20 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 10:22 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -988,7 +988,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:20 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:22 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1565,7 +1565,6 @@
             window.addEventListener('keydown', (e) => { 
                 if (e.repeat) return; 
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
-                if (l === -1 && k === 'h') l = 4; 
                 if (l !== -1) {
                     if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
                     e.preventDefault();
@@ -1576,7 +1575,6 @@
             }, {capture: true});
             window.addEventListener('keyup', (e) => { 
                 let k = e.key.toLowerCase(), l = KEY_MAP.indexOf(k); 
-                if (l === -1 && k === 'h') l = 4; 
                 if (l !== -1) {
                     if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
                     e.preventDefault();
