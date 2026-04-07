@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 12:02 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 12:06 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -929,7 +929,10 @@
                         <option value="0.25">0.25x</option>
                         <option value="0.5">0.5x</option>
                         <option value="0.75">0.75x</option>
-                        <option value="1.0" selected>1.0x</option>
+                        <option value="1">1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2.0x</option>
                     </select>
 
 
@@ -1015,7 +1018,8 @@
                     <div class="flex justify-between"><span class="mr-2">Play</span><span class="text-white font-mono bg-white/10 px-1 rounded">Enter</span></div>
                     <div class="flex justify-between"><span class="mr-2">Rec</span><span class="text-blue-300 font-mono bg-blue-500/20 px-1 rounded">R</span></div>
                     <div class="flex justify-between"><span class="mr-2">Test</span><span class="text-green-300 font-mono bg-green-500/20 px-1 rounded">P</span></div>
-                    <div class="flex justify-between"><span class="mr-2">Seek</span><span class="text-white font-mono bg-white/10 px-1 rounded">← / →</span></div>
+                    <div class="flex justify-between mb-1"><span class="mr-2">Seek</span><span class="text-white font-mono bg-white/10 px-1 rounded">← / →</span></div>
+                    <div class="flex justify-between"><span class="mr-2">Speed</span><span class="text-white font-mono bg-white/10 px-1 rounded">↑ / ↓</span></div>
                 </div>
             </div>
             <div>
@@ -1043,7 +1047,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:02 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:06 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1645,6 +1649,18 @@
                     } else if (e.key === 'ArrowRight') {
                         e.preventDefault();
                         seekVideoBy(5);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+                        let cur = localVideo.playbackRate;
+                        let next = speeds.find(s => s > cur) || speeds[speeds.length - 1];
+                        setVideoSpeed(next);
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+                        let cur = localVideo.playbackRate;
+                        let next = [...speeds].reverse().find(s => s < cur) || speeds[0];
+                        setVideoSpeed(next);
                     }
                 }
             }, {capture: true});
@@ -2038,8 +2054,11 @@
 
         function setVideoSpeed(speed) {
             if (!localVideo) return;
-            localVideo.playbackRate = parseFloat(speed);
-            showToast(`再生速度: ${speed}x`, 1000);
+            const s = parseFloat(speed);
+            localVideo.playbackRate = s;
+            const sel = document.getElementById('editor-speed-select');
+            if (sel) sel.value = s.toString();
+            showToast(`再生速度: ${s}x`, 1000);
         }
 
         function syncEditorNotes() {
