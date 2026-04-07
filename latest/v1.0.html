@@ -1265,7 +1265,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:50 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:58 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1330,10 +1330,11 @@
         let currentSongIndex = -1;
         let songsStore = [];
         let BACKUP_SONG_LIST = [
-            { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
-            { name: "START:DASH!!", video: BASE_PATH + "assets/videos/startdash.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/startdash_hard.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/startdash.jpg" },
-            { name: "タカラモノズ", video: BASE_PATH + "assets/videos/takaramonos.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/takaramonos.jpg" },
-            { name: "A song for You! You? You!!", video: BASE_PATH + "assets/videos/asongforyou.mp4", charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/asongforyou.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/asongforyou.jpg" }
+            { name: "僕らのLIVE 君とのLIFE", video: BASE_PATH + "assets/videos/bokura.mp4", preview_start: 76, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/bokura.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokura.jpg" },
+            { name: "僕らは今のなかで", video: BASE_PATH + "assets/videos/bokuima.mp4", preview_start: 61, charts: { EASY: BASE_PATH + "assets/charts/bokuima_easy.txt", NORMAL: "", HARD: "", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/bokuima.jpg" },
+            { name: "START:DASH!!", video: BASE_PATH + "assets/videos/startdash.mp4", preview_start: 64, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/startdash_hard.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/startdash.jpg" },
+            { name: "タカラモノズ", video: BASE_PATH + "assets/videos/takaramonos.mp4", preview_start: 60, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/takaramonos.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/takaramonos.jpg" },
+            { name: "A song for You! You? You!!", video: BASE_PATH + "assets/videos/asongforyou.mp4", preview_start: 98, charts: { EASY: "", NORMAL: "", HARD: BASE_PATH + "assets/charts/asongforyou.txt", EXPERT: "", MASTER: "" }, jacket: BASE_PATH + "assets/images/asongforyou.jpg" }
         ];
         let AUTO_SONG_LIST = []; // キャッシュ用
         let localVideo, isVideoReady = false;
