@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 14:48 Update</title>
+    <title>ArcAngel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1090,6 +1090,9 @@
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
+
+                // --- タイトルの動的更新 ---
+                document.title = `ArcAngel ${MY_VERSION} - ${updateDate} Update`;
 
                 // --- 動的バージョン誘導ロジック ---
                 const switchContainer = document.getElementById('version-switch-container');
