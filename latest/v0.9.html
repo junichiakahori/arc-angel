@@ -467,9 +467,10 @@
                 width: auto;
                 left: 10px;
                 right: 10px;
-                bottom: calc(140px + env(safe-area-inset-bottom));
-                padding: 14px;
-                gap: 10px;
+                bottom: calc(105px + env(safe-area-inset-bottom)); /* 位置をさらに下げてゲーム画面を確保 */
+                padding: 10px;
+                gap: 6px;
+                border-radius: 18px;
             }
 
             #editor-actions {
@@ -478,19 +479,36 @@
                 right: 10px;
                 bottom: max(10px, env(safe-area-inset-bottom));
                 grid-template-columns: repeat(4, 1fr);
-                gap: 6px;
-                padding: 10px;
+                gap: 5px;
+                padding: 8px;
+                border-radius: 18px;
             }
 
             #editor-controls button {
-                font-size: 9px;
-                padding: 12px 2px;
-                border-radius: 12px;
+                font-size: 8px;
+                padding: 8px 1px;
+                border-radius: 10px;
             }
 
             #editor-time-display {
-                font-size: 11px !important;
-                width: 48px !important;
+                font-size: 10px !important;
+                width: 40px !important;
+            }
+
+            #editor-status-row {
+                font-size: 7px;
+                margin-top: 2px;
+                padding-top: 2px;
+            }
+
+            #btn-editor-pause {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+
+            #editor-speed-select {
+                padding: 4px;
+                font-size: 8px;
             }
         }
 
@@ -1086,7 +1104,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 15:37 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 15:45 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
