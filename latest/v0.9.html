@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 11:40 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 11:46 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -932,8 +932,7 @@
                         <option value="1.0" selected>1.0x</option>
                     </select>
 
-                    <button onclick="promptDeleteNote()"
-                        class="bg-red-900/40 text-red-200 border border-red-500/40 px-2 py-0.5 rounded text-[8px] font-bold">付近削除</button>
+
                 </div>
             </div>
         </div>
@@ -1043,7 +1042,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 11:40 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 11:45 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2318,13 +2317,28 @@
                 recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); 
                 syncEditorNotes(); 
-            } else if (!isEditMode) judgeStart(l); 
-            else { 
+            } else if (!isEditMode) {
+                judgeStart(l);
+            } else { 
                 playTapSound(); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); 
             } 
+            if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
         }
-        function handleInputEnd(l) { if (!lanePressed[l]) return; lanePressed[l] = false; const ct = gameCurrentTime; if (isEditMode && isRecording) { const dur = ct - lanePressStartTime[l]; if (dur > 0.2) { const last = recordedChart.filter(n => n.lane === l).pop(); if (last) last.endTime = parseFloat(ct.toFixed(2)); } syncEditorNotes(); } else if (!isEditMode) judgeEnd(l); }
+        function handleInputEnd(l) { 
+            if (!lanePressed[l]) return; 
+            lanePressed[l] = false; 
+            const ct = gameCurrentTime; 
+            if (isEditMode && isRecording) { 
+                const dur = ct - lanePressStartTime[l]; 
+                if (dur > 0.2) { 
+                    const last = recordedChart.filter(n => n.lane === l).pop(); 
+                    if (last) last.endTime = parseFloat(ct.toFixed(2)); 
+                } 
+                syncEditorNotes(); 
+            } else if (!isEditMode) judgeEnd(l);
+            if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
+        }
         function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound('PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(md, buttons[l]); } } else { playTapSound(); } }
         function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const d = Math.abs(ct - n.endTime); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(d, buttons[l]); else { playTapSound('MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500"); updateUI(); } }
         function processResult(d, tb) {
