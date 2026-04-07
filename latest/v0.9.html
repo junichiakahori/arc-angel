@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 10:56 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 10:57 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -393,7 +393,7 @@
             position: fixed;
             bottom: max(10px, env(safe-area-inset-bottom) + 10px);
             left: 10px;
-            width: 260px;
+            width: 320px;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(15px);
             padding: 8px 12px;
@@ -460,7 +460,7 @@
 
         @media (max-width: 650px) {
             #editor-timeline-panel {
-                width: 180px;
+                width: 240px;
                 bottom: 5px;
                 left: 5px;
                 padding: 6px;
@@ -919,7 +919,7 @@
                     <span id="edit-status"
                         class="text-[8px] font-black italic text-gray-400 uppercase tracking-tighter w-14">Ready</span>
                 </div>
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1 flex-wrap justify-end">
                     <button onclick="seekVideoBy(-5)" class="bg-gray-800 text-gray-200 px-1.5 py-0.5 rounded-sm text-[8px] border border-gray-600 active:bg-gray-700">-5s</button>
                     <button id="btn-editor-pause" onclick="toggleEditorPause()"
                         class="bg-blue-600/50 border border-blue-500/50 px-2 py-0.5 rounded text-[8px]">⏸️/▶️</button>
@@ -1009,7 +1009,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:56 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 10:57 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
