@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:45 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:48 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1791,17 +1791,22 @@
                 prevStatus.className = "text-[10px] text-green-400 font-bold";
                 if(status) { status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2"; }
                 
+                const doPreview = () => {
+                    localVideo.volume = 0;
+                    localVideo.play().then(() => {
+                        fadeVideoVolume(1.0, 800);
+                    }).catch(() => console.log("Auto-preview blocked"));
+                    localVideo.oncanplay = null;
+                    localVideo.onseeked = null;
+                };
+
                 // サビ位置にシーク
-                if (previewStart > 0) {
+                if (previewStart > 0 && Math.abs(localVideo.currentTime - previewStart) > 0.5) {
+                    localVideo.onseeked = doPreview;
                     localVideo.currentTime = previewStart;
+                } else {
+                    doPreview();
                 }
-                
-                // フェードインして再生
-                localVideo.volume = 0;
-                localVideo.play().then(() => {
-                    fadeVideoVolume(1.0, 800);
-                }).catch(() => console.log("Auto-preview blocked"));
-                localVideo.oncanplay = null;
 
                 // サビ終了位置でループさせるリスナー
                 localVideo._previewLoopListener = () => {
