@@ -995,42 +995,33 @@
     </div>
 
     <div id="keyboard-help"
-        class="hidden lg:block fixed left-4 top-4 bg-black/60 backdrop-blur-xl p-4 rounded-3xl border border-white/10 text-[10px] text-gray-300 pointer-events-none z-[100] w-48 shadow-2xl transition-opacity animate-fade-in shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-        <div class="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
+        class="hidden lg:block fixed left-1/2 -translate-x-1/2 top-4 bg-black/60 backdrop-blur-xl p-4 rounded-3xl border border-white/10 text-[10px] text-gray-300 pointer-events-none z-[100] w-64 shadow-2xl transition-opacity animate-fade-in shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+        <div class="flex items-center justify-center gap-2 mb-3 border-b border-white/10 pb-2">
             <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h3 class="font-bold text-blue-400 tracking-widest uppercase">Shortcuts</h3>
         </div>
-        <div class="space-y-3">
+        <div class="grid grid-cols-3 gap-4">
             <div>
-                <p class="text-[8px] text-gray-500 uppercase mb-1">Gameplay / Input</p>
-                <div class="flex justify-between items-center">
-                    <span>Lanes 1-9</span>
-                    <span class="text-white font-mono bg-white/10 px-1 rounded ml-2">A...; / Space</span>
+                <p class="text-[8px] text-gray-500 uppercase mb-1">Gameplay</p>
+                <div class="flex flex-col gap-1">
+                    <span class="text-white font-mono bg-white/10 px-1 rounded text-center">A...; / Space</span>
                 </div>
             </div>
             <div>
                 <p class="text-[8px] text-gray-500 uppercase mb-1">Editor Actions</p>
-                <div class="flex justify-between items-center mb-1">
-                    <span>Play/Pause</span>
-                    <span class="text-white font-mono bg-white/10 px-1 rounded ml-2">Enter</span>
-                </div>
-                <div class="flex justify-between items-center mb-1">
-                    <span>Record</span>
-                    <span class="text-white font-mono bg-blue-500/30 px-1 rounded ml-2 text-blue-300">R</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span>Test Play</span>
-                    <span class="text-white font-mono bg-green-500/30 px-1 rounded ml-2 text-green-300">P</span>
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between"><span class="mr-2">Play</span><span class="text-white font-mono bg-white/10 px-1 rounded">Enter</span></div>
+                    <div class="flex justify-between"><span class="mr-2">Rec</span><span class="text-blue-300 font-mono bg-blue-500/20 px-1 rounded">R</span></div>
+                    <div class="flex justify-between"><span class="mr-2">Test</span><span class="text-green-300 font-mono bg-green-500/20 px-1 rounded">P</span></div>
                 </div>
             </div>
             <div>
                 <p class="text-[8px] text-gray-500 uppercase mb-1">System</p>
-                <div class="flex justify-between items-center">
-                    <span>Menu / Back</span>
-                    <span class="text-white font-mono bg-white/10 px-1 rounded ml-2">Escape</span>
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between"><span class="mr-2">Menu</span><span class="text-white font-mono bg-white/10 px-1 rounded">Esc</span></div>
                 </div>
             </div>
         </div>
