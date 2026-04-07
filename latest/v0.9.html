@@ -1005,9 +1005,9 @@
         </div>
     </div>
 
-    <!-- PC専用ショートカットガイド (JS側でPC時のみ表示制御) -->
+    <!-- PC専用ショートカットガイド -->
     <div id="keyboard-help" style="display: none;"
-        class="lg:flex fixed left-1/2 -translate-x-1/2 top-4 bg-black/40 backdrop-blur-2xl p-4 rounded-3xl border border-white/10 text-[9px] text-gray-300 pointer-events-none z-[100] w-[400px] shadow-2xl transition-all animate-fade-in items-start gap-3">
+        class="fixed left-1/2 -translate-x-1/2 top-4 bg-black/50 backdrop-blur-3xl p-5 rounded-3xl border border-white/20 text-[9px] text-gray-300 pointer-events-none z-[600] w-[420px] shadow-[0_20px_50px_rgba(0,0,0,0.8)] transition-all animate-fade-in items-start gap-4">
         
         <!-- アイコンセクション -->
         <div class="flex flex-col items-center gap-1 border-r border-white/10 pr-2">
@@ -1086,7 +1086,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 14:55 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 15:05 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1176,11 +1176,8 @@
         function showHelpOnPC() {
             const kh = document.getElementById('keyboard-help');
             if (!kh) return;
-            // タッチデバイス判定と画面幅の組み合わせ
-            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            const isWide = window.innerWidth >= 1024;
-            
-            if (!isTouch && isWide) {
+            // 判定をシンプルにする：1024px以上ならPCとみなして表示。それ未満（スマホ等）なら隠す。
+            if (window.innerWidth >= 1024) {
                 kh.style.display = 'flex';
                 kh.style.opacity = "1.0";
             } else {
