@@ -1589,6 +1589,7 @@
             }, { passive: false });
 
             canvas.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // ダブルクリック時のテキスト全選択を防止
                 if (isEditMode && tryInteractNoteAt(e.clientX, e.clientY)) return;
                 const l = getNearestLane(e.clientX, e.clientY);
                 if (l !== -1) sH(l);
@@ -1938,30 +1939,51 @@
             CHART = [...recordedChart].sort((a, b) => a.time - b.time);
             CHART.forEach((c, i) => c.isSim = CHART.some((n, idx) => idx !== i && Math.abs(n.time - c.time) < 0.015));
 
-            // モード切り替え
-            isEditMode = false;
-            isPlaying = true;
-            isPaused = false;
-            isRecording = false;
-            isPreviewMode = false;
-            isEditorTestPlay = true; // フラグをオン
+            const doPlay = () => {
+                // モード切り替え
+                isEditMode = false;
+                isPlaying = true;
+                isPaused = false;
+                isRecording = false;
+                isPreviewMode = false;
+                isEditorTestPlay = true;
 
-            // UI
-            document.getElementById('editor-controls').style.display = 'none';
-            document.getElementById('ui-overlay').style.opacity = '1';
-            document.getElementById('ui-overlay').style.pointerEvents = 'auto';
-            document.getElementById('btn-back-to-editor').classList.remove('hidden'); // ボタン表示
+                // UI
+                document.getElementById('editor-controls').style.display = 'none';
+                document.getElementById('ui-overlay').style.opacity = '1';
+                document.getElementById('ui-overlay').style.pointerEvents = 'auto';
+                document.getElementById('btn-back-to-editor').classList.remove('hidden');
 
-            // ライブ開始
-            score = 0; combo = 0; maxCombo = 0;
-            counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
-            notesQueue = [...CHART];
-            activeNotes = [];
+                const jEl = document.getElementById('judge-display'); 
+                jEl.innerText = "TEST PLAY"; 
+                jEl.className = "text-2xl font-black text-blue-400 h-8 flex items-center justify-center italic tracking-widest";
 
-            localVideo.currentTime = 0;
-            localVideo.style.opacity = "1"; // プレイ中は不透明度を 100% に
-            localVideo.play();
-            saveChartToLocal(); // プレイ開始時にも保存
+                // ライブ開始
+                score = 0; combo = 0; maxCombo = 0; stamina = 100; gameCurrentTime = 0;
+                counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0 };
+                notesQueue = [...CHART];
+                activeNotes = []; hitEffects = [];
+                lanePressed.fill(false); activeTouches.clear();
+                updateUI();
+
+                gameStartTime = performance.now();
+                requestAnimationFrame(update);
+                
+                localVideo.play().catch(e => console.warn(e));
+                saveChartToLocal(); 
+            };
+
+            localVideo.style.opacity = "1";
+            if (localVideo && Math.abs(localVideo.currentTime) > 0.1) {
+                localVideo.onseeked = () => {
+                    localVideo.onseeked = null;
+                    doPlay();
+                };
+                localVideo.currentTime = 0;
+                setTimeout(() => { if (!isPlaying) doPlay(); }, 2000); // タイムアウト保険
+            } else {
+                doPlay();
+            }
         }
 
         // --- 譜面保存関連 ---
