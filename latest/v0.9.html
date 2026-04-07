@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 12:13 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 12:16 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -996,40 +996,63 @@
         </div>
     </div>
 
+    <!-- PC専用ショートカットガイド -->
     <div id="keyboard-help"
-        class="hidden lg:block fixed left-1/2 -translate-x-1/2 top-4 bg-black/60 backdrop-blur-xl p-4 rounded-3xl border border-white/10 text-[10px] text-gray-300 pointer-events-none z-[100] w-64 shadow-2xl transition-opacity animate-fade-in shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-        <div class="flex items-center justify-center gap-2 mb-3 border-b border-white/10 pb-2">
-            <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        class="hidden lg:flex fixed left-1/2 -translate-x-1/2 top-4 bg-black/40 backdrop-blur-2xl p-4 rounded-3xl border border-white/10 text-[9px] text-gray-300 pointer-events-none z-[100] w-[460px] shadow-2xl transition-all animate-fade-in items-start gap-4">
+        
+        <!-- アイコンセクション -->
+        <div class="flex flex-col items-center gap-1 border-r border-white/10 pr-3">
+            <svg class="w-4 h-4 text-blue-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="font-bold text-blue-400 tracking-widest uppercase">Shortcuts</h3>
+            <span class="text-[8px] font-black text-blue-500 uppercase tracking-tighter">Guides</span>
         </div>
-        <div class="grid grid-cols-3 gap-4">
-            <div>
-                <p class="text-[8px] text-gray-500 uppercase mb-1">Gameplay</p>
-                <div class="flex flex-col gap-1">
-                    <span class="text-white font-mono bg-white/10 px-1 rounded text-center">A...; / Space</span>
+
+        <div class="flex-1 grid grid-cols-3 gap-6">
+            <!-- Gameplay -->
+            <div class="space-y-2">
+                <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Gameplay</p>
+                <div class="flex flex-wrap gap-1">
+                    <span class="bg-white/10 border border-white/20 px-1.5 py-0.5 rounded font-bold text-white font-mono">A...;</span>
+                    <span class="bg-white/10 border border-white/20 px-1.5 py-0.5 rounded font-bold text-white font-mono flex-1 text-center">Space</span>
                 </div>
             </div>
-            <div>
-                <p class="text-[8px] text-gray-500 uppercase mb-1">Editor Actions</p>
-                <div class="flex flex-col gap-1">
-                    <div class="flex justify-between"><span class="mr-2">Play</span><span class="text-white font-mono bg-white/10 px-1 rounded">Enter</span></div>
-                    <div class="flex justify-between"><span class="mr-2">Rec</span><span class="text-blue-300 font-mono bg-blue-500/20 px-1 rounded">R</span></div>
-                    <div class="flex justify-between"><span class="mr-2">Test</span><span class="text-green-300 font-mono bg-green-500/20 px-1 rounded">P</span></div>
-                    <div class="flex justify-between mb-1"><span class="mr-2">Seek</span><span class="text-white font-mono bg-white/10 px-1 rounded">← / →</span></div>
-                    <div class="flex justify-between"><span class="mr-2">Speed</span><span class="text-white font-mono bg-white/10 px-1 rounded">↑ / ↓</span></div>
+
+            <!-- Editor -->
+            <div class="space-y-2">
+                <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">Editor</p>
+                <div class="grid grid-cols-1 gap-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="opacity-60 italic">Play/Rec</span>
+                        <div class="flex gap-1">
+                            <kbd class="bg-white/10 border border-white/20 px-1 rounded font-bold text-white">⏎</kbd>
+                            <kbd class="bg-blue-500/20 border border-blue-500/30 px-1 rounded font-bold text-blue-300">R</kbd>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="opacity-60 italic">Test</span>
+                        <kbd class="bg-green-500/20 border border-green-500/30 px-1 rounded font-bold text-green-300">P</kbd>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="opacity-60 italic">Seek/Spd</span>
+                        <div class="flex gap-1 text-[7px] font-bold">
+                            <span class="bg-white/5 border border-white/10 px-1 rounded">←→</span>
+                            <span class="bg-white/5 border border-white/10 px-1 rounded">↑↓</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div>
-                <p class="text-[8px] text-gray-500 uppercase mb-1">System</p>
-                <div class="flex flex-col gap-1">
-                    <div class="flex justify-between"><span class="mr-2">Menu</span><span class="text-white font-mono bg-white/10 px-1 rounded">Esc</span></div>
+
+            <!-- System -->
+            <div class="space-y-2">
+                <p class="text-[7px] text-gray-500 font-black uppercase tracking-widest border-b border-white/5 pb-1">System</p>
+                <div class="flex justify-between items-center">
+                    <span class="opacity-60 italic">Title/Menu</span>
+                    <kbd class="bg-white/10 border border-white/20 px-1 rounded font-bold text-white">Esc</kbd>
                 </div>
+                <p class="mt-2 text-[7px] text-gray-600 italic text-right">PC Only</p>
             </div>
         </div>
-        <p class="mt-4 text-[8px] text-gray-500 italic text-center">Visible only on PC</p>
     </div>
 
     <script>
@@ -1047,7 +1070,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:13 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:16 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
