@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 13:21 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 13:23 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1077,7 +1077,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 13:21 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 13:23 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1798,6 +1798,7 @@
                 document.getElementById('ui-overlay').style.display = 'block';
                 document.getElementById('ui-overlay').style.opacity = isEditMode ? '0' : '1';
                 document.getElementById('ui-overlay').style.pointerEvents = isEditMode ? 'none' : 'auto';
+                document.getElementById('keyboard-help').style.display = 'none';
                 document.getElementById('editor-controls').style.display = isEditMode ? 'flex' : 'none';
                 if (isEditMode) document.getElementById('editor-seek-bar').max = localVideo.duration || 100;
                 if (isCommandActivated) updateCommandUI(true, currentSelectedSong ? currentSelectedSong.jacket : null);
