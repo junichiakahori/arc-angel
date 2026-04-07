@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:29 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:38 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2224,6 +2224,9 @@
 
             // ゲーム開始・UI遷移の実行
             const doPlay = async () => {
+                // 二重起動防止
+                if (isPlaying) return;
+
                 // UIを一気にプレイモードへ切り替え
                 document.getElementById('start-screen').style.display = 'none';
                 document.getElementById('launcher-screen').style.display = 'none';
@@ -2502,8 +2505,11 @@
                         activeNotes.splice(i, 1);
                         if (n.status === 'holding') laneCurrentHoldNote[n.lane] = null;
                         if (!isEditMode) {
-                            counts.miss++; combo = 0; stamina -= 10;
-                            showJ("MISS", "text-red-500"); updateUI();
+                            // 開始1秒間はタイムジャンプ等による理不尽なミスを防ぐための保護期間
+                            if (ct > 1.0) {
+                                counts.miss++; combo = 0; stamina -= 10;
+                                showJ("MISS", "text-red-500"); updateUI();
+                            }
                         }
                     }
                 }
