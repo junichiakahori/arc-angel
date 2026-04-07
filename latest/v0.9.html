@@ -30,7 +30,7 @@
             });
         })();
     </script>
-    <title>ArcAngel v0.9 - 2026/04/07 12:57 Update</title>
+    <title>ArcAngel v0.9 - 2026/04/07 13:12 Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -1077,7 +1077,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v0.9"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 12:57 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 13:12 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2385,15 +2385,16 @@
             lanePressed[l] = true; 
             if (isEditMode) gameCurrentTime = localVideo.currentTime; // エディター時は入力時点を同期
             lanePressStartTime[l] = gameCurrentTime; 
-            const currentInputIsOneShot = isEditMode && isEditorPaused; // 停止中は常に1つノーツを置く(ステップ入力)
-            if (isEditMode && (isRecording || currentInputIsOneShot)) { 
+            // 記録モード中かつ（再生中 または 停止中のステップ入力）なら記録
+            if (isEditMode && isRecording) { 
                 playTapSound(); 
                 recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
-                createHitEffect(buttons[l].x, buttons[l].y, isRecording ? '#ef4444' : '#ffffff'); 
+                createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); 
                 syncEditorNotes(); 
             } else if (!isEditMode) {
                 judgeStart(l);
             } else { 
+                // 非記録モード時は、単に音を鳴らして視覚フィードバックを出すだけ
                 playTapSound(); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); 
             } 
