@@ -692,6 +692,46 @@
         .animate-combo-burst {
             animation: combo-burst 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
+
+        /* キーコンフィグ画面用 */
+        .key-config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+        .key-config-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .key-config-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            animation: pulse-border 1.5s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: #3b82f6; }
+            50% { border-color: rgba(59, 130, 246, 0.3); }
+        }
+        .key-config-label {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-family: monospace;
+            font-weight: 900;
+            color: #60a5fa;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -834,6 +874,14 @@
                     <button onclick="backToLauncher()"
                         class="w-full mt-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-bold text-gray-500 transition-all uppercase tracking-widest">
                         タイトル画面(ランチャー)に戻る
+                    </button>
+                </div>
+
+                <!-- 設定セクション -->
+                <div class="mt-4 pt-4 border-t border-white/5 w-full flex justify-center">
+                    <button onclick="openKeyConfig()" class="flex items-center gap-2 px-4 py-2 bg-gray-800/60 hover:bg-gray-700/80 border border-gray-600/40 rounded-xl text-[10px] font-bold text-gray-300 transition-all">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        キーコンフィグ
                     </button>
                 </div>
 
@@ -1029,6 +1077,23 @@
     </div>
     <div id="toast-msg" class="toast"></div>
 
+    <!-- キーコンフィグ画面 -->
+    <div id="key-config-screen" class="overlay-screen" style="display: none;">
+        <div class="overlay-screen-content w-full max-w-sm">
+            <h2 class="text-3xl font-black mb-1 italic text-blue-400 tracking-tighter">Key Config</h2>
+            <p class="text-[9px] text-gray-500 mb-6 font-bold uppercase tracking-widest">各レーンのキー割り当てを変更できます</p>
+            
+            <div id="key-config-list" class="grid grid-cols-1 gap-2 w-full mb-8">
+                <!-- JavaScriptで生成 -->
+            </div>
+
+            <div class="flex gap-4 w-full">
+                <button onclick="resetKeyConfig()" class="flex-1 py-3 bg-red-900/40 hover:bg-red-800/60 border border-red-500/30 rounded-2xl text-[10px] font-bold text-red-200 transition-all uppercase tracking-widest">初期化</button>
+                <button onclick="closeKeyConfig()" class="flex-[1.5] btn-action">閉じる</button>
+            </div>
+        </div>
+    </div>
+
     <!-- リザルト画面 -->
     <div id="result-screen" class="overlay-screen" style="display: none;">
         <div class="overlay-screen-content">
@@ -1147,7 +1212,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 18:46 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 19:05 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1242,7 +1307,21 @@
         let lanePressed = new Array(9).fill(false), lanePressStartTime = new Array(9).fill(0), laneCurrentHoldNote = new Array(9).fill(null);
         let gameCurrentTime = 0; // 一貫性のあるゲーム内時刻
         let NOTE_TRAVEL_TIME = 2.0;
-        const KEY_LABELS = ['A', 'S', 'D', 'F', 'SPACE', 'J', 'K', 'L', ';'], KEY_MAP = ['a', 's', 'd', 'f', ' ', 'j', 'k', 'l', ';'];
+        let KEY_LABELS = ['A', 'S', 'D', 'F', 'SPACE', 'J', 'K', 'L', ';'];
+        let KEY_MAP = ['a', 's', 'd', 'f', ' ', 'j', 'k', 'l', ';'];
+
+        // キーコンフィグ初期化
+        function initKeyConfig() {
+            const savedMap = localStorage.getItem('arcangel_key_map');
+            const savedLabels = localStorage.getItem('arcangel_key_labels');
+            if (savedMap && savedLabels) {
+                try {
+                    KEY_MAP = JSON.parse(savedMap);
+                    KEY_LABELS = JSON.parse(savedLabels);
+                } catch(e) { console.error(e); }
+            }
+        }
+        initKeyConfig();
 
         const activeTouches = new Map();
 
@@ -2584,14 +2663,13 @@
         function handleInputStart(l, isSimulated = false) { 
             if (lanePressed[l]) return; 
             lanePressed[l] = true; 
-            if (isEditMode) gameCurrentTime = localVideo.currentTime; // エディター時は入力時点を同期
+            if (isEditMode) gameCurrentTime = localVideo.currentTime; 
             lanePressStartTime[l] = gameCurrentTime; 
             
             if (!isEditMode && !isAutoPlay && !isGhostReplay && !isSimulated) {
                 userPlayRecord.push({ type: 'start', lane: l, time: gameCurrentTime });
             }
 
-            // 記録モード中かつ（再生中 または 停止中のステップ入力）なら記録
             if (isEditMode && isRecording) { 
                 playTapSound(); 
                 recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
@@ -2600,7 +2678,6 @@
             } else if (!isEditMode) {
                 judgeStart(l);
             } else { 
-                // 非記録モード時は、単に音を鳴らして視覚フィードバックを出すだけ
                 playTapSound(); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ffffff'); 
             } 
@@ -2616,15 +2693,96 @@
             }
 
             if (isEditMode && isRecording) { 
-                const dur = ct - lanePressStartTime[l]; 
-                if (dur > 0.2) { 
-                    const last = recordedChart.filter(n => n.lane === l).pop(); 
-                    if (last) last.endTime = parseFloat(ct.toFixed(2)); 
-                } 
-                syncEditorNotes(); 
+                 const dur = ct - lanePressStartTime[l]; 
+                 if (dur > 0.2) { 
+                     const last = recordedChart.filter(n => n.lane === l).pop(); 
+                     if (last) last.endTime = parseFloat(ct.toFixed(2)); 
+                 } 
+                 syncEditorNotes(); 
             } else if (!isEditMode) judgeEnd(l);
             if (isEditMode && isEditorPaused) draw(localVideo.currentTime);
         }
+
+        // --- キーコンフィグ関連 ---
+        let configActiveIndex = -1;
+        function openKeyConfig() {
+            const list = document.getElementById('key-config-list');
+            list.innerHTML = '';
+            KEY_MAP.forEach((k, i) => {
+                const item = document.createElement('div');
+                item.className = 'key-config-item cursor-pointer';
+                item.id = `key-config-${i}`;
+                item.onclick = () => activateKeyBinding(i);
+                
+                const laneName = ['LEFT 1', 'LEFT 2', 'LEFT 3', 'LEFT 4', 'CENTER', 'RIGHT 4', 'RIGHT 3', 'RIGHT 2', 'RIGHT 1'][i];
+                item.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-[8px] text-gray-500 font-black uppercase tracking-tighter">${laneName}</span>
+                        <span class="text-[10px] font-bold text-white uppercase">${KEY_LABELS[i]}</span>
+                    </div>
+                    <div class="key-config-label">${KEY_LABELS[i] === ' ' ? 'SPC' : KEY_LABELS[i]}</div>
+                `;
+                list.appendChild(item);
+            });
+            document.getElementById('key-config-screen').style.display = 'flex';
+        }
+
+        function activateKeyBinding(index) {
+            if (configActiveIndex !== -1) {
+                document.getElementById(`key-config-${configActiveIndex}`).classList.remove('active');
+            }
+            configActiveIndex = index;
+            document.getElementById(`key-config-${index}`).classList.add('active');
+            
+            // 入力待ちリスナーを一度だけ追加
+            const waitKey = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (e.key === 'Escape') {
+                    deactivateKeyBinding();
+                    window.removeEventListener('keydown', waitKey, true);
+                    return;
+                }
+
+                const newKey = e.key.toLowerCase();
+                const newLabel = e.key.toUpperCase();
+                
+                KEY_MAP[configActiveIndex] = newKey === ' ' ? ' ' : newKey;
+                KEY_LABELS[configActiveIndex] = newKey === ' ' ? 'SPACE' : newLabel;
+                
+                localStorage.setItem('arcangel_key_map', JSON.stringify(KEY_MAP));
+                localStorage.setItem('arcangel_key_labels', JSON.stringify(KEY_LABELS));
+                
+                deactivateKeyBinding();
+                openKeyConfig(); // UI更新のために再描画
+                window.removeEventListener('keydown', waitKey, true);
+            };
+            window.addEventListener('keydown', waitKey, true);
+        }
+
+        function deactivateKeyBinding() {
+            if (configActiveIndex !== -1) {
+                const el = document.getElementById(`key-config-${configActiveIndex}`);
+                if (el) el.classList.remove('active');
+            }
+            configActiveIndex = -1;
+        }
+
+        function resetKeyConfig() {
+            if (!confirm('キー設定を初期状態に戻しますか？')) return;
+            KEY_MAP = ['a', 's', 'd', 'f', ' ', 'j', 'k', 'l', ';'];
+            KEY_LABELS = ['A', 'S', 'D', 'F', 'SPACE', 'J', 'K', 'L', ';'];
+            localStorage.removeItem('arcangel_key_map');
+            localStorage.removeItem('arcangel_key_labels');
+            openKeyConfig();
+        }
+
+        function closeKeyConfig() {
+            document.getElementById('key-config-screen').style.display = 'none';
+            deactivateKeyBinding();
+        }
+
         function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35, diff = 0; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; diff = ct - n.time; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound('PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(diff, buttons[l]); } } else { playTapSound(); } }
         function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l]); else { playTapSound('MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
         function processResult(diff, tb) {
