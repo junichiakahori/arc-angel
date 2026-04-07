@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:42 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:45 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1790,6 +1790,11 @@
                 prevStatus.innerText = `🎵 「${s.name}」 サビプレビュー再生中...`; 
                 prevStatus.className = "text-[10px] text-green-400 font-bold";
                 if(status) { status.innerText = `楽曲準備完了: ${s.name}`; status.className = "text-[9px] text-green-400 font-bold mt-2"; }
+                
+                // サビ位置にシーク
+                if (previewStart > 0) {
+                    localVideo.currentTime = previewStart;
+                }
                 
                 // フェードインして再生
                 localVideo.volume = 0;
