@@ -1260,7 +1260,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.0"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:00 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/07 22:01 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1829,18 +1829,18 @@
             const chartUrl = song.charts[diff];
             const chartStatus = document.getElementById('chart-file-status');
 
-            // サーバーからの読み込みを優先するため、保存済みデータの自動復旧を一旦無効化、または後に回します
-            /*
             const savedData = loadChartFromLocal();
-            if (savedData) {
-                recordedChart = savedData;
-                CHART = [...recordedChart].sort((a, b) => a.time - b.time);
-                chartStatus.innerText = `[${diff}] ブラウザ保存済みの譜面を読み込みました`;
-                chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
-                syncEditorNotes();
-                return;
+            if (savedData && savedData.length > 0) {
+                // ローカルにデータがある場合は確認
+                if (confirm(`この曲の保存済み譜面データ(${savedData.length}個)が見つかりました。復旧しますか？\n(キャンセルするとサーバーのデフォルト譜面をロードします)`)) {
+                    recordedChart = savedData;
+                    CHART = [...recordedChart].sort((a, b) => a.time - b.time);
+                    chartStatus.innerText = `[${diff}] ローカル保存済みの譜面を復旧しました`;
+                    chartStatus.className = "text-[9px] text-green-400 font-bold mt-1";
+                    syncEditorNotes();
+                    return;
+                }
             }
-            */
 
             if (!chartUrl) {
                 CHART = []; recordedChart = [];
@@ -2221,7 +2221,13 @@
                 // doPlay 直前ですべてのリセットを実行
                 score = 0; combo = 0; maxCombo = 0; stamina = 100;
                 counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0, fast: 0, slow: 0 };
-                recordedChart = isEditMode ? JSON.parse(JSON.stringify(CHART)) : [];
+                
+                // エディットモード有効時のみ、CHARTからrecordedChartを初期化。
+                // プレイモード開始時は、既存のrecordedChart（エディット中の内容）を保護する。
+                if (isEditMode) {
+                    recordedChart = JSON.parse(JSON.stringify(CHART));
+                }
+                
                 notesQueue = isEditMode ? [] : [...CHART];
                 activeNotes = []; hitEffects = [];
                 lanePressed.fill(false); activeTouches.clear();
