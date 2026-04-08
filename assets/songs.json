@@ -87,7 +87,7 @@
         "name": "A song for You! You? You!!",
         "video": "assets/videos/asongforyou.mp4",
         "release_date": "2020/03/25",
-        "preview_start": 98,
+        "preview_start": 79,
         "charts": {
             "EASY": "assets/charts/asongforyou_easy.txt",
             "NORMAL": "assets/charts/asongforyou_normal.txt",
