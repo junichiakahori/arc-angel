@@ -1295,7 +1295,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 13:40 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 15:52 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -3502,7 +3502,36 @@
             deactivateKeyBinding();
         }
 
-        function judgeStart(l) { const ct = gameCurrentTime; let ti = -1, md = 0.35, diff = 0; activeNotes.forEach((n, i) => { if (n.lane === l && n.status === 'waiting') { const d = Math.abs(ct - n.time); if (d < md) { md = d; diff = ct - n.time; ti = i; } } }); if (ti !== -1) { const n = activeNotes[ti]; if (n.endTime) { playTapSound(l, 'PERFECT'); n.status = 'holding'; laneCurrentHoldNote[l] = n; createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); } else { activeNotes.splice(ti, 1); processResult(diff, buttons[l], l); } } else { playTapSound(l); } }
+        function judgeStart(l) { 
+            const ct = gameCurrentTime; 
+            let ti = -1, diff = 0; 
+            // 修正: 判定範囲内で最も「古い（先に来る）」ノーツを優先的にキャッチする
+            for (let i = 0; i < activeNotes.length; i++) {
+                const n = activeNotes[i];
+                if (n.lane === l && n.status === 'waiting') {
+                    const d = Math.abs(ct - n.time);
+                    if (d < 0.35) { 
+                        ti = i;
+                        diff = ct - n.time;
+                        break; 
+                    }
+                }
+            }
+            if (ti !== -1) { 
+                const n = activeNotes[ti]; 
+                if (n.endTime) { 
+                    playTapSound(l, 'PERFECT'); 
+                    n.status = 'holding'; 
+                    laneCurrentHoldNote[l] = n; 
+                    createHitEffect(buttons[l].x, buttons[l].y, '#facc15'); 
+                } else { 
+                    activeNotes.splice(ti, 1); 
+                    processResult(diff, buttons[l], l); 
+                } 
+            } else { 
+                playTapSound(l); 
+            } 
+        }
         function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l], l); else { playTapSound(l, 'MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
         function processResult(diff, tb, lane) {
             const d = Math.abs(diff);
