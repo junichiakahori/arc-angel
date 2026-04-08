@@ -1098,6 +1098,20 @@
                 </div>
                 <span class="text-[7px] text-gray-600 font-bold uppercase tracking-[0.2em]">Editor Level.09</span>
             </div>
+            <!-- 4段目: AI解析設定 (v1.1追加) -->
+            <div id="editor-ai-config" class="mt-2 border-t border-white/10 pt-2 flex flex-col gap-2">
+                <div class="flex items-center justify-between text-[8px] text-indigo-300 font-bold uppercase tracking-wider">
+                    <span>AI Analysis SENSITivity</span>
+                    <span id="ai-sens-val">0.45</span>
+                </div>
+                <input type="range" id="ai-sens-input" min="0.1" max="1.5" step="0.05" value="0.45"
+                    class="w-full h-1 bg-indigo-900/40 rounded-full appearance-none cursor-pointer accent-indigo-500"
+                    oninput="document.getElementById('ai-sens-val').innerText = this.value">
+                <div class="flex items-center gap-2">
+                   <input type="checkbox" id="ai-distribute-check" checked class="w-2.5 h-2.5 accent-indigo-500">
+                   <label for="ai-distribute-check" class="text-[7px] text-gray-400 font-bold uppercase cursor-pointer">Lanes Distribute (Freq-based)</label>
+                </div>
+            </div>
         </div>
 
         <!-- 右側パネル: メイン・アクション -->
@@ -1108,6 +1122,7 @@
                 class="bg-blue-700 text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] font-black">プレイ開始</button>
             <button onclick="openTextEditor()"
                 class="bg-orange-800 text-white shadow-[0_0_10px_rgba(249,115,22,0.4)]">テキスト編集</button>
+            <button onclick="analyzeAudioRhythm()" class="bg-indigo-700 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] font-black">AI解析 (試作)</button>
             <button onclick="copyChart()" class="bg-green-800 text-white">出力</button>
             <button onclick="sendChartByEmail()"
                 class="bg-blue-500 text-white flex items-center justify-center gap-0.5">
@@ -1359,6 +1374,101 @@
         let gameStartTime = 0; // ゲーム開始時刻 (performance.now())
         let score = 0, combo = 0, maxCombo = 0, counts = { perfect: 0, great: 0, good: 0, bad: 0, miss: 0, fast: 0, slow: 0 };
         let stamina = 100, maxStamina = 100;
+
+
+        // --- v1.1: Rhythm Analysis Engine (音声解析エンジン) ---
+        async function analyzeAudioRhythm() {
+            if (!localVideo || !localVideo.src) { showToast("動画を先に読み込んでください"); return; }
+            if (recordedChart.length > 0 && !confirm("現在の譜面を上書きして解析結果を反映しますか？")) return;
+            
+            showLoading("音声波形を深度解析中...");
+            try {
+                // 1. 設定値の取得
+                const threshold = parseFloat(document.getElementById('ai-sens-input')?.value || "0.45");
+                const isDistribute = document.getElementById('ai-distribute-check')?.checked;
+
+                // 2. 動画から音声データを取得 (ArrayBuffer)
+                const response = await fetch(localVideo.src);
+                const buffer = await response.arrayBuffer();
+                
+                // 3. 音声の復号 (Decoding)
+                if (!audioCtx) initAudio();
+                const audioBuffer = await audioCtx.decodeAudioData(buffer);
+                
+                // 4. 解析の準備 (2つのパス)
+                const sampleRate = audioBuffer.sampleRate;
+                const rawData = audioBuffer.getChannelData(0);
+                const results = [];
+                
+                // 簡易的な周波数フィルタリングシミュレーション用バッファ
+                // Low-pass (Kick系) と High-pass (Snare系) を擬似的に作成
+                const lowData = new Float32Array(rawData.length);
+                const highData = new Float32Array(rawData.length);
+                
+                // Simple IIR filters (LP: y[i] = y[i-1] + a * (x[i] - y[i-1]))
+                let lp_prev = 0, hp_prev = 0, raw_prev = 0;
+                const lp_alpha = 0.1, hp_alpha = 0.8;
+                for(let i=0; i < rawData.length; i++) {
+                    // Low-pass
+                    lp_prev += lp_alpha * (rawData[i] - lp_prev);
+                    lowData[i] = lp_prev;
+                    // High-pass (raw - lowpass)
+                    highData[i] = rawData[i] - lp_prev;
+                }
+
+                // スキャンスロット設定
+                const step = Math.floor(sampleRate * 0.05); // 50ms (20fps精度)
+                const windowSize = Math.floor(sampleRate * 0.1); 
+                const minInterval = 0.12; 
+                let lastPeakTime = -1;
+
+                for (let i = 0; i < rawData.length - windowSize; i += step) {
+                    const time = i / sampleRate;
+                    if (time < 1.0) continue; // 開始直後はスキップ
+
+                    // 各バンドのエネルギーを計算
+                    let rmsRaw = 0, rmsLow = 0, rmsHigh = 0;
+                    for (let j = 0; j < windowSize; j++) {
+                        rmsRaw += rawData[i+j] * rawData[i+j];
+                        rmsLow += lowData[i+j] * lowData[i+j];
+                        rmsHigh += highData[i+j] * highData[i+j];
+                    }
+                    rmsRaw = Math.sqrt(rmsRaw / windowSize);
+                    rmsLow = Math.sqrt(rmsLow / windowSize);
+                    rmsHigh = Math.sqrt(rmsHigh / windowSize);
+                    
+                    // 解析ロジック
+                    if (rmsRaw > threshold && (time - lastPeakTime) > minInterval) {
+                        let lane = 4; // Default: Center
+                        
+                        if (isDistribute) {
+                            // 周波数成分でレーンを振分
+                            if (rmsLow > rmsHigh * 1.5) {
+                                lane = Math.random() > 0.5 ? 0 : 1; // Left (Kick)
+                            } else if (rmsHigh > rmsLow * 1.2) {
+                                lane = Math.random() > 0.5 ? 7 : 8; // Right (Snare/HH)
+                            } else {
+                                lane = Math.floor(Math.random() * 3) + 3; // Center range (3,4,5)
+                            }
+                        }
+                        
+                        results.push({ time: Math.round(time * 100) / 100, lane: lane });
+                        lastPeakTime = time;
+                    }
+                }
+                
+                // 結果を反映
+                recordedChart = results;
+                showToast(`${results.length}個のノーツを周波数解析で生成しました`);
+                syncEditorNotes(); 
+            } catch (e) {
+                console.error("Advanced Analysis Error:", e);
+                showToast("解析に失敗しました。メモリ不足か形式不備の可能性があります。");
+            } finally {
+                hideLoading();
+            }
+        }
+
         let isEditorPaused = false, isSeeking = false;
         let isPlaying = false, isEditMode = false, isPaused = false, isRecording = false, isPreviewMode = false, isEditorTestPlay = false, isAutoPlay = false, isGhostReplay = false;
         // --- 9レーンカラー定義 (虹色グラデーション) ---
