@@ -511,62 +511,63 @@
         @media (max-width: 768px) {
             #editor-timeline-panel {
                 width: auto;
-                left: 10px;
-                right: 10px;
-                bottom: calc(105px + env(safe-area-inset-bottom)); /* 位置をさらに下げてゲーム画面を確保 */
-                padding: 10px;
-                gap: 6px;
-                border-radius: 18px;
+                left: 6px;
+                right: 6px;
+                bottom: calc(125px + env(safe-area-inset-bottom)); /* さらに下げて視認性を確保 */
+                padding: 8px;
+                gap: 4px;
+                border-radius: 14px;
+                background: rgba(15, 23, 42, 0.75); /* 透過度を上げて背景を見やすく */
             }
 
             #editor-actions {
                 width: auto;
-                left: 10px;
-                right: 10px;
-                bottom: max(10px, env(safe-area-inset-bottom));
+                left: 6px;
+                right: 6px;
+                bottom: max(6px, env(safe-area-inset-bottom));
                 grid-template-columns: repeat(4, 1fr);
-                gap: 5px;
-                padding: 8px;
-                border-radius: 18px;
+                gap: 4px;
+                padding: 6px;
+                border-radius: 14px;
+                background: rgba(15, 23, 42, 0.75);
             }
 
             #editor-controls button {
-                font-size: 8px;
-                padding: 8px 1px;
-                border-radius: 10px;
+                font-size: 7px; /* 極限まで小さく */
+                padding: 6px 1px;
+                border-radius: 8px;
+                height: 32px; /* 高さを揃える */
             }
 
             #editor-time-display {
-                font-size: 10px !important;
-                width: 40px !important;
+                font-size: 9px !important;
+                width: 35px !important;
             }
 
             #editor-status-row {
                 font-size: 7px;
-                margin-top: 2px;
-                padding-top: 2px;
+                margin-top: 1px;
+                padding-top: 1px;
             }
 
             #btn-editor-pause {
-                padding-left: 20px !important;
-                padding-right: 20px !important;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
             }
 
             #editor-speed-select {
-                padding: 4px;
-                font-size: 8px;
+                padding: 2px;
+                font-size: 7px;
             }
+
+            /* AI解析セクションをよりコンパクトに */
+            #editor-ai-config span { font-size: 7.5px !important; }
+            #editor-ai-config label { font-size: 7px !important; }
+            #editor-ai-config input[type="range"] { margin: 4px 0 !important; }
 
             #editor-seek-bar {
-                height: 8px; /* 極限まで薄く */
-                border-radius: 4px;
-                margin: 0;
-            }
-
-            #editor-timeline {
-                padding: 2px 8px; /* パディングを極限まで削減 */
-                gap: 6px;
-                min-height: 28px;
+                height: 6px;
+                border-radius: 3px;
             }
         }
 
@@ -1295,7 +1296,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 18:16 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 21:05 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
