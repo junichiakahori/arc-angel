@@ -513,30 +513,33 @@
                 width: auto;
                 left: 6px;
                 right: 6px;
-                bottom: calc(125px + env(safe-area-inset-bottom)); /* さらに下げて視認性を確保 */
-                padding: 8px;
-                gap: 4px;
-                border-radius: 14px;
-                background: rgba(15, 23, 42, 0.75); /* 透過度を上げて背景を見やすく */
+                top: max(10px, env(safe-area-inset-top)); /* 修正: 画面上部へ配置 */
+                bottom: auto;
+                padding: 6px 10px;
+                gap: 2px;
+                border-radius: 12px;
+                background: rgba(15, 23, 42, 0.85);
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             #editor-actions {
                 width: auto;
                 left: 6px;
                 right: 6px;
-                bottom: max(6px, env(safe-area-inset-bottom));
+                bottom: max(6px, env(safe-area-inset-bottom)); /* 修正: 画面下部に集約 */
                 grid-template-columns: repeat(4, 1fr);
                 gap: 4px;
                 padding: 6px;
                 border-radius: 14px;
-                background: rgba(15, 23, 42, 0.75);
+                background: rgba(15, 23, 42, 0.85);
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             #editor-controls button {
-                font-size: 7px; /* 極限まで小さく */
+                font-size: 7px;
                 padding: 6px 1px;
                 border-radius: 8px;
-                height: 32px; /* 高さを揃える */
+                height: 30px;
             }
 
             #editor-time-display {
@@ -555,15 +558,14 @@
                 padding-right: 10px !important;
             }
 
-            #editor-speed-select {
-                padding: 2px;
-                font-size: 7px;
+            /* AI解析セクションをモバイル上端にフィットさせる */
+            #editor-ai-config {
+                margin-top: 4px;
+                padding-top: 4px;
             }
-
-            /* AI解析セクションをよりコンパクトに */
-            #editor-ai-config span { font-size: 7.5px !important; }
-            #editor-ai-config label { font-size: 7px !important; }
-            #editor-ai-config input[type="range"] { margin: 4px 0 !important; }
+            #editor-ai-config span { font-size: 7px !important; }
+            #editor-ai-config label { font-size: 6.5px !important; }
+            #editor-ai-config input[type="range"] { margin: 2px 0 !important; }
 
             #editor-seek-bar {
                 height: 6px;
@@ -1296,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 21:05 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 23:18 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
