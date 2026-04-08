@@ -119,7 +119,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* 修正: コンテンツ量が増えても上端が消えないようにする */
             padding: 80px 20px 40px;
             text-align: center;
             overflow-y: auto;
@@ -1295,7 +1295,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/08 15:52 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/08 16:03 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
