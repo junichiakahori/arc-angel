@@ -1966,6 +1966,14 @@
         async function showSongList() {
             const container = document.getElementById('song-list-container'); const list = document.getElementById('song-list');
             const vSec = document.getElementById('video-selector'); const cSec = document.getElementById('chart-selector');
+            
+            // すでにリストがレンダリング済みの場合は、再描画をスキップしてスクロール位置を維持
+            if (list.children.length > 0 && songsStore.length > 0) {
+                container.classList.remove('hidden');
+                if (vSec) vSec.classList.add('hidden'); if (cSec) cSec.classList.add('hidden');
+                return;
+            }
+
             container.classList.remove('hidden'); list.innerHTML = '<p class="text-[9px] text-blue-300 animate-pulse text-center">楽曲リストを読込中...</p>';
             if (vSec) vSec.classList.add('hidden'); if (cSec) cSec.classList.add('hidden');
 
