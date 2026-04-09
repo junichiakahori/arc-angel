@@ -1298,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/10 00:33 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/10 00:51 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2964,8 +2964,19 @@
         function seekVideoStart() { if (!isEditMode) return; isSeeking = true; if (localVideo) localVideo.pause(); }
         function seekVideo(val) {
             if (!isEditMode || !localVideo) return;
-            localVideo.currentTime = parseFloat(val);
-            document.getElementById('editor-time-display').innerText = parseFloat(val).toFixed(3) + "s";
+            const nt = parseFloat(val);
+            localVideo.currentTime = nt;
+            document.getElementById('editor-time-display').innerText = nt.toFixed(3) + "s";
+            
+            // 録音中かつ停止中の場合、現在押下しているレーンのノーツをホールド化（終点更新）
+            if (isRecording && isEditorPaused) {
+                recordedChart.forEach(n => {
+                    if (lanePressed[n.lane] && Math.abs(n.time - lanePressStartTime[n.lane]) < 0.01) {
+                        n.endTime = parseFloat(nt.toFixed(3));
+                    }
+                });
+            }
+            
             syncEditorNotes();
         }
         function seekVideoEnd() {
@@ -2982,6 +2993,16 @@
             localVideo.currentTime = nt;
             document.getElementById('editor-time-display').innerText = nt.toFixed(3) + "s";
             document.getElementById('editor-seek-bar').value = nt;
+
+            // 録音中かつ停止中の場合、現在押下しているレーンのノーツをホールド化（終点更新）
+            if (isRecording && isEditorPaused) {
+                recordedChart.forEach(n => {
+                    if (lanePressed[n.lane] && Math.abs(n.time - lanePressStartTime[n.lane]) < 0.01) {
+                        n.endTime = parseFloat(nt.toFixed(3));
+                    }
+                });
+            }
+
             syncEditorNotes();
             draw(nt);
             showToast(`シーク: ${sec > 0 ? '+' : ''}${sec}s`, 1000);
