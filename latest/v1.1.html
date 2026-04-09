@@ -1298,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/10 00:51 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/10 08:05 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2452,10 +2452,10 @@
                         startPlayFromEditor();
                     } else if (e.key === 'ArrowLeft') {
                         e.preventDefault();
-                        seekVideoBy(-5);
+                        seekVideoBy(-0.05); // 👈 50ms 戻る
                     } else if (e.key === 'ArrowRight') {
                         e.preventDefault();
-                        seekVideoBy(5);
+                        seekVideoBy(0.05);  // 👈 50ms 進む
                     } else if (e.key === 'ArrowUp') {
                         e.preventDefault();
                         const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -2548,7 +2548,7 @@
 
         async function startLive(editMode = false, autoPlay = false, ghostReplay = false) {
             isPlaying = false;
-            isEditMode = false; 
+            isEditMode = editMode; 
             isEditorTestPlay = false;
             initAudio(); playStartSound(); stopTitleBGM();
             isAutoPlay = autoPlay;
@@ -2569,7 +2569,6 @@
             // ロード中表示を開始
             showLoading(editMode ? "エディット環境を構築中..." : "ライブ準備中...");
             
-            isEditMode = editMode;
             isEditorPaused = false;
             const speedVal = parseFloat(document.getElementById('speed-input').value) || 5.0;
             NOTE_TRAVEL_TIME = Math.max(0.2, 5.0 / speedVal);
@@ -3214,14 +3213,16 @@
 
             // エディター側の一時停止ボタン表示の同期
             const pBtn = document.getElementById('btn-editor-pause');
-            if (pBtn) pBtn.innerText = "▶️";
-
+            if (pBtn) pBtn.innerText = "⏸️/▶️";
+            
             // UI復帰
             document.getElementById('editor-controls').style.display = 'flex';
             document.getElementById('ui-overlay').style.opacity = '0';
             document.getElementById('ui-overlay').style.pointerEvents = 'none';
             showHelpOnPC(); // PCならヘルプを出す
-            document.getElementById('btn-back-to-editor').classList.add('hidden');
+            
+            const backEditBtn = document.getElementById('btn-back-to-editor');
+            if (backEditBtn) backEditBtn.classList.add('hidden');
 
             // 再生速度をエディターの設定に戻す
             const speedSel = document.getElementById('editor-speed-select');
@@ -3229,12 +3230,30 @@
                 localVideo.playbackRate = parseFloat(speedSel.value) || 1.0;
             }
 
+            // 状態の同期と強制描画
+            syncEditorNotes();
+            draw(localVideo.currentTime);
+            
             // 描画ループ再開
             requestAnimationFrame(update);
-            showToast("エディターに復帰しました");
+            showToast("エディターに戻りました");
         }
 
-        function togglePause() { if (isPaused) { localVideo.play(); isPaused = false; document.getElementById('pause-screen').style.display = 'none'; requestAnimationFrame(update); } else { localVideo.pause(); isPaused = true; document.getElementById('pause-screen').style.display = 'flex'; } }
+        function togglePause() { 
+            if (isPaused) { 
+                localVideo.play(); 
+                isPaused = false; 
+                document.getElementById('pause-screen').style.display = 'none'; 
+                requestAnimationFrame(update); 
+            } else { 
+                localVideo.pause(); 
+                isPaused = true; 
+                // エディターからのテストプレイ時は「エディターに戻る」を表示
+                const backEditBtn = document.getElementById('btn-back-to-editor');
+                if (backEditBtn) backEditBtn.style.display = isEditorTestPlay ? 'block' : 'none';
+                document.getElementById('pause-screen').style.display = 'flex'; 
+            } 
+        }
         function resetChart() {
             if (confirm("現在記録されているすべてのノーツを消去しますか？")) {
                 recordedChart = [];
@@ -3279,7 +3298,13 @@
         }
 
         function backToTitle() {
+            if (isEditorTestPlay) {
+                // テストプレイ中の「戻る」はエディター復帰
+                backToEditorFromPlay();
+                return;
+            }
             isPlaying = false; isPaused = false; isRecording = false; isPreviewMode = false; isEditMode = false;
+            isEditorTestPlay = false;
             updateRecordingUI();
 
             // 重要：サビプレビューのリピートを解除
