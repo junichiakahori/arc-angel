@@ -1298,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/09 23:34 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/10 00:33 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2734,13 +2734,17 @@
                         activeNotes.push({ ...notesQueue.shift(), status: 'waiting' });
                     }
 
-                    // オートプレイ（鑑賞リプレイ）ロジック
+                    // オートプレイ（鑑賞）ロジック
                     if (isAutoPlay && !isEditMode) {
                         for (let i = activeNotes.length - 1; i >= 0; i--) {
                             const n = activeNotes[i];
+                            // 開始判定
                             if (n.status === 'waiting' && ct >= n.time) {
-                                activeNotes.splice(i, 1);
-                                processResult(0, buttons[n.lane], n.lane);
+                                handleInputStart(n.lane, true);
+                            }
+                            // 長押し終了判定
+                            if (n.status === 'holding' && n.endTime && ct >= n.endTime) {
+                                handleInputEnd(n.lane, true);
                             }
                         }
                     }
