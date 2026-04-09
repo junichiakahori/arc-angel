@@ -1298,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/09 23:31 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/09 23:34 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -1455,7 +1455,7 @@
                             }
                         }
                         
-                        results.push({ time: Math.round(time * 100) / 100, lane: lane });
+                        results.push({ time: Math.round(time * 1000) / 1000, lane: lane });
                         lastPeakTime = time;
                     }
                 }
@@ -2724,7 +2724,7 @@
             if (typeof ct === 'number') {
                 if (isEditMode && !isSeeking) {
                     document.getElementById('editor-seek-bar').value = ct;
-                    document.getElementById('editor-time-display').innerText = ct.toFixed(2) + "s";
+                    document.getElementById('editor-time-display').innerText = ct.toFixed(3) + "s";
                 }
                 
                 // プレイ中またはプレビュー中、またはエディットモードなら処理継続
@@ -2961,7 +2961,7 @@
         function seekVideo(val) {
             if (!isEditMode || !localVideo) return;
             localVideo.currentTime = parseFloat(val);
-            document.getElementById('editor-time-display').innerText = parseFloat(val).toFixed(2) + "s";
+            document.getElementById('editor-time-display').innerText = parseFloat(val).toFixed(3) + "s";
             syncEditorNotes();
         }
         function seekVideoEnd() {
@@ -2976,7 +2976,7 @@
             if (nt < 0) nt = 0;
             if (nt > localVideo.duration) nt = localVideo.duration;
             localVideo.currentTime = nt;
-            document.getElementById('editor-time-display').innerText = nt.toFixed(2) + "s";
+            document.getElementById('editor-time-display').innerText = nt.toFixed(3) + "s";
             document.getElementById('editor-seek-bar').value = nt;
             syncEditorNotes();
             draw(nt);
@@ -3008,12 +3008,12 @@
                 n.isSim = sortedChart.some((other, idx) => idx !== i && Math.abs(other.time - n.time) < 0.015);
                 
                 const startTime = n.time - NOTE_TRAVEL_TIME;
-                const endTime = (n.endTime || n.time) + 0.4;
+                const endTime = (n.endTime || n.time) + 2.0; // 判定時間を少し広げて表示を安定させる
                 
-                if (ct >= startTime && ct <= endTime) {
+                if (ct >= startTime - 0.5 && ct <= endTime) {
                     // 現在の再生時間で画面上に存在するべきノーツ
                     activeNotes.push({ ...n, status: 'waiting' });
-                } else if (n.time > ct + NOTE_TRAVEL_TIME) {
+                } else if (n.time > ct + NOTE_TRAVEL_TIME - 0.5) {
                     // まだ未来にある（これから流れてくる）ノーツ
                     notesQueue.push(n);
                 }
@@ -3347,7 +3347,7 @@
 
             if (isEditMode && isRecording) { 
                 playTapSound(l); 
-                recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(2)), lane: l }); 
+                recordedChart.push({ time: parseFloat(lanePressStartTime[l].toFixed(3)), lane: l }); 
                 createHitEffect(buttons[l].x, buttons[l].y, '#ef4444'); 
                 syncEditorNotes(); 
             } else if (!isEditMode) {
@@ -3371,7 +3371,7 @@
                  const dur = ct - lanePressStartTime[l]; 
                  if (dur > 0.2) { 
                      const last = recordedChart.filter(n => n.lane === l).pop(); 
-                     if (last) last.endTime = parseFloat(ct.toFixed(2)); 
+                     if (last) last.endTime = parseFloat(ct.toFixed(3)); 
                  } 
                  syncEditorNotes(); 
             } else if (!isEditMode) judgeEnd(l);
