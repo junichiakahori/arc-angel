@@ -1298,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/10 09:02 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/10 13:08 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -3562,10 +3562,11 @@
             for (let i = 0; i < activeNotes.length; i++) {
                 const n = activeNotes[i];
                 if (n.lane === l && n.status === 'waiting') {
-                    const d = Math.abs(ct - n.time);
+                    // オートプレイ中なら強制的にジャストタイミングにする
+                    const d = isAutoPlay ? 0 : Math.abs(ct - n.time);
                     if (d < 0.35) { 
                         ti = i;
-                        diff = ct - n.time;
+                        diff = isAutoPlay ? 0 : (ct - n.time);
                         break; 
                     }
                 }
