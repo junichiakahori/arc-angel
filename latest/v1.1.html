@@ -1298,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/10 13:08 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/10 13:25 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2790,6 +2790,7 @@
         }
 
         function showLiveFailed() {
+            if (isAutoPlay) return; // 👈 鑑賞中は失敗させない
             isPlaying = false; if (localVideo) localVideo.pause();
             const resultTitle = document.querySelector('#result-screen h2');
             resultTitle.innerText = "LIVE FAILED";
@@ -2914,7 +2915,7 @@
                     if (n.status === 'waiting' || n.status === 'holding') {
                         activeNotes.splice(i, 1);
                         if (n.status === 'holding') laneCurrentHoldNote[n.lane] = null;
-                        if (!isEditMode) {
+                        if (!isEditMode && !isAutoPlay) { // 👈 鑑賞中はスタミナを減らさない
                             // 開始1秒間はタイムジャンプ等による理不尽なミスを防ぐための保護期間
                             if (ct > 1.0) {
                                 counts.miss++; combo = 0; stamina -= 10;
