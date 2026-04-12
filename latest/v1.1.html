@@ -831,7 +831,7 @@
                         class="text-[11px] text-blue-400 mb-4 tracking-[0.4em] font-bold text-center uppercase opacity-90">
                         動画同期型リズムゲーム</p>
                     <p class="text-[10px] text-gray-500 tracking-widest font-bold opacity-60 text-center">
-                        <span id="version-display">ArcAngel v1.0</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
+                        <span id="version-display">ArcAngel v1.1</span> | 最終更新: <span id="last-updated-display">読み込み中...</span>
                     </p>
                 </div>
 
@@ -1298,7 +1298,7 @@
                 
                 // 特定バージョン版ファイル
                 const MY_VERSION = "v1.1"; 
-                const updateDate = data.history[MY_VERSION] || "2026/04/10 13:25 (JST)";
+                const updateDate = data.history[MY_VERSION] || "2026/04/12 15:24 (JST)";
                 
                 if (verDisp) verDisp.innerText = "ArcAngel " + MY_VERSION;
                 if (timeDisp) timeDisp.innerText = updateDate;
@@ -2337,12 +2337,25 @@
             for (let i = activeNotes.length - 1; i >= 0; i--) {
                 const n = activeNotes[i];
                 const tb = buttons[n.lane];
+                
+                // 始点判定
                 const sp = (ct - (n.time - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
-                if (sp < 0 || sp > 1.2) continue; 
-                const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
-                const dist = Math.hypot(x - hx, y - hy);
-                if (dist < buttonRadius * 1.5) {
-                    candidates.push(n);
+                if (sp >= 0 && sp <= 1.2) {
+                    const hx = cx + (tb.x - cx) * sp, hy = cy + (tb.y - cy) * sp;
+                    if (Math.hypot(x - hx, y - hy) < buttonRadius * 1.5) {
+                        candidates.push({ ...n, selectionType: 'start' });
+                    }
+                }
+                
+                // 終点判定
+                if (n.endTime) {
+                    const ep = (ct - (n.endTime - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME;
+                    if (ep >= 0 && ep <= 1.2) {
+                        const ex = cx + (tb.x - cx) * ep, ey = cy + (tb.y - cy) * ep;
+                        if (Math.hypot(x - ex, y - ey) < buttonRadius * 1.5) {
+                            candidates.push({ ...n, selectionType: 'end' });
+                        }
+                    }
                 }
             }
 
@@ -2355,16 +2368,20 @@
 
             let target = candidates[0];
             if (editorSelectedNote) {
-                const alreadySelected = candidates.find(c => Math.abs(c.time - editorSelectedNote.time) < 0.005 && c.lane === editorSelectedNote.lane);
+                const alreadySelected = candidates.find(c => 
+                    Math.abs(c.time - editorSelectedNote.time) < 0.005 && 
+                    c.lane === editorSelectedNote.lane && 
+                    c.selectionType === (editorSelectedNote.selectionType || 'start')
+                );
                 if (alreadySelected) {
                     deleteNote(alreadySelected.time, alreadySelected.lane);
                     return true;
                 }
             }
 
-            editorSelectedNote = { time: target.time, lane: target.lane };
+            editorSelectedNote = { time: target.time, lane: target.lane, selectionType: target.selectionType };
             draw(ct);
-            showToast("選択状態 (再度押すと削除 / 長押しで一覧表示)", 2000);
+            showToast(target.selectionType === 'end' ? "終端を選択 (再度押すとノーツ削除)" : "始点を選択 (再度押すとノーツ削除)", 2000);
             return true;
         }
 
@@ -2390,14 +2407,15 @@
                 const timeStr = n.time.toFixed(3);
                 const laneNames = ['LEFT 1', 'LEFT 2', 'LEFT 3', 'LEFT 4', 'CENTER', 'RIGHT 4', 'RIGHT 3', 'RIGHT 2', 'RIGHT 1'];
                 const laneName = laneNames[n.lane];
-                const typeName = n.endTime ? "HOLD" : "TAP";
+                const typeName = n.endTime ? (n.selectionType === 'end' ? "HOLD(終端)" : "HOLD(始点)") : "TAP";
+                const displayTime = n.selectionType === 'end' ? n.endTime : n.time;
                 btn.innerHTML = `
                     <div class="flex flex-col">
                         <div class="flex items-center gap-2">
                              <span class="w-1.5 h-1.5 rounded-full" style="background: rgb(${LANE_COLORS[n.lane]})"></span>
                              <span class="text-[10px] font-black italic text-white">${laneName}</span>
                         </div>
-                        <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${typeName} @ ${timeStr}s</span>
+                        <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">${typeName} @ ${displayTime.toFixed(3)}s</span>
                     </div>
                     <div class="flex gap-2">
                         <button class="px-3 py-1 bg-blue-600/40 hover:bg-blue-500/60 rounded-lg text-[8px] font-bold uppercase tracking-widest">選択</button>
@@ -2406,10 +2424,10 @@
                 `;
                 btn.querySelectorAll('button')[0].onclick = (e) => {
                     e.stopPropagation();
-                    editorSelectedNote = { time: n.time, lane: n.lane };
+                    editorSelectedNote = { time: n.time, lane: n.lane, selectionType: n.selectionType };
                     closeNoteSelector();
                     draw(localVideo.currentTime);
-                    showToast("ノートを選択しました");
+                    showToast(`${n.selectionType === 'end' ? '終端' : '始点'}を選択しました`);
                 };
                 btn.querySelectorAll('button')[1].onclick = (e) => {
                     e.stopPropagation();
@@ -2767,7 +2785,7 @@
                         document.getElementById('progress-bar').style.width = `${progress}%`;
                         document.getElementById('progress-text').innerText = `${Math.floor(progress)}%`;
 
-                        if (stamina <= 0) {
+                        if (stamina <= 0 && !isAutoPlay) {
                             showLiveFailed();
                             return;
                         }
@@ -2886,7 +2904,12 @@
                     if (n.endTime) {
                         const ep = (ct - (n.endTime - NOTE_TRAVEL_TIME)) / NOTE_TRAVEL_TIME; const tx = cx + (tb.x - cx) * Math.max(0, ep), ty = cy + (tb.y - cy) * Math.max(0, ep);
                         ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(tx, ty); ctx.strokeStyle = (n.status === 'holding') ? '#facc15' : 'rgba(255,0,255,0.5)'; ctx.lineWidth = noteSize * 0.8; ctx.lineCap = 'round'; ctx.stroke();
-                        if (ep >= 0) { ctx.beginPath(); ctx.arc(tx, ty, noteSize * 0.7, 0, Math.PI * 2); ctx.fillStyle = '#facc15'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); }
+                        if (ep >= 0) { 
+                            if (isEditMode && editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane && editorSelectedNote.selectionType === 'end') {
+                                ctx.save(); ctx.beginPath(); ctx.arc(tx, ty, (noteSize * 0.7) + 10, 0, Math.PI * 2); ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 4; ctx.stroke(); ctx.fillStyle = 'rgba(192, 132, 252, 0.4)'; ctx.fill(); ctx.restore();
+                            }
+                            ctx.beginPath(); ctx.arc(tx, ty, noteSize * 0.7, 0, Math.PI * 2); ctx.fillStyle = '#facc15'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke(); 
+                        }
                     }
                     if (n.status !== 'holding') {
                         const noteColor = n.endTime ? '250, 204, 21' : (LANE_COLORS[n.lane] || '59, 130, 246');
@@ -2900,7 +2923,7 @@
                             ctx.beginPath(); ctx.arc(hx, hy, noteSize + 5, 0, Math.PI * 2); 
                             ctx.strokeStyle = 'white'; ctx.lineWidth = 4; ctx.stroke(); 
                         }
-                        if (isEditMode && editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane) {
+                        if (isEditMode && editorSelectedNote && Math.abs(n.time - editorSelectedNote.time) < 0.005 && n.lane === editorSelectedNote.lane && (editorSelectedNote.selectionType === 'start' || !editorSelectedNote.selectionType)) {
                             ctx.beginPath(); ctx.arc(hx, hy, noteSize + 10, 0, Math.PI * 2); 
                             ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 4; ctx.stroke();
                             ctx.fillStyle = 'rgba(192, 132, 252, 0.4)'; ctx.fill();
@@ -2976,6 +2999,13 @@
                     }
                 });
             }
+            if (isEditMode && isEditorPaused && editorSelectedNote && editorSelectedNote.selectionType === 'end') {
+                const n = recordedChart.find(rn => Math.abs(rn.time - editorSelectedNote.time) < 0.01 && rn.lane === editorSelectedNote.lane);
+                if (n) {
+                    n.endTime = parseFloat(nt.toFixed(3));
+                    if (n.endTime < n.time) n.endTime = n.time + 0.05;
+                }
+            }
             
             syncEditorNotes();
         }
@@ -3001,6 +3031,13 @@
                         n.endTime = parseFloat(nt.toFixed(3));
                     }
                 });
+            }
+            if (isEditMode && isEditorPaused && editorSelectedNote && editorSelectedNote.selectionType === 'end') {
+                const n = recordedChart.find(rn => Math.abs(rn.time - editorSelectedNote.time) < 0.01 && rn.lane === editorSelectedNote.lane);
+                if (n) {
+                    n.endTime = parseFloat(nt.toFixed(3));
+                    if (n.endTime < n.time) n.endTime = n.time + 0.05;
+                }
             }
 
             syncEditorNotes();
@@ -3587,8 +3624,21 @@
                 playTapSound(l); 
             } 
         }
-        function judgeEnd(l) { const n = laneCurrentHoldNote[l]; if (!n) return; const ct = gameCurrentTime; const diff = ct - n.endTime; const d = Math.abs(diff); laneCurrentHoldNote[l] = null; const idx = activeNotes.indexOf(n); if (idx !== -1) activeNotes.splice(idx, 1); if (d < 0.4) processResult(diff, buttons[l], l); else { playTapSound(l, 'MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } }
+        function judgeEnd(l) { 
+            const n = laneCurrentHoldNote[l]; 
+            if (!n) return; 
+            const ct = gameCurrentTime; 
+            let diff = ct - n.endTime; 
+            if (isAutoPlay) diff = 0;
+            const d = Math.abs(diff); 
+            laneCurrentHoldNote[l] = null; 
+            const idx = activeNotes.indexOf(n); 
+            if (idx !== -1) activeNotes.splice(idx, 1); 
+            if (isAutoPlay || d < 0.4) processResult(diff, buttons[l], l); 
+            else { playTapSound(l, 'MISS'); counts.miss++; combo = 0; showJ("MISS", "text-red-500", "±---ms"); updateUI(); } 
+        }
         function processResult(diff, tb, lane) {
+            if (isAutoPlay) diff = 0;
             const d = Math.abs(diff);
             let judgment = "MISS";
             let desc = "";
